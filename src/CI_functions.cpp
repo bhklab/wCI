@@ -10,9 +10,9 @@ using namespace Rcpp;
 #include <time.h>
 #include <omp.h>
 
+
+
 // [[Rcpp::plugins(openmp)]]
-
-
 
 /* function to compute the concordance index with constraints on which pairs to compare
  * input:
