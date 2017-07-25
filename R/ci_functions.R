@@ -14,7 +14,7 @@
 
 
 
-CIinC <-function(x,y, deltaX=0, deltaY=0, alpha =0, outx = 1, npermut=1000000)
+CIinC <-function(x,y, deltaX=0, deltaY=0, alpha =0, outx = 1, npermut=1000000, ncpu=1)
 {
   cindex <- concordanceIndex_modified(x = x, y = y,
                                       deltaX = deltaX, deltaY = deltaY,
@@ -23,7 +23,7 @@ CIinC <-function(x,y, deltaX=0, deltaY=0, alpha =0, outx = 1, npermut=1000000)
   permutCI <- permute_concordanceIndex_modified(x = x, y = y,
                                                 deltaX = deltaX, deltaY = deltaY,
                                                 alpha = alpha, outx = outx,
-                                                permutations = npermut)
+                                                permutations = npermut, nThread=ncpu)
   pv <- .computePval(cindex, permutCI)
   return(list(ci=cindex, p.value=pv))
 }
@@ -95,7 +95,7 @@ testCI <- function()
   CI(x=out[,1], y=out[,2], deltaX=0, deltaY=0, alpha =0, outx = 1, npermut=10000,
      ncpu = 2)
 
-  CIinC(out[,1], out[,2], deltaX=0, deltaY=0, alpha =0, outx = 1, npermut=10000)
+  CIinC(out[,1], out[,2], deltaX=0, deltaY=0, alpha =0, outx = 1, npermut=10000,ncpu = 2)
 }
 
 

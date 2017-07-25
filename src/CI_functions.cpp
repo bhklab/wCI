@@ -8,14 +8,26 @@ using namespace Rcpp;
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
-//#include <omp.h>
+#include <omp.h>
+
+// [[Rcpp::plugins(openmp)]]
 
 
+
+/* function to compute the concordance index with constraints on which pairs to compare
+ * input:
+ * x,y: vectors that will be compared. Has to have the same length and no missing values.
+ * deltaX, deltaY: the delta range which pairs within are not compared
+ * outx = True: do not include pairs that are equal
+ * 
+ * output:
+ * c-index [-1,1]
+ */
 
 // Enable C++11 via this plugin (Rcpp 0.10.3 or later)
 // [[Rcpp::plugins(cpp11)]]
 // [[Rcpp::export]]
-double concordanceIndex_modified(NumericVector x, NumericVector y, double deltaX, double deltaY, double alpha, int outx) {
+double concordanceIndex_modified(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY, double alpha, int outx) {
   double N = (double)x.size();
   double ch = 0;
   double dh = 0;
@@ -27,7 +39,7 @@ double concordanceIndex_modified(NumericVector x, NumericVector y, double deltaX
       int firstVectorPair = fabs(x[i] - x[j]) > deltaX;
       int secondVectorPair = fabs(y[i] - y[j]) > deltaY;
       if(firstVectorPair | secondVectorPair){
-        NumericVector pp(2);
+        std::vector<double> pp(2);
         if(x[i] < x[j]){
           pp[0] = 1;
           pp[1] = 2;
@@ -40,7 +52,7 @@ double concordanceIndex_modified(NumericVector x, NumericVector y, double deltaX
           pp[0] = 1;
           pp[1] = 1;
         }
-        NumericVector oo(2);
+        std::vector<double> oo(2);
         if(y[i] < y[j]){
           oo[0] = 1;
           oo[1] = 2;
@@ -77,56 +89,21 @@ double concordanceIndex_modified(NumericVector x, NumericVector y, double deltaX
   return(dci);
 }
 
+
+
+/* function to shuffle an array.
+ * input:
+ * array:  a vector of at least length 2
+ * 
+ * output:
+ * shuffled array
+ */
 // [[Rcpp::plugins(cpp11)]]
 // [[Rcpp::export]]
-NumericVector shuffle(NumericVector array) {
+std::vector<double> shuffle(std::vector<double> array) {
 
   int n =  array.size();
-  NumericVector array1(n);
-
-  for(int i=0; i< n;i++){
-    array1[i] = array[i];
-  }
-
-  srand((unsigned)time(NULL));
-  for (int i = 0; i < n - 1; i++) {
-    size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
-    double t = array1[j];
-    array1[j] = array1[i];
-    array1[i] = t;
-  }
-
-  return(array1);
-}
-
-// [[Rcpp::plugins(cpp11)]]
-// [[Rcpp::export]]
-NumericVector fisher_yates(NumericVector array) {
-
-  int n =  array.size();
-  NumericVector array1(n);
-
-  for(int i=0; i< n;i++){
-    array1[i] = array[i];
-  }
-  srand (time(NULL));
-
-  for(int i=n-1; i>0; i--) {
-    int idx = (rand() % (i+1));
-    std::swap(array1[idx], array1[i]);
-  }
-
-  return(array1);
-}
-
-
-
-// [[Rcpp::plugins(cpp11)]]
-// [[Rcpp::export]]
-NumericVector shuffle2(NumericVector array) {
-
-  int n =  array.size();
-  NumericVector array1(n);
+  std::vector<double> array1(n);
   for(int i=0; i< n;i++){
     array1[i] = array[i];
   }
@@ -137,22 +114,40 @@ NumericVector shuffle2(NumericVector array) {
   return(array1);
 }
 
+
+
+/* function to compute the pvalue based on the modified concordance index
+ * input:
+ * x,y: vectors that will be compared. Has to have the same length and no missing values.
+ * deltaX, deltaY: the delta range which pairs within are not compared
+ * outx = True: do not include pairs that are equal
+ * permutations: number of permutations to do on the shuffled array
+ * nThreads: number of threads to use.
+ * 
+ * output:
+ * an array of length(permutation) with cindecies of the shuffled vectors
+ */
+
 // [[Rcpp::plugins(cpp11)]]
 // [[Rcpp::export]]
-NumericVector permute_concordanceIndex_modified(NumericVector x, NumericVector y, double deltaX, double deltaY, double alpha, int outx, int permutations) {
-
-  NumericVector randomPermut(permutations);
-
-  NumericVector xShuffled(x.size());
-
-  //	#pragma omp parallel for private(xShuffled)
+std::vector<double> permute_concordanceIndex_modified(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY, double alpha, int outx, int permutations,int nThreads) {
+  
+  std::vector<double> randomPermut(permutations);
+  
+  omp_set_dynamic(0);     // Explicitly disable dynamic teams
+  omp_set_num_threads(nThreads); // Use n threads for all consecutive parallel regions
+  
+  #pragma omp parallel for
   for(int i=0; i < permutations;i++){
-    xShuffled = shuffle2(x);
-    //	std::shuffle
-    //xShuffled = shuffle(x);
-    //NumericVector yShuffled = shuffle(y,sizeY);
+    
+    std::vector<double> xShuffled(x.size());
+    xShuffled = shuffle(x);
     randomPermut[i] = concordanceIndex_modified(xShuffled,y,deltaX,deltaY,alpha,outx);
+    
   }
+  
+  
   return(randomPermut);
+  
+  
 }
-
