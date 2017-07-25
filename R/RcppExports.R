@@ -9,16 +9,8 @@ shuffle <- function(array) {
     .Call('_CI_shuffle', PACKAGE = 'CI', array)
 }
 
-fisher_yates <- function(array) {
-    .Call('_CI_fisher_yates', PACKAGE = 'CI', array)
-}
-
-shuffle2 <- function(array) {
-    .Call('_CI_shuffle2', PACKAGE = 'CI', array)
-}
-
-permute_concordanceIndex_modified <- function(x, y, deltaX, deltaY, alpha, outx, permutations) {
-    .Call('_CI_permute_concordanceIndex_modified', PACKAGE = 'CI', x, y, deltaX, deltaY, alpha, outx, permutations)
+permute_concordanceIndex_modified <- function(x, y, deltaX, deltaY, alpha, outx, permutations, nThreads) {
+    .Call('_CI_permute_concordanceIndex_modified', PACKAGE = 'CI', x, y, deltaX, deltaY, alpha, outx, permutations, nThreads)
 }
 
 rcpp_hello <- function() {

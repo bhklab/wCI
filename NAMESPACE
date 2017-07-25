@@ -1,3 +1,6 @@
 exportPattern("^[[:alpha:]]+")
 importFrom(Rcpp, evalCpp)
+importFrom(foreach,"%dopar%")
+importFrom(foreach,"%do%")
+importFrom(foreach,foreach)
 useDynLib(CI)

@@ -6,13 +6,13 @@
 using namespace Rcpp;
 
 // concordanceIndex_modified
-double concordanceIndex_modified(NumericVector x, NumericVector y, double deltaX, double deltaY, double alpha, int outx);
+double concordanceIndex_modified(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY, double alpha, int outx);
 RcppExport SEXP _CI_concordanceIndex_modified(SEXP xSEXP, SEXP ySEXP, SEXP deltaXSEXP, SEXP deltaYSEXP, SEXP alphaSEXP, SEXP outxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type y(ySEXP);
+    Rcpp::traits::input_parameter< std::vector<double> >::type x(xSEXP);
+    Rcpp::traits::input_parameter< std::vector<double> >::type y(ySEXP);
     Rcpp::traits::input_parameter< double >::type deltaX(deltaXSEXP);
     Rcpp::traits::input_parameter< double >::type deltaY(deltaYSEXP);
     Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
@@ -22,52 +22,31 @@ BEGIN_RCPP
 END_RCPP
 }
 // shuffle
-NumericVector shuffle(NumericVector array);
+std::vector<double> shuffle(std::vector<double> array);
 RcppExport SEXP _CI_shuffle(SEXP arraySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type array(arraySEXP);
+    Rcpp::traits::input_parameter< std::vector<double> >::type array(arraySEXP);
     rcpp_result_gen = Rcpp::wrap(shuffle(array));
     return rcpp_result_gen;
 END_RCPP
 }
-// fisher_yates
-NumericVector fisher_yates(NumericVector array);
-RcppExport SEXP _CI_fisher_yates(SEXP arraySEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type array(arraySEXP);
-    rcpp_result_gen = Rcpp::wrap(fisher_yates(array));
-    return rcpp_result_gen;
-END_RCPP
-}
-// shuffle2
-NumericVector shuffle2(NumericVector array);
-RcppExport SEXP _CI_shuffle2(SEXP arraySEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type array(arraySEXP);
-    rcpp_result_gen = Rcpp::wrap(shuffle2(array));
-    return rcpp_result_gen;
-END_RCPP
-}
 // permute_concordanceIndex_modified
-NumericVector permute_concordanceIndex_modified(NumericVector x, NumericVector y, double deltaX, double deltaY, double alpha, int outx, int permutations);
-RcppExport SEXP _CI_permute_concordanceIndex_modified(SEXP xSEXP, SEXP ySEXP, SEXP deltaXSEXP, SEXP deltaYSEXP, SEXP alphaSEXP, SEXP outxSEXP, SEXP permutationsSEXP) {
+std::vector<double> permute_concordanceIndex_modified(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY, double alpha, int outx, int permutations, int nThreads);
+RcppExport SEXP _CI_permute_concordanceIndex_modified(SEXP xSEXP, SEXP ySEXP, SEXP deltaXSEXP, SEXP deltaYSEXP, SEXP alphaSEXP, SEXP outxSEXP, SEXP permutationsSEXP, SEXP nThreadsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type y(ySEXP);
+    Rcpp::traits::input_parameter< std::vector<double> >::type x(xSEXP);
+    Rcpp::traits::input_parameter< std::vector<double> >::type y(ySEXP);
     Rcpp::traits::input_parameter< double >::type deltaX(deltaXSEXP);
     Rcpp::traits::input_parameter< double >::type deltaY(deltaYSEXP);
     Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
     Rcpp::traits::input_parameter< int >::type outx(outxSEXP);
     Rcpp::traits::input_parameter< int >::type permutations(permutationsSEXP);
-    rcpp_result_gen = Rcpp::wrap(permute_concordanceIndex_modified(x, y, deltaX, deltaY, alpha, outx, permutations));
+    Rcpp::traits::input_parameter< int >::type nThreads(nThreadsSEXP);
+    rcpp_result_gen = Rcpp::wrap(permute_concordanceIndex_modified(x, y, deltaX, deltaY, alpha, outx, permutations, nThreads));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -85,9 +64,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_CI_concordanceIndex_modified", (DL_FUNC) &_CI_concordanceIndex_modified, 6},
     {"_CI_shuffle", (DL_FUNC) &_CI_shuffle, 1},
-    {"_CI_fisher_yates", (DL_FUNC) &_CI_fisher_yates, 1},
-    {"_CI_shuffle2", (DL_FUNC) &_CI_shuffle2, 1},
-    {"_CI_permute_concordanceIndex_modified", (DL_FUNC) &_CI_permute_concordanceIndex_modified, 7},
+    {"_CI_permute_concordanceIndex_modified", (DL_FUNC) &_CI_permute_concordanceIndex_modified, 8},
     {"_CI_rcpp_hello", (DL_FUNC) &_CI_rcpp_hello, 0},
     {NULL, NULL, 0}
 };
