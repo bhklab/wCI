@@ -1,0 +1,4 @@
+CFLAGS=-ffast-math -ftree-vectorize $(SHLIB_OPENMP_CFLAGS)
+CXXFLAGS=-ffast-math -ftree-vectorize $(SHLIB_OPENMP_CXXFLAGS)
+CPPFLAGS=-ffast-math -ftree-vectorize $(SHLIB_OPENMP_CXXFLAGS)
+PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` $(SHLIB_OPENMP_CXXFLAGS) 
