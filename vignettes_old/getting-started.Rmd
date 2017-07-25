@@ -1,0 +1,56 @@
+---
+title: "CI_vig"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+Load library
+```{r ci1}
+library(CI)
+library(MASS)
+```
+
+Generate data for analysis
+```{r ci2}
+cr = 0.95
+df <- mvrnorm(50, mu = c(0,0), Sigma = matrix(c(1,cr,cr,1), ncol = 2), empirical = TRUE)
+```
+
+Calculate concordance index
+```{r ci3}
+CI(x=df[,1], y=df[,2], deltaX=0, deltaY=0, alpha =0, outx = 1, npermut=10000)
+```
+
+
+
+
+Calculate correlations
+```{r ci4}
+cor.test(df[,1], df[,2])
+cor.test(df[,1], df[,2], method = "pearson")
+cor.test(df[,1], df[,2], method = "spearman")
+```
+
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
