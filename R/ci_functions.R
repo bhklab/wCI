@@ -46,6 +46,7 @@ CIinC <-function(x,y, deltaX=0, deltaY=0, alpha =0, outx = 1, npermut=1000000, n
 #' library(CI)
 #' x <- 1:30; y <- x*x
 #' CI(x=x, y=y, deltaX=0, deltaY=0, alpha =0, outx = 1, npermut=10000)
+#' @importFrom foreach foreach %dopar%
 #' @export
 CI <-function(x,y, deltaX=0, deltaY=0, alpha=0, outx = 1, npermut=1000000,
               ncpu=1)
@@ -63,7 +64,7 @@ CI <-function(x,y, deltaX=0, deltaY=0, alpha=0, outx = 1, npermut=1000000,
                                 deltaX = deltaX, deltaY = deltaY,
                                 alpha = alpha, outx = outx)
     }
-    stopCluster(cl)
+    parallel::stopCluster(cl)
   } else
   {
     permutCI <- sapply(1:npermut, function(i){

@@ -59,7 +59,7 @@ plotData <- function(x,y,title="", xlab="x", ylab="y")
 
 dt <- lapply(seq(-1,1,0.1), function(cr){
       df <- mvrnorm(50, mu = c(0,0), Sigma = matrix(c(1,cr,cr,1), ncol = 2), empirical = TRUE)
-      ci <- CI(x=df[,1], y=df[,2], deltaX=0, deltaY=0, alpha =0, outx = 1, npermut=10000, ncpu = 1)
+      ci <- CI(x=df[,1], y=df[,2], deltaX=0, deltaY=0, alpha =0, outx = 1, npermut=10000, ncpu = 2)
       pr <- cor.test(df[,1], df[,2], method = "pearson")
       sm <- cor.test(df[,1], df[,2], method = "spearman")
       data.frame(ci=ci$ci, ci.p=ci$p.value,
