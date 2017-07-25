@@ -137,16 +137,19 @@ std::vector<double> permute_concordanceIndex_modified(std::vector<double> x, std
   omp_set_dynamic(0);     // Explicitly disable dynamic teams
   omp_set_num_threads(nThreads); // Use n threads for all consecutive parallel regions
   
-  #pragma omp parallel for
+  #pragma omp parallel
+  {
+    std::vector<double> xShuffled(x.size());
+    #pragma omp for
   for(int i=0; i < permutations;i++){
     
-    std::vector<double> xShuffled(x.size());
+    
     xShuffled = shuffle(x);
     randomPermut[i] = concordanceIndex_modified(xShuffled,y,deltaX,deltaY,alpha,outx);
     
   }
   
-  
+  }
   return(randomPermut);
   
   
