@@ -36,8 +36,12 @@ paired.concordance.index <- function(predictions, observations, cutoff = c(0.2, 
       pair <- c(i, j)
       if ((any(predictions[pair] >= cutoff[1]) && abs(predictions[i] - predictions[j]) >= delta[1]) ||
           (any(observations[pair] >= cutoff[2]) && abs(observations[i] - observations[j]) >= delta[2])) {
-        if ((predictions[i] == predictions[j] || observations[i] == observations[j]) && !outx) { #add flag to replace 'or' behaviour with 'xor' behaviour
-          d[pair] <- d[pair] + 1
+        if ((predictions[i] == predictions[j] || observations[i] == observations[j])) { #add flag to replace 'or' behaviour with 'xor' behaviour
+          if(outx){
+            u[pair] <- u[pair] + 1
+          }else{
+            d[pair] <- d[pair] + 1
+          }
         } else {
           pp <- (predictions[i] < predictions[j])
           oo <- (observations[i] < observations[j])
