@@ -2,15 +2,16 @@
 using namespace Rcpp;
 
 #include <algorithm>
-#include <random>
-
-#include <stdio.h>
-#include <math.h>
-#include <stdlib.h>
-#include <time.h>
+#include <cmath>
 #include <omp.h>
-
-
+#include <random>
+#include <Rcpp.h>
+#include <stdexcept>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+#include <time.h>
+#include <vector>
 
 // [[Rcpp::plugins(openmp)]]
 
@@ -26,70 +27,112 @@ using namespace Rcpp;
 
 // Enable C++11 via this plugin (Rcpp 0.10.3 or later)
 // [[Rcpp::plugins(cpp11)]]
+
+/* function tests whether a pair is usable for concordance index calculation purposes. */
+bool usable (std::vector<double> x, double cutoff, double delta) {
+  if ((x[0] >= cutoff || x[1] >= cutoff) && std::abs(x[0] - x[1]) >= delta) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+/* function returns sign of argument */
+int sgn(double x) {
+  if (x > 0) {
+    return(1);
+  } else if (x == 0) {
+    return(0);
+  } else if (x < 0) {
+    return(-1);
+  } else {
+    throw std::invalid_argument ("erfinv received an argument that was not a real number.");
+  }
+}
+
+/* function computes inverse of error function for normal quantile calculation */
+double erfinv(double x){
+  int sgnx = sgn(x);
+  x = 1 - x * x;
+  double lnx = log(x);
+  double a = 4.3307467508 + lnx / 2; // magic number for Winitzki approximation
+  double b = 6.80272108844 * lnx; // other magic number for approximation
+  return(sgnx * sqrt(sqrt(a * a - b) - a));
+}
+
+/* function calculates modified concordance index.
+   Input: predictions x, observations y, cutoffs for x and y, deltas for x and y, confidence level alpha, flag outx, string alternative*/
 // [[Rcpp::export]]
-double concordanceIndex_modified(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY, double alpha, int outx) {
-  double N = (double)x.size();
-  double ch = 0;
-  double dh = 0;
-  double uh = 0;
-  int pos = 0;
-  for(int i=0; i < (x.size()-1); i++){
-    for(int j=i+1; j < x.size(); j++){
-      pos++;
-      int firstVectorPair = fabs(x[i] - x[j]) > deltaX;
-      int secondVectorPair = fabs(y[i] - y[j]) > deltaY;
-      if(firstVectorPair | secondVectorPair){
-        std::vector<double> pp(2);
-        if(x[i] < x[j]){
-          pp[0] = 1;
-          pp[1] = 2;
-
-        } else if(x[i] > x[j]){
-          pp[0] = 2;
-          pp[1] = 1;
-
-        } else{
-          pp[0] = 1;
-          pp[1] = 1;
-        }
-        std::vector<double> oo(2);
-        if(y[i] < y[j]){
-          oo[0] = 1;
-          oo[1] = 2;
-        } else if(y[i] > y[j]){
-          oo[0] = 2;
-          oo[1] = 1;
-        } else{
-          oo[0] = 1;
-          oo[1] = 1;
-        }
-        if((pp[0]==pp[1])||(oo[0]==oo[1])){
-          if(outx){
-            uh = uh + 1;
-          }else{
-            dh = dh + 1;
-          }
-        }else{
-          if((pp[0]==oo[0]) && (pp[1]==oo[1])){
-            ch = ch + 1;
-          }else{
-            dh = dh + 1;
+double concordanceIndex_modified(std::vector<double> x, std::vector<double> y, std::vector<double> cutoff, std::vector<double> delta, double alpha, bool outx, std::string alternative) {
+  
+  int N = static_cast<int>(x.size());
+  std::vector<int> c(N);
+  std::vector<int> d(N);
+  
+  for (int i = 0; i < N; ++i) {
+    c[i] = 0;
+    d[i] = 0;
+  }
+  
+  for (int i = 0; i < N - 1; ++i) {
+    for (int j = i + 1; j < N; ++j) {
+      if (usable(x, cutoff[0], delta[0]) && usable(y, cutoff[1], delta[1])) {
+        if (outx == false && (x[i] == x[j] || y[i] == y[j])) { // should this be an xor?
+          ++d[i];
+          ++d[j];
+        } else {
+          if ((x[0] > x[1] && y[0] > y[1]) || (x[0] < x[1] && y[0] < y[1])) {
+            ++c[i];
+            ++c[j];
+          } else {
+            ++d[i];
+            ++d[j];
           }
         }
-        //		free(pp);
-        //		free(oo);
       }
     }
   }
-  double pc = (1/N * (N-1)) * ch;
-  double pd = (1/N * (N-1)) * dh;
-  double cindex = pc / (pc + pd);
-  double dci = (cindex - 0.5)*2.0;
-  ////return(cindex);
-  return(dci);
+  
+  int C = 0;
+  int D = 0;
+  int CC = 0;
+  int CD = 0;
+  int DD = 0;
+  
+  for (int i = 0; i < N; ++i) {
+    C += c[i];
+    D += d[i];
+    CC += c[i] * (c[i] - 1);
+    DD += d[i] * (d[i] - 1);
+    CD += c[i] * d[i];
+  }
+  
+  if (C == 0 && D == 0) {
+    throw std::invalid_argument ("All pairs were thrown out. Consider changing cutoff and/or delta.");
+  }
+  
+  double cindex = static_cast<double>(C) / (C + D); //static_cast prevents integer division from occurring
+  double varp = 4 * N * (N - 1) / (N - 2) * (pow(D, 2.0) * CC - 2 * C * D * CD + pow(C, 2.0) * DD) / pow(C + D, 4.0);
+  if (varp / N >= 0) {
+    double sterr = sqrt(varp / N);
+    double ci = sterr * 1.41421356237 * erfinv(2 * alpha); // magic number is sqrt(2)
+    double p = (1 + erf((cindex - 0.5) / sterr / 1.41421356237)) / 2;
+    if (std::string::compare(alternative, "less") == 0) {
+    } else if (std::string::compare(alternative, "greater") == 0) {
+      p <- 1 - p;
+    } else if (std::string::compare(alternative, "two.sided") == 0) {
+      p <- 2 * std::min(p, 1 - p);
+    } else {
+      throw std::invalid_argument ("'alternative' must be set to one of 'less', 'greater', or 'two.sided'.");
+    }
+    std::cout << "Calculated Concordance Index: " << cindex << "\n";
+    std::cout << (1 - alpha) * 100 << "% confidence interval: [" << std::max(cindex - ci, 0.0) << ", " << std::min(cindex + ci, 1.0) << "]\n";
+    std::cout << "p-value: " << p << "\n";
+    return cindex;
+  } else {
+    throw std::invalid_argument ("CI calculation failed.");
+  }
 }
-
-
 
 /* function to shuffle an array.
  * input:
@@ -98,7 +141,7 @@ double concordanceIndex_modified(std::vector<double> x, std::vector<double> y, d
  * output:
  * shuffled array
  */
-// [[Rcpp::plugins(cpp11)]]
+
 // [[Rcpp::export]]
 std::vector<double> shuffle(std::vector<double> array) {
 
@@ -128,7 +171,6 @@ std::vector<double> shuffle(std::vector<double> array) {
  * an array of length(permutation) with cindecies of the shuffled vectors
  */
 
-// [[Rcpp::plugins(cpp11)]]
 // [[Rcpp::export]]
 std::vector<double> permute_concordanceIndex_modified(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY, double alpha, int outx, int permutations,int nThreads) {
   
