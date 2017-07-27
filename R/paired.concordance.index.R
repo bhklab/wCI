@@ -29,7 +29,6 @@ paired.concordance.index <- function(predictions, observations, cutoff = c(0.2, 
   predictions <- predictions[which(cc.ix)]
   observations <- observations[which(cc.ix)]
   N <- length(which(cc.ix))
-  all.pairs <- combn(1:N, 2)
   c <- d <- u <- matrix(0, nrow = 1, ncol = N)
   for (i in seq(from = 1, to = N - 1)) {
     for (j in seq(from = i + 1, to = N)) {
