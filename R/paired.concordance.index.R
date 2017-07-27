@@ -21,7 +21,7 @@
 #' along with the lower and upper confidence intervals
 #' @export
 
-paired.concordance.index <- function(predictions, observations, cutoff = c(0.2, 0.2), delta = c(0.2, 0.2), alpha = 0.05, outx = TRUE, alternative = c("two.sided", "less", "greater")) {
+paired.concordance.index <- function(predictions, observations, cutoff=0.2, delta=0.2, alpha = 0.05, outx = TRUE, alternative = c("two.sided", "less", "greater")) {
   alternative <- match.arg(alternative)
   predictions[which(is.nan(predictions))] <- NA
   observations[which(is.nan(observations))] <- NA
@@ -33,10 +33,14 @@ paired.concordance.index <- function(predictions, observations, cutoff = c(0.2, 
   for (i in seq(from = 1, to = N - 1)) {
     for (j in seq(from = i + 1, to = N)) {
       pair <- c(i, j)
-      if ((any(predictions[pair] >= cutoff[1]) && abs(predictions[i] - predictions[j]) >= delta[1]) ||
-          (any(observations[pair] >= cutoff[2]) && abs(observations[i] - observations[j]) >= delta[2])) {
-        if ((predictions[i] == predictions[j] || observations[i] == observations[j]) && !outx) { #add flag to replace 'or' behaviour with 'xor' behaviour
-          d[pair] <- d[pair] + 1
+      if ((any(predictions[pair] >= cutoff) && abs(predictions[i] - predictions[j]) >= delta) ||
+          (any(observations[pair] >= cutoff) && abs(observations[i] - observations[j]) >= delta)) {
+        if ((predictions[i] == predictions[j] || observations[i] == observations[j])) { #add flag to replace 'or' behaviour with 'xor' behaviour
+          if(outx){
+            u[pair] <- u[pair] + 1
+          }else{
+            d[pair] <- d[pair] + 1
+          }
         } else {
           pp <- (predictions[i] < predictions[j])
           oo <- (observations[i] < observations[j])
@@ -68,7 +72,7 @@ paired.concordance.index <- function(predictions, observations, cutoff = c(0.2, 
     ci <- qnorm(p = alpha / 2, lower.tail = FALSE) * sterr
     p <- pnorm((cindex - 0.5) / sterr)
   } else {
-    stop("CI calculation failed.")
+    return(list("cindex"=cindex, "p.value"=1, "lower"=0, "upper"=0, "relevant.pairs.no"=(C + D) / 2))
   }
-  return(list("cindex" = cindex, "p.value" = switch(alternative, less = p, greater = 1 - p, two.sided = 2 * min(p, 1 - p)), "lower" = max(cindex - ci, 0), "upper" = min(cindex + ci, 1)))
+  return(list("cindex" = cindex, "p.value" = switch(alternative, less = p, greater = 1 - p, two.sided = 2 * min(p, 1 - p)), "lower" = max(cindex - ci, 0), "upper" = min(cindex + ci, 1), "relevant.pairs.no" = (C + D) / 2))
 }
