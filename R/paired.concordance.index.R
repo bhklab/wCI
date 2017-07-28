@@ -51,7 +51,7 @@ paired.concordance.index <- function(predictions, observations, cutoff=0.2, delt
             d[pair] <- d[pair] + 1
           }
         }
-      }
+      #}
     }
   }
 
