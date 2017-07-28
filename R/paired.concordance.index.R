@@ -38,18 +38,19 @@ paired.concordance.index <- function(predictions, observations, cutoff=0.2, delt
       #if ((any(predictions[pair] >= cutoff) && abs(predictions[i] - predictions[j]) >= delta) ||
          #(any(observations[pair] >= cutoff) && abs(observations[i] - observations[j]) >= delta)) {
         #if ((predictions[i] == predictions[j] || observations[i] == observations[j])||
-         if(abs(observations[i] - observations[j]) <= delta || abs(predictions[i] - predictions[j]) <= delta) { #add flag to replace 'or' behaviour with 'xor' behaviour
-          if(outx){
-            u[pair] <- u[pair] + 1
-          }else{
-            d[pair] <- d[pair] + 1
-          }
-        } else {
+        if(abs(observations[i] - observations[j]) >= delta || abs(predictions[i] - predictions[j]) >= delta) { #add flag to replace 'or' behaviour with 'xor' behaviour
           pp <- (predictions[i] < predictions[j])
           oo <- (observations[i] < observations[j])
           if (pp == oo) {
             c[pair] <- c[pair] + 1
           } else {
+            d[pair] <- d[pair] + 1
+          }
+          
+        } else {
+          if(outx){
+            u[pair] <- u[pair] + 1
+          }else{
             d[pair] <- d[pair] + 1
           }
         }
@@ -61,7 +62,7 @@ paired.concordance.index <- function(predictions, observations, cutoff=0.2, delt
   D <- sum(d)
   
   if (C == 0 && D == 0) {
-    stop("All pairs were thrown out. Consider changing cutoff and/or delta.")
+    return(list("cindex"=NA, "p.value"=NA, "lower"=NA, "upper"=NA, "relevant.pairs.no"=0))
   }
   
   cindex <- C / (C + D)
