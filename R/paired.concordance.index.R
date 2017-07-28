@@ -33,9 +33,10 @@ paired.concordance.index <- function(predictions, observations, cutoff=0.2, delt
   for (i in seq(from = 1, to = N - 1)) {
     for (j in seq(from = i + 1, to = N)) {
       pair <- c(i, j)
-      if ((any(predictions[pair] >= cutoff) && abs(predictions[i] - predictions[j]) >= delta) ||
-          (any(observations[pair] >= cutoff) && abs(observations[i] - observations[j]) >= delta)) {
-        if ((predictions[i] == predictions[j] || observations[i] == observations[j])) { #add flag to replace 'or' behaviour with 'xor' behaviour
+      #if ((any(predictions[pair] >= cutoff) && abs(predictions[i] - predictions[j]) >= delta) ||
+         #(any(observations[pair] >= cutoff) && abs(observations[i] - observations[j]) >= delta)) {
+        #if ((predictions[i] == predictions[j] || observations[i] == observations[j])||
+         if(abs(observations[i] - observations[j]) <= delta || abs(predictions[i] - predictions[j]) <= delta) { #add flag to replace 'or' behaviour with 'xor' behaviour
           if(outx){
             u[pair] <- u[pair] + 1
           }else{
