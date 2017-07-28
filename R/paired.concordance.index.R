@@ -13,6 +13,8 @@
 #' @param observations {numeric} A vector of observed continuous drug responces 
 #' @param cutoff {numeric} A drug responce threshold which is used to classify cells to sensitive vs resistant to drug. 
 #' @param delta {numeric} The minimunm reliable difference between two drug sensitivity values to be considered as significantly various responses.
+#' default value for delta is picked by looking into delta auc values between biological replicates across three 
+#' large pharmacogenomic studies, CTRPv2(370 drugs over ~15-20 cells) , GDSC(1 drug over ~600 cells), GRAY (85 drugs over ~10-50)
 #' @param alpha {numeric} alpha level to compute confidence interval
 #' @param outx {boolean} set to TRUE to not count pairs of observations tied on x as a relevant pair. 
 #' This results in a Goodman-Kruskal gamma type rank correlation.
