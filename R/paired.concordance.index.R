@@ -61,7 +61,7 @@ paired.concordance.index <- function(predictions, observations, cutoff=0.2, delt
   C <- sum(c)
   D <- sum(d)
   
-  if (C == 0 && D == 0) {
+  if (N < 3 || (C == 0 && D == 0)) {
     return(list("cindex"=NA, "p.value"=NA, "lower"=NA, "upper"=NA, "relevant.pairs.no"=0))
   }
   
