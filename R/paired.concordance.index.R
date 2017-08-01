@@ -23,7 +23,7 @@
 #' along with the lower and upper confidence intervals
 #' @export
 
-paired.concordance.index <- function(predictions, observations, cutoff=0.2, delta=0.2, alpha = 0.05, outx = TRUE, alternative = c("two.sided", "less", "greater")) {
+paired.concordance.index <- function(predictions, observations, delta.pred=0.2, delta.obs=0.2, alpha = 0.05, outx = TRUE, alternative = c("two.sided", "less", "greater")) {
   alternative <- match.arg(alternative)
   predictions[which(is.nan(predictions))] <- NA
   observations[which(is.nan(observations))] <- NA
@@ -38,7 +38,7 @@ paired.concordance.index <- function(predictions, observations, cutoff=0.2, delt
       #if ((any(predictions[pair] >= cutoff) && abs(predictions[i] - predictions[j]) >= delta) ||
          #(any(observations[pair] >= cutoff) && abs(observations[i] - observations[j]) >= delta)) {
         #if ((predictions[i] == predictions[j] || observations[i] == observations[j])||
-        if(abs(observations[i] - observations[j]) >= delta || abs(predictions[i] - predictions[j]) >= delta) { #add flag to replace 'or' behaviour with 'xor' behaviour
+        if(abs(observations[i] - observations[j]) >= delta.obs || abs(predictions[i] - predictions[j]) >= delta[2]) { #add flag to replace 'or' behaviour with 'xor' behaviour
           pp <- (predictions[i] < predictions[j])
           oo <- (observations[i] < observations[j])
           if (pp == oo) {
