@@ -38,7 +38,7 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0.2, 
       #if ((any(predictions[pair] >= cutoff) && abs(predictions[i] - predictions[j]) >= delta) ||
          #(any(observations[pair] >= cutoff) && abs(observations[i] - observations[j]) >= delta)) {
         #if ((predictions[i] == predictions[j] || observations[i] == observations[j])||
-        if(abs(observations[i] - observations[j]) >= delta.obs || abs(predictions[i] - predictions[j]) >= delta[2]) { #add flag to replace 'or' behaviour with 'xor' behaviour
+        if(abs(observations[i] - observations[j]) >= delta.obs || abs(predictions[i] - predictions[j]) >= delta.pred) { #add flag to replace 'or' behaviour with 'xor' behaviour
           pp <- (predictions[i] < predictions[j])
           oo <- (observations[i] < observations[j])
           if (pp == oo) {
@@ -78,5 +78,9 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0.2, 
   } else {
     return(list("cindex"=cindex, "p.value"=1, "lower"=0, "upper"=0, "relevant.pairs.no"=(C + D) / 2))
   }
-  return(list("cindex" = cindex, "p.value" = switch(alternative, less = p, greater = 1 - p, two.sided = 2 * min(p, 1 - p)), "lower" = max(cindex - ci, 0), "upper" = min(cindex + ci, 1), "relevant.pairs.no" = (C + D) / 2))
+  return(list("cindex"=cindex, 
+              "p.value"=switch(alternative, less=p, greater=1 - p, two.sided=2 * min(p, 1 - p)), 
+              "lower"=max(cindex - ci, 0), 
+              "upper"=min(cindex + ci, 1), 
+              "relevant.pairs.no"=(C + D) / 2))
 }
