@@ -32,6 +32,7 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0.2, 
   observations <- observations[which(cc.ix)]
   N <- length(which(cc.ix))
   c <- d <- u <- matrix(0, nrow = 1, ncol = N)
+  c.d.seq <- NULL
   for (i in seq(from = 1, to = N - 1)) {
     for (j in seq(from = i + 1, to = N)) {
       pair <- c(i, j)
@@ -41,8 +42,10 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0.2, 
           oo <- (observations[i] < observations[j])
           if (pp == oo) {
             c[pair] <- c[pair] + 1
+            c.d.seq <- c(c.d.seq, TRUE)
           } else {
             d[pair] <- d[pair] + 1
+            c.d.seq <- c(c.d.seq, FALSE)
           }
 
         } else {
@@ -50,6 +53,7 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0.2, 
             u[pair] <- u[pair] + 1
           }else{
             d[pair] <- d[pair] + 1
+            c.d.seq <- c(c.d.seq, FALSE)
           }
         }
     }
@@ -75,5 +79,5 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0.2, 
   } else {
     return(list("cindex"=cindex, "p.value"=1, "lower"=0, "upper"=0, "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
   }
-  return(list("cindex" = cindex, "p.value" = switch(alternative, less = p, greater = 1 - p, two.sided = 2 * min(p, 1 - p)), "lower" = max(cindex - ci, 0), "upper" = min(cindex + ci, 1), "relevant.pairs.no" = (C + D) / 2))
+  return(list("cindex" = cindex, "p.value" = switch(alternative, less = p, greater = 1 - p, two.sided = 2 * min(p, 1 - p)), "lower" = max(cindex - ci, 0), "upper" = min(cindex + ci, 1), "relevant.pairs.no" = (C + D) / 2), "concordant.pairs"=c.d.seq)
 }
