@@ -1,4 +1,4 @@
-resampleResiduals <- function(conc, viability, viability_as_pct = TRUE, conc_as_log = FALSE, N = 100, SDs = 2) {
+resampleResiduals <- function(conc, viability, viability_as_pct = TRUE, conc_as_log = FALSE, N = 100) {
   
   AUCs <- matrix(NA, nrow = 1, ncol = N)
   pars <- unlist(logLogisticRegression(conc,
@@ -23,5 +23,5 @@ resampleResiduals <- function(conc, viability, viability_as_pct = TRUE, conc_as_
                             viability_as_pct = viability_as_pct)
   }
   
-  return(list("AUC" = trueAUC, "lower" = trueAUC - SDs * sd(AUCs), "upper" = trueAUC + SDs * sd(AUCs)))
+  return(list("AUC" = trueAUC, "bootstrapped mean AUC" = mean(AUCs), "bootstrapped SD of AUCs" = sd(AUCs)))
 }
