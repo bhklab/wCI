@@ -38,7 +38,7 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0.2, 
   for (i in seq(from = 1, to = N - 1)) {
     for (j in seq(from = i + 1, to = N)) {
       pair <- c(i, j)
-        iff <- as.logical(outer(abs(predictions[i] - predictions[j]) >= delta.pred, abs(observations[i] - observations[j]) >= delta.obs, logic.operator))
+        iff <- as.logical(outer(abs(predictions[i] - predictions[j]) > delta.pred, abs(observations[i] - observations[j]) > delta.obs, logic.operator))
         if(iff){ #add flag to replace 'or' behaviour with 'xor' behaviour
           pp <- (predictions[i] < predictions[j])
           oo <- (observations[i] < observations[j])
