@@ -38,8 +38,13 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0.2, 
   for (i in seq(from = 1, to = N - 1)) {
     for (j in seq(from = i + 1, to = N)) {
       pair <- c(i, j)
-        iff <- as.logical(outer(abs(predictions[i] - predictions[j]) > delta.pred, abs(observations[i] - observations[j]) > delta.obs, logic.operator))
-        if(iff){ #add flag to replace 'or' behaviour with 'xor' behaviour
+      iff <- as.logical(outer(abs(predictions[i] - predictions[j]) > delta.pred, abs(observations[i] - observations[j]) > delta.obs, logic.operator))
+      if(logic.operator == "&"){
+        ife <- abs(predictions[i] - predictions[j]) == delta.pred
+      }else{
+        ife <- !iff
+      }
+      if(iff){ #add flag to replace 'or' behaviour with 'xor' behaviour
           pp <- (predictions[i] < predictions[j])
           oo <- (observations[i] < observations[j])
           if (pp == oo) {
@@ -49,8 +54,7 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0.2, 
             d[pair] <- d[pair] + 1
             c.d.seq <- c(c.d.seq, FALSE)
           }
-
-        } else {
+        }else if (ife){
           if(outx){
             u[pair] <- u[pair] + 1
           }else{
