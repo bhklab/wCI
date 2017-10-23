@@ -50,21 +50,24 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0.2, 
           if (pp == oo) {
             c[pair] <- c[pair] + 1
             c.d.seq <- c(c.d.seq, TRUE)
+            c.d.seq <- c(c.d.seq, TRUE)
           } else {
             d[pair] <- d[pair] + 1
+            c.d.seq <- c(c.d.seq, FALSE)
             c.d.seq <- c(c.d.seq, FALSE)
           }
         }else if (ife){
           if(outx){
             u[pair] <- u[pair] + 1
           }else{
-            d[pair] <- d[pair] + 1
+            d[pair] <- d[pair] + 0.5
+            c[pair] <- c[pair] + 0.5
+            c.d.seq <- c(c.d.seq, TRUE)
             c.d.seq <- c(c.d.seq, FALSE)
           }
         }
     }
   }
-
   C <- sum(c)
   D <- sum(d)
   
