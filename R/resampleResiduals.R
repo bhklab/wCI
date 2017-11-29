@@ -1,4 +1,4 @@
-resampleResiduals <- function(conc, viability, conc_as_log=TRUE, viability_as_pct=FALSE, N=50, nthread=1) {
+resampleResiduals <- function(conc, viability, conc_as_log=TRUE, viability_as_pct=FALSE, N=100, nthread=1) {
   availcore <- parallel::detectCores()
   if ( nthread > availcore) {
     nthread <- availcore
@@ -11,20 +11,9 @@ resampleResiduals <- function(conc, viability, conc_as_log=TRUE, viability_as_pc
                         viability,
                         conc_as_log=conc_as_log,
                         viability_as_pct=viability_as_pct)
-  #trueViability <- PharmacoGx:::.Hill(conc, c(pars[1], pars[2]/100, log10(pars[3]))) * 100
   trueViability <- PharmacoGx:::.Hill(conc, pars)
   errors <- viability - trueViability
   errors <- errors[which(!is.na(errors))]
-  # for (i in seq_len(N)) {
-  #   #pars <-
-  #     AUCs[i] <- computeAUC(conc,
-  #                           Hill_fit = unlist(logLogisticRegression(conc,
-  #                                                        trueViability + sample(errors, length(trueViability), replace=TRUE),
-  #                                                        conc_as_log=conc_as_log,
-  #                                                        viability_as_pct=viability_as_pct)),
-  #                           conc_as_log = conc_as_log,
-  #                           viability_as_pct = viability_as_pct)
-  # }
   library(parallel)
   AUCs <- parallel::mclapply(seq_len(N),
                                     function(x, conc, trueViability, errors, conc_as_log, viability_as_pct){
