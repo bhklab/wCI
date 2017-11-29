@@ -1,27 +1,42 @@
-resampleResiduals <- function(conc, viability, viability_as_pct = TRUE, conc_as_log = FALSE, N = 100) {
-  
-  AUCs <- matrix(NA, nrow = 1, ncol = N)
+resampleResiduals <- function(conc, viability, conc_as_log=TRUE, viability_as_pct=FALSE, N=50, nthread=1) {
+  availcore <- parallel::detectCores()
+  if ( nthread > availcore) {
+    nthread <- availcore
+  }
   pars <- unlist(logLogisticRegression(conc,
                                        viability,
-                                       conc_as_log = conc_as_log,
-                                       viability_as_pct = viability_as_pct))
+                                       conc_as_log=conc_as_log,
+                                       viability_as_pct=viability_as_pct))
   trueAUC <- computeAUC(conc,
-                        Hill_fit = pars,
-                        conc_as_log = conc_as_log,
-                        viability_as_pct = viability_as_pct)
+                        viability,
+                        conc_as_log=conc_as_log,
+                        viability_as_pct=viability_as_pct)
+  #trueViability <- PharmacoGx:::.Hill(conc, c(pars[1], pars[2]/100, log10(pars[3]))) * 100
   trueViability <- PharmacoGx:::.Hill(conc, pars)
   errors <- viability - trueViability
   errors <- errors[which(!is.na(errors))]
-  for (i in seq_len(N)) {
-    pars <- 
-      AUCs[i] <- computeAUC(conc,
-                            Hill_fit = unlist(logLogisticRegression(conc,
-                                                         trueViability + sample(errors, length(trueViability), replace = TRUE),
-                                                         conc_as_log = conc_as_log,
-                                                         viability_as_pct = viability_as_pct)),
-                            conc_as_log = conc_as_log,
-                            viability_as_pct = viability_as_pct)
-  }
-  
-  return(list("AUC" = trueAUC, "bootstrapped mean AUC" = mean(AUCs), "bootstrapped SD of AUCs" = sd(AUCs)))
+  # for (i in seq_len(N)) {
+  #   #pars <-
+  #     AUCs[i] <- computeAUC(conc,
+  #                           Hill_fit = unlist(logLogisticRegression(conc,
+  #                                                        trueViability + sample(errors, length(trueViability), replace=TRUE),
+  #                                                        conc_as_log=conc_as_log,
+  #                                                        viability_as_pct=viability_as_pct)),
+  #                           conc_as_log = conc_as_log,
+  #                           viability_as_pct = viability_as_pct)
+  # }
+  library(parallel)
+  AUCs <- parallel::mclapply(seq_len(N),
+                                    function(x, conc, trueViability, errors, conc_as_log, viability_as_pct){
+                                              auc <- computeAUC(conc,
+                                                                Hill_fit=unlist(logLogisticRegression(conc,
+                                                                                                      trueViability + sample(errors, length(trueViability), replace=TRUE),
+                                                                                                      conc_as_log=conc_as_log,
+                                                                                                      viability_as_pct=viability_as_pct)),
+                                                               conc_as_log=conc_as_log,
+                                                                viability_as_pct=viability_as_pct)
+                                              return(auc)
+    }, conc=conc, trueViability=trueViability, errors=errors, conc_as_log=conc_as_log, viability_as_pct=viability_as_pct, mc.cores=parallel::detectCores())
+  AUCs <- do.call(c, AUCs)
+  return(list("AUC"=trueAUC, "bootstrapped mean AUC"=mean(AUCs), "bootstrapped SD of AUCs"=sd(AUCs)))
 }
