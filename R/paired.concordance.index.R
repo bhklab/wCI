@@ -33,14 +33,24 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0.2, 
   predictions <- predictions[which(cc.ix)]
   observations <- observations[which(cc.ix)]
   N <- length(which(cc.ix))
+  if(length(delta.pred) == 1){
+    delta.pred <- rep(delta.pred, N)
+  }else{
+    delta.pred <- delta.pred[which(cc.ix)]
+  }
+  if(length(delta.obs) == 1){
+    delta.obs <- rep(delta.obs, N)
+  }else{
+    delta.obs <- delta.obs[which(cc.ix)]
+  }
   c <- d <- u <- matrix(0, nrow = 1, ncol = N)
   c.d.seq <- NULL
   for (i in seq(from = 1, to = N - 1)) {
     for (j in seq(from = i + 1, to = N)) {
       pair <- c(i, j)
-      iff <- as.logical(outer(abs(predictions[i] - predictions[j]) > delta.pred, abs(observations[i] - observations[j]) > delta.obs, logic.operator))
+      iff <- as.logical(outer(abs(predictions[i] - predictions[j]) > max(delta.pred[i], delta.pred[j]), abs(observations[i] - observations[j]) > max(delta.obs[i], delta.obs[j]), logic.operator))
       if(logic.operator == "&"){
-        ife <- abs(predictions[i] - predictions[j]) == delta.pred
+        ife <- abs(predictions[i] - predictions[j]) == max(delta.pred[i], delta.pred[j])
       }else{
         ife <- !iff
       }
@@ -70,7 +80,7 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0.2, 
   }
   C <- sum(c)
   D <- sum(d)
-  
+
   if (N < 3 || (C == 0 && D == 0)) {
     return(list("cindex"=NA, "p.value"=NA, "lower"=NA, "upper"=NA, "relevant.pairs.no"=0))
   }
