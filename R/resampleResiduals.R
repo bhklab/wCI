@@ -27,5 +27,5 @@ resampleResiduals <- function(conc, viability, conc_as_log=TRUE, viability_as_pc
                                               return(auc)
     }, conc=conc, trueViability=trueViability, errors=errors, conc_as_log=conc_as_log, viability_as_pct=viability_as_pct, mc.cores=parallel::detectCores())
   AUCs <- do.call(c, AUCs)
-  return(list("AUC"=trueAUC, "bootstrapped mean AUC"=mean(AUCs), "bootstrapped SD of AUCs"=sd(AUCs)))
+  return(list("AUC"=trueAUC, "bootstrapped AUCs"=AUCs, "errors"=errors))
 }
