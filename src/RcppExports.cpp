@@ -5,9 +5,9 @@
 
 using namespace Rcpp;
 
-// concordanceIndex_modified
-double concordanceIndex_modified(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY, double alpha, int outx);
-RcppExport SEXP _CI_concordanceIndex_modified(SEXP xSEXP, SEXP ySEXP, SEXP deltaXSEXP, SEXP deltaYSEXP, SEXP alphaSEXP, SEXP outxSEXP) {
+// concordanceIndex_modified_helper
+List concordanceIndex_modified_helper(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY, double alpha, bool outx, std::string alternative, std::string logicOp);
+RcppExport SEXP _CI_concordanceIndex_modified_helper(SEXP xSEXP, SEXP ySEXP, SEXP deltaXSEXP, SEXP deltaYSEXP, SEXP alphaSEXP, SEXP outxSEXP, SEXP alternativeSEXP, SEXP logicOpSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -16,8 +16,28 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type deltaX(deltaXSEXP);
     Rcpp::traits::input_parameter< double >::type deltaY(deltaYSEXP);
     Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
-    Rcpp::traits::input_parameter< int >::type outx(outxSEXP);
-    rcpp_result_gen = Rcpp::wrap(concordanceIndex_modified(x, y, deltaX, deltaY, alpha, outx));
+    Rcpp::traits::input_parameter< bool >::type outx(outxSEXP);
+    Rcpp::traits::input_parameter< std::string >::type alternative(alternativeSEXP);
+    Rcpp::traits::input_parameter< std::string >::type logicOp(logicOpSEXP);
+    rcpp_result_gen = Rcpp::wrap(concordanceIndex_modified_helper(x, y, deltaX, deltaY, alpha, outx, alternative, logicOp));
+    return rcpp_result_gen;
+END_RCPP
+}
+// concordanceIndex_modified_AllinC
+List concordanceIndex_modified_AllinC(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY, double alpha, bool outx, std::string alternative, std::string logicOp);
+RcppExport SEXP _CI_concordanceIndex_modified_AllinC(SEXP xSEXP, SEXP ySEXP, SEXP deltaXSEXP, SEXP deltaYSEXP, SEXP alphaSEXP, SEXP outxSEXP, SEXP alternativeSEXP, SEXP logicOpSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::vector<double> >::type x(xSEXP);
+    Rcpp::traits::input_parameter< std::vector<double> >::type y(ySEXP);
+    Rcpp::traits::input_parameter< double >::type deltaX(deltaXSEXP);
+    Rcpp::traits::input_parameter< double >::type deltaY(deltaYSEXP);
+    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
+    Rcpp::traits::input_parameter< bool >::type outx(outxSEXP);
+    Rcpp::traits::input_parameter< std::string >::type alternative(alternativeSEXP);
+    Rcpp::traits::input_parameter< std::string >::type logicOp(logicOpSEXP);
+    rcpp_result_gen = Rcpp::wrap(concordanceIndex_modified_AllinC(x, y, deltaX, deltaY, alpha, outx, alternative, logicOp));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -62,7 +82,8 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_CI_concordanceIndex_modified", (DL_FUNC) &_CI_concordanceIndex_modified, 6},
+    {"_CI_concordanceIndex_modified_helper", (DL_FUNC) &_CI_concordanceIndex_modified_helper, 8},
+    {"_CI_concordanceIndex_modified_AllinC", (DL_FUNC) &_CI_concordanceIndex_modified_AllinC, 8},
     {"_CI_shuffle", (DL_FUNC) &_CI_shuffle, 1},
     {"_CI_permute_concordanceIndex_modified", (DL_FUNC) &_CI_permute_concordanceIndex_modified, 8},
     {"_CI_rcpp_hello", (DL_FUNC) &_CI_rcpp_hello, 0},

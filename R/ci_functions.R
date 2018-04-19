@@ -1,4 +1,32 @@
 
+paired.concordance.index.usingC <-function(x,y, deltaX=0, deltaY=0, alpha =0, outx = 1, alternative = c("two.sided", "less", "greater"), logic.operator=c("and", "or"))
+{
+  values <- concordanceIndex_modified_helper(x = x, y = y,
+                                      deltaX = deltaX, deltaY = deltaY,
+                                      alpha = alpha, outx = outx,alternative=alternative,logicOp = logic.operator)
+
+  C <- values$C
+  D <- values$D
+  CC <- values$CC
+  DD <- values$DD
+  CD <- values$CD
+  N <- values$N
+  c.d.seq <- values$cdseq
+  cindex <- C / (C + D)
+  varp <- 4 * ((D ^ 2 * CC - 2 * C * D * CD + C ^ 2 * DD) / (C + D) ^ 4) * N * (N - 1) / (N - 2)
+  if (varp >= 0) {
+    sterr <- sqrt(varp / N)
+    ci <- qnorm(p = alpha / 2, lower.tail = FALSE) * sterr
+    p <- pnorm((cindex - 0.5) / sterr)
+  } else {
+    return(list("cindex"=cindex, "p.value"=1, "lower"=0, "upper"=0, "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
+  }
+  return(list("cindex" = cindex, "p.value" = switch(alternative, less = p, greater = 1 - p, two.sided = 2 * min(p, 1 - p)), "lower" = max(cindex - ci, 0), "upper" = min(cindex + ci, 1), "relevant.pairs.no" = (C + D) / 2, "concordant.pairs"=c.d.seq))
+}
+
+
+
+
 .computePval <- function(cindex, permutCI)
 {
   pv <- NA
@@ -20,10 +48,10 @@ CIinC <-function(x,y, deltaX=0, deltaY=0, alpha =0, outx = 1, npermut=1000000, n
                                       deltaX = deltaX, deltaY = deltaY,
                                       alpha = alpha, outx = outx)
 
-  permutCI <- permute_concordanceIndex_modified(x = x, y = y,
-                                                deltaX = deltaX, deltaY = deltaY,
-                                                alpha = alpha, outx = outx,
-                                                permutations = npermut, nThread=ncpu)
+#  permutCI <- permute_concordanceIndex_modified(x = x, y = y,
+#                                                deltaX = deltaX, deltaY = deltaY,
+#                                                alpha = alpha, outx = outx,
+#                                                permutations = npermut, nThread=ncpu)
   pv <- .computePval(cindex, permutCI)
   return(list(ci=cindex, p.value=pv))
 }

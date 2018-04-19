@@ -12,6 +12,7 @@ using namespace Rcpp;
 #include <string>
 #include <time.h>
 #include <vector>
+#include <string>
 
 // [[Rcpp::plugins(openmp)]]
 
@@ -20,7 +21,7 @@ using namespace Rcpp;
  * x,y: vectors that will be compared. Has to have the same length and no missing values.
  * deltaX, deltaY: the delta range which pairs within are not compared
  * outx = True: do not include pairs that are equal
- * 
+ *
  * output:
  * c-index [-1,1]
  */
@@ -29,8 +30,8 @@ using namespace Rcpp;
 // [[Rcpp::plugins(cpp11)]]
 
 /* function tests whether a pair is usable for concordance index calculation purposes. */
-bool usable (std::vector<double> x, double cutoff, double delta) {
-  if ((x[0] >= cutoff || x[1] >= cutoff) && std::abs(x[0] - x[1]) >= delta) {
+bool usable (double x1, double x2, double delta) {
+  if (std::abs(x1 - x2) >= delta) {
     return true;
   } else {
     return false;
@@ -60,45 +61,80 @@ double erfinv(double x){
   return(sgnx * sqrt(sqrt(a * a - b) - a));
 }
 
+
+//function to do and, or
+double logicOpF(bool x, bool y, std::string logicOp){
+  if (logicOp.compare("and") == 0){
+    return(x && y);
+  }else if(logicOp.compare("or") == 0){
+    return(x || y);
+  }
+
+  throw std::invalid_argument ("CI calculation failed.");
+
+}
+
+
 /* function calculates modified concordance index.
-   Input: predictions x, observations y, cutoffs for x and y, deltas for x and y, confidence level alpha, flag outx, string alternative*/
+ Input: predictions x, observations y, cutoffs for x and y, deltas for x and y, confidence level alpha, flag outx, string alternative*/
 // [[Rcpp::export]]
-double concordanceIndex_modified(std::vector<double> x, std::vector<double> y, std::vector<double> cutoff, std::vector<double> delta, double alpha, bool outx, std::string alternative) {
-  
+List concordanceIndex_modified_helper(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY, double alpha, bool outx, std::string alternative, std::string logicOp) {
+
   int N = static_cast<int>(x.size());
   std::vector<int> c(N);
   std::vector<int> d(N);
-  
+
+
+  std::list<bool> cdseq;
+
   for (int i = 0; i < N; ++i) {
     c[i] = 0;
     d[i] = 0;
   }
-  
+
+  double numOfPairs = 0;
+
   for (int i = 0; i < N - 1; ++i) {
     for (int j = i + 1; j < N; ++j) {
-      if (usable(x, cutoff[0], delta[0]) && usable(y, cutoff[1], delta[1])) {
-        if (outx == false && (x[i] == x[j] || y[i] == y[j])) { // should this be an xor?
-          ++d[i];
-          ++d[j];
-        } else {
-          if ((x[0] > x[1] && y[0] > y[1]) || (x[0] < x[1] && y[0] < y[1])) {
-            ++c[i];
-            ++c[j];
-          } else {
+
+      if (logicOpF(usable(x[i],x[j], deltaX), usable(y[i],y[j], deltaY), logicOp)) {
+        if(y[i]!=y[j]){
+          ++numOfPairs;
+          if (outx == false && (x[i] == x[j])) { // should this be an xor?
             ++d[i];
             ++d[j];
+            cdseq.push_back(false);
+            cdseq.push_back(false);
+          } else {
+
+
+            if ((x[i] > x[j] & y[i] > y[j]) || (x[i] < x[j] & y[i] < y[j])) {
+              ++c[i];
+              ++c[j];
+              cdseq.push_back(true);
+              cdseq.push_back(true);
+            } else {
+              if(outx == true && (x[i] == x[j])){
+                --numOfPairs;
+              }else{
+                ++d[i];
+                ++d[j];
+                cdseq.push_back(false);
+                cdseq.push_back(false);
+              }
+            }
           }
         }
       }
     }
   }
-  
-  int C = 0;
-  int D = 0;
-  int CC = 0;
-  int CD = 0;
-  int DD = 0;
-  
+
+  double C = 0.0;
+  double D = 0.0;
+  double CC = 0.0;
+  double CD = 0.0;
+  double DD = 0.0;
+
   for (int i = 0; i < N; ++i) {
     C += c[i];
     D += d[i];
@@ -106,29 +142,206 @@ double concordanceIndex_modified(std::vector<double> x, std::vector<double> y, s
     DD += d[i] * (d[i] - 1);
     CD += c[i] * d[i];
   }
-  
+
+    List ret;
+    ret["C"] = C;
+    ret["D"] = D;
+    ret["CC"] = CC;
+    ret["DD"] = DD;
+    ret["CD"] = CD;
+    ret["N"] = N;
+    ret["cdseq"] = cdseq;
+    return ret;
+
+
+}
+
+
+
+/* function calculates modified concordance index.
+ Input: predictions x, observations y, cutoffs for x and y, deltas for x and y, confidence level alpha, flag outx, string alternative*/
+// [[Rcpp::export]]
+List concordanceIndex_modified_helper_parallel(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY, double alpha, bool outx, std::string alternative, std::string logicOp) {
+
+  int N = static_cast<int>(x.size());
+  std::vector<int> c(N);
+  std::vector<int> d(N);
+
+
+  std::list<bool> cdseq;
+
+  for (int i = 0; i < N; ++i) {
+    c[i] = 0;
+    d[i] = 0;
+  }
+
+  double numOfPairs = 0;
+
+  for (int i = 0; i < N - 1; ++i) {
+    for (int j = i + 1; j < N; ++j) {
+
+      if (logicOpF(usable(x[i],x[j], deltaX), usable(y[i],y[j], deltaY), logicOp)) {
+        if(y[i]!=y[j]){
+          ++numOfPairs;
+          if (outx == false && (x[i] == x[j])) { // should this be an xor?
+            ++d[i];
+            ++d[j];
+            cdseq.push_back(false);
+            cdseq.push_back(false);
+          } else {
+
+
+            if ((x[i] > x[j] & y[i] > y[j]) || (x[i] < x[j] & y[i] < y[j])) {
+              ++c[i];
+              ++c[j];
+              cdseq.push_back(true);
+              cdseq.push_back(true);
+            } else {
+              if(outx == true && (x[i] == x[j])){
+                --numOfPairs;
+              }else{
+                ++d[i];
+                ++d[j];
+                cdseq.push_back(false);
+                cdseq.push_back(false);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  double C = 0.0;
+  double D = 0.0;
+  double CC = 0.0;
+  double CD = 0.0;
+  double DD = 0.0;
+
+  for (int i = 0; i < N; ++i) {
+    C += c[i];
+    D += d[i];
+    CC += c[i] * (c[i] - 1);
+    DD += d[i] * (d[i] - 1);
+    CD += c[i] * d[i];
+  }
+
+  List ret;
+  ret["C"] = C;
+  ret["D"] = D;
+  ret["CC"] = CC;
+  ret["DD"] = DD;
+  ret["CD"] = CD;
+  ret["N"] = N;
+  ret["cdseq"] = cdseq;
+  return ret;
+
+
+}
+
+
+
+/* function calculates modified concordance index.
+   Input: predictions x, observations y, cutoffs for x and y, deltas for x and y, confidence level alpha, flag outx, string alternative*/
+// [[Rcpp::export]]
+List concordanceIndex_modified_AllinC(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY, double alpha, bool outx, std::string alternative, std::string logicOp) {
+
+  int N = static_cast<int>(x.size());
+  std::vector<int> c(N);
+  std::vector<int> d(N);
+
+  for (int i = 0; i < N; ++i) {
+    c[i] = 0;
+    d[i] = 0;
+  }
+
+  logicOp = "|";
+
+  double numOfPairs = 0;
+
+  for (int i = 0; i < N - 1; ++i) {
+    for (int j = i + 1; j < N; ++j) {
+      if (usable(x[i],x[j], deltaX) && usable(y[i],y[j], deltaY)) {
+        if(y[i]!=y[j]){
+          ++numOfPairs;
+        if (outx == false && (x[i] == x[j])) { // should this be an xor?
+          ++d[i];
+          ++d[j];
+        } else {
+
+
+          if ((x[i] > x[j] & y[i] > y[j]) || (x[i] < x[j] & y[i] < y[j])) {
+            ++c[i];
+            ++c[j];
+          } else {
+            if(outx == true && (x[i] == x[j])){
+              --numOfPairs;
+            }else{
+              ++d[i];
+              ++d[j];
+            }
+          }
+        }
+        }
+      }
+    }
+  }
+
+  double C = 0.0;
+  double D = 0.0;
+  double CC = 0.0;
+  double CD = 0.0;
+  double DD = 0.0;
+
+  for (int i = 0; i < N; ++i) {
+    C += c[i];
+    D += d[i];
+    CC += c[i] * (c[i] - 1);
+    DD += d[i] * (d[i] - 1);
+    CD += c[i] * d[i];
+  }
+
+
+  std::cout << "C: " << C << ", D:" << D << "\n";
   if (C == 0 && D == 0) {
     throw std::invalid_argument ("All pairs were thrown out. Consider changing cutoff and/or delta.");
   }
-  
   double cindex = static_cast<double>(C) / (C + D); //static_cast prevents integer division from occurring
-  double varp = 4 * N * (N - 1) / (N - 2) * (pow(D, 2.0) * CC - 2 * C * D * CD + pow(C, 2.0) * DD) / pow(C + D, 4.0);
+
+  double varp = 4 * (( (pow(D, 2.0) * CC ) - (2 * C * D * CD) + (pow(C, 2.0) * DD)) / pow(C + D, 4.0)) * N * (N - 1) / (N - 2);
+
   if (varp / N >= 0) {
     double sterr = sqrt(varp / N);
+
+
+
     double ci = sterr * 1.41421356237 * erfinv(2 * alpha); // magic number is sqrt(2)
     double p = (1 + erf((cindex - 0.5) / sterr / 1.41421356237)) / 2;
-    if (std::string::compare(alternative, "less") == 0) {
-    } else if (std::string::compare(alternative, "greater") == 0) {
+    if (alternative.compare("less") == 0) {
+    } else if (alternative.compare("greater") == 0) {
       p <- 1 - p;
-    } else if (std::string::compare(alternative, "two.sided") == 0) {
-      p <- 2 * std::min(p, 1 - p);
+    } else if (alternative.compare("two.sided") == 0) {
+      p = 2 * std::min(p, 1 - p);
     } else {
       throw std::invalid_argument ("'alternative' must be set to one of 'less', 'greater', or 'two.sided'.");
     }
     std::cout << "Calculated Concordance Index: " << cindex << "\n";
     std::cout << (1 - alpha) * 100 << "% confidence interval: [" << std::max(cindex - ci, 0.0) << ", " << std::min(cindex + ci, 1.0) << "]\n";
     std::cout << "p-value: " << p << "\n";
-    return cindex;
+
+    std::cout << "ci: " << ci << "\n";
+    std::cout << "sterr: " << sterr << "\n";
+
+    List ret;
+    ret["cindex"] = cindex;
+    ret["p.value"] = p;
+    ret["lower"] = std::max(cindex - ci, 0.0);
+    ret["upper"] = std::min(cindex + ci, 1.0);
+    ret["relevant.pairs.no"] = numOfPairs;
+    ret["p.concordant.pairs"] = C;
+    return ret;
+
+//    return cindex;
   } else {
     throw std::invalid_argument ("CI calculation failed.");
   }
@@ -137,7 +350,7 @@ double concordanceIndex_modified(std::vector<double> x, std::vector<double> y, s
 /* function to shuffle an array.
  * input:
  * array:  a vector of at least length 2
- * 
+ *
  * output:
  * shuffled array
  */
@@ -166,33 +379,33 @@ std::vector<double> shuffle(std::vector<double> array) {
  * outx = True: do not include pairs that are equal
  * permutations: number of permutations to do on the shuffled array
  * nThreads: number of threads to use.
- * 
+ *
  * output:
  * an array of length(permutation) with cindecies of the shuffled vectors
  */
 
 // [[Rcpp::export]]
 std::vector<double> permute_concordanceIndex_modified(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY, double alpha, int outx, int permutations,int nThreads) {
-  
+
   std::vector<double> randomPermut(permutations);
-  
-  omp_set_dynamic(0);     // Explicitly disable dynamic teams
+
+/*  omp_set_dynamic(0);     // Explicitly disable dynamic teams
   omp_set_num_threads(nThreads); // Use n threads for all consecutive parallel regions
-  
+
   #pragma omp parallel
   {
     std::vector<double> xShuffled(x.size());
     #pragma omp for
-  for(int i=0; i < permutations;i++){
-    
-    
+    for(int i=0; i < permutations;i++){
     xShuffled = shuffle(x);
     randomPermut[i] = concordanceIndex_modified(xShuffled,y,deltaX,deltaY,alpha,outx);
-    
+
   }
-  
+
   }
+  */
   return(randomPermut);
-  
-  
+
+
 }
+

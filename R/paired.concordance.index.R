@@ -90,7 +90,7 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0.2, 
   CC <- sum(c * (c - 1))
   DD <- sum(d * (d - 1))
   CD <- sum(c * d)
-  varp <- 4 * (D ^ 2 * CC - 2 * C * D * CD + C ^ 2 * DD) / (C + D) ^ 4 * N * (N - 1) / (N - 2)
+  varp <- 4 * ((D ^ 2 * CC - 2 * C * D * CD + C ^ 2 * DD) / (C + D) ^ 4) * N * (N - 1) / (N - 2)
   if (varp >= 0) {
     sterr <- sqrt(varp / N)
     ci <- qnorm(p = alpha / 2, lower.tail = FALSE) * sterr
