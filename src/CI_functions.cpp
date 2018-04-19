@@ -3,7 +3,6 @@ using namespace Rcpp;
 
 #include <algorithm>
 #include <cmath>
-#include <omp.h>
 #include <random>
 #include <Rcpp.h>
 #include <stdexcept>
