@@ -1,9 +1,10 @@
 
-paired.concordance.index.usingC <-function(x,y, deltaX=0, deltaY=0, alpha =0, outx = 1, alternative = c("two.sided", "less", "greater"), logic.operator=c("and", "or"))
-{
-  values <- concordanceIndex_modified_helper(x = x, y = y,
-                                      deltaX = deltaX, deltaY = deltaY,
-                                      alpha = alpha, outx = outx,alternative=alternative,logicOp = logic.operator)
+paired.concordance.index.usingC <-function(predictions, observations, delta.pred=0.2, delta.obs=0.2, alpha=0.05, outx=TRUE, alternative=c("two.sided", "less", "greater"), logic.operator=c("and", "or")) {
+  alternative <- match.arg(alternative)
+  logic.operator <- match.arg(logic.operator)
+  values <- concordanceIndex_modified_helper(x=predictions, y=observations,
+                                      deltaX=delta.pred, deltaY=delta.obs,
+                                      alpha=alpha, outx=outx, alternative=alternative, logicOp=logic.operator)
 
   C <- values$C
   D <- values$D
