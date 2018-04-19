@@ -318,7 +318,7 @@ List concordanceIndex_modified_AllinC(std::vector<double> x, std::vector<double>
     double p = (1 + erf((cindex - 0.5) / sterr / 1.41421356237)) / 2;
     if (alternative.compare("less") == 0) {
     } else if (alternative.compare("greater") == 0) {
-      p <- 1 - p;
+      p = 1 - p;
     } else if (alternative.compare("two.sided") == 0) {
       p = 2 * std::min(p, 1 - p);
     } else {
