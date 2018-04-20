@@ -2,22 +2,26 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 concordanceIndex_modified_helper <- function(x, y, deltaX, deltaY, alpha, outx, alternative, logicOp) {
-    .Call('_CI_concordanceIndex_modified_helper', PACKAGE = 'CI', x, y, deltaX, deltaY, alpha, outx, alternative, logicOp)
+    .Call('_mCI_concordanceIndex_modified_helper', PACKAGE = 'mCI', x, y, deltaX, deltaY, alpha, outx, alternative, logicOp)
+}
+
+concordanceIndex_modified_helper_parallel <- function(x, y, deltaX, deltaY, alpha, outx, alternative, logicOp) {
+    .Call('_mCI_concordanceIndex_modified_helper_parallel', PACKAGE = 'mCI', x, y, deltaX, deltaY, alpha, outx, alternative, logicOp)
 }
 
 concordanceIndex_modified_AllinC <- function(x, y, deltaX, deltaY, alpha, outx, alternative, logicOp) {
-    .Call('_CI_concordanceIndex_modified_AllinC', PACKAGE = 'CI', x, y, deltaX, deltaY, alpha, outx, alternative, logicOp)
+    .Call('_mCI_concordanceIndex_modified_AllinC', PACKAGE = 'mCI', x, y, deltaX, deltaY, alpha, outx, alternative, logicOp)
 }
 
 shuffle <- function(array) {
-    .Call('_CI_shuffle', PACKAGE = 'CI', array)
+    .Call('_mCI_shuffle', PACKAGE = 'mCI', array)
 }
 
 permute_concordanceIndex_modified <- function(x, y, deltaX, deltaY, alpha, outx, permutations, nThreads) {
-    .Call('_CI_permute_concordanceIndex_modified', PACKAGE = 'CI', x, y, deltaX, deltaY, alpha, outx, permutations, nThreads)
+    .Call('_mCI_permute_concordanceIndex_modified', PACKAGE = 'mCI', x, y, deltaX, deltaY, alpha, outx, permutations, nThreads)
 }
 
 rcpp_hello <- function() {
-    .Call('_CI_rcpp_hello', PACKAGE = 'CI')
+    .Call('_mCI_rcpp_hello', PACKAGE = 'mCI')
 }
 

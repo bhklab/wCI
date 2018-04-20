@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 // concordanceIndex_modified_helper
 List concordanceIndex_modified_helper(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY, double alpha, bool outx, std::string alternative, std::string logicOp);
-RcppExport SEXP _CI_concordanceIndex_modified_helper(SEXP xSEXP, SEXP ySEXP, SEXP deltaXSEXP, SEXP deltaYSEXP, SEXP alphaSEXP, SEXP outxSEXP, SEXP alternativeSEXP, SEXP logicOpSEXP) {
+RcppExport SEXP _mCI_concordanceIndex_modified_helper(SEXP xSEXP, SEXP ySEXP, SEXP deltaXSEXP, SEXP deltaYSEXP, SEXP alphaSEXP, SEXP outxSEXP, SEXP alternativeSEXP, SEXP logicOpSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -23,9 +23,27 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// concordanceIndex_modified_helper_parallel
+List concordanceIndex_modified_helper_parallel(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY, double alpha, bool outx, std::string alternative, std::string logicOp);
+RcppExport SEXP _mCI_concordanceIndex_modified_helper_parallel(SEXP xSEXP, SEXP ySEXP, SEXP deltaXSEXP, SEXP deltaYSEXP, SEXP alphaSEXP, SEXP outxSEXP, SEXP alternativeSEXP, SEXP logicOpSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::vector<double> >::type x(xSEXP);
+    Rcpp::traits::input_parameter< std::vector<double> >::type y(ySEXP);
+    Rcpp::traits::input_parameter< double >::type deltaX(deltaXSEXP);
+    Rcpp::traits::input_parameter< double >::type deltaY(deltaYSEXP);
+    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
+    Rcpp::traits::input_parameter< bool >::type outx(outxSEXP);
+    Rcpp::traits::input_parameter< std::string >::type alternative(alternativeSEXP);
+    Rcpp::traits::input_parameter< std::string >::type logicOp(logicOpSEXP);
+    rcpp_result_gen = Rcpp::wrap(concordanceIndex_modified_helper_parallel(x, y, deltaX, deltaY, alpha, outx, alternative, logicOp));
+    return rcpp_result_gen;
+END_RCPP
+}
 // concordanceIndex_modified_AllinC
 List concordanceIndex_modified_AllinC(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY, double alpha, bool outx, std::string alternative, std::string logicOp);
-RcppExport SEXP _CI_concordanceIndex_modified_AllinC(SEXP xSEXP, SEXP ySEXP, SEXP deltaXSEXP, SEXP deltaYSEXP, SEXP alphaSEXP, SEXP outxSEXP, SEXP alternativeSEXP, SEXP logicOpSEXP) {
+RcppExport SEXP _mCI_concordanceIndex_modified_AllinC(SEXP xSEXP, SEXP ySEXP, SEXP deltaXSEXP, SEXP deltaYSEXP, SEXP alphaSEXP, SEXP outxSEXP, SEXP alternativeSEXP, SEXP logicOpSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -43,7 +61,7 @@ END_RCPP
 }
 // shuffle
 std::vector<double> shuffle(std::vector<double> array);
-RcppExport SEXP _CI_shuffle(SEXP arraySEXP) {
+RcppExport SEXP _mCI_shuffle(SEXP arraySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -54,7 +72,7 @@ END_RCPP
 }
 // permute_concordanceIndex_modified
 std::vector<double> permute_concordanceIndex_modified(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY, double alpha, int outx, int permutations, int nThreads);
-RcppExport SEXP _CI_permute_concordanceIndex_modified(SEXP xSEXP, SEXP ySEXP, SEXP deltaXSEXP, SEXP deltaYSEXP, SEXP alphaSEXP, SEXP outxSEXP, SEXP permutationsSEXP, SEXP nThreadsSEXP) {
+RcppExport SEXP _mCI_permute_concordanceIndex_modified(SEXP xSEXP, SEXP ySEXP, SEXP deltaXSEXP, SEXP deltaYSEXP, SEXP alphaSEXP, SEXP outxSEXP, SEXP permutationsSEXP, SEXP nThreadsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -72,7 +90,7 @@ END_RCPP
 }
 // rcpp_hello
 List rcpp_hello();
-RcppExport SEXP _CI_rcpp_hello() {
+RcppExport SEXP _mCI_rcpp_hello() {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -82,15 +100,16 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_CI_concordanceIndex_modified_helper", (DL_FUNC) &_CI_concordanceIndex_modified_helper, 8},
-    {"_CI_concordanceIndex_modified_AllinC", (DL_FUNC) &_CI_concordanceIndex_modified_AllinC, 8},
-    {"_CI_shuffle", (DL_FUNC) &_CI_shuffle, 1},
-    {"_CI_permute_concordanceIndex_modified", (DL_FUNC) &_CI_permute_concordanceIndex_modified, 8},
-    {"_CI_rcpp_hello", (DL_FUNC) &_CI_rcpp_hello, 0},
+    {"_mCI_concordanceIndex_modified_helper", (DL_FUNC) &_mCI_concordanceIndex_modified_helper, 8},
+    {"_mCI_concordanceIndex_modified_helper_parallel", (DL_FUNC) &_mCI_concordanceIndex_modified_helper_parallel, 8},
+    {"_mCI_concordanceIndex_modified_AllinC", (DL_FUNC) &_mCI_concordanceIndex_modified_AllinC, 8},
+    {"_mCI_shuffle", (DL_FUNC) &_mCI_shuffle, 1},
+    {"_mCI_permute_concordanceIndex_modified", (DL_FUNC) &_mCI_permute_concordanceIndex_modified, 8},
+    {"_mCI_rcpp_hello", (DL_FUNC) &_mCI_rcpp_hello, 0},
     {NULL, NULL, 0}
 };
 
-RcppExport void R_init_CI(DllInfo *dll) {
+RcppExport void R_init_mCI(DllInfo *dll) {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }
