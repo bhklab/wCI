@@ -23,7 +23,7 @@
 #' along with the lower and upper confidence intervals
 #' @export
 
-paired.concordance.index <- function(predictions, observations, delta.pred=0.2, delta.obs=0.2, alpha = 0.05, outx = TRUE, alternative = c("two.sided", "less", "greater"), logic.operator=c("and", "or")) {
+paired.concordance.index <- function(predictions, observations, delta.pred=0.2, delta.obs=0.2, alpha = 0.05, outx = TRUE, alternative = c("two.sided", "less", "greater"), logic.operator=c("and", "or"), CPP=TRUE) {
   alternative <- match.arg(alternative)
   logic.operator <- match.arg(logic.operator)
   logic.operator <- ifelse(logic.operator=="or", "|", "&")
@@ -32,29 +32,30 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0.2, 
   cc.ix <- complete.cases(predictions, observations)
   predictions <- predictions[which(cc.ix)]
   observations <- observations[which(cc.ix)]
-  N <- length(which(cc.ix))
-  if(length(delta.pred) == 1){
-    delta.pred <- rep(delta.pred, N)
-  }else{
-    delta.pred <- delta.pred[which(cc.ix)]
-  }
-  if(length(delta.obs) == 1){
-    delta.obs <- rep(delta.obs, N)
-  }else{
-    delta.obs <- delta.obs[which(cc.ix)]
-  }
-  c <- d <- u <- matrix(0, nrow = 1, ncol = N)
-  c.d.seq <- NULL
-  for (i in seq(from = 1, to = N - 1)) {
-    for (j in seq(from = i + 1, to = N)) {
-      pair <- c(i, j)
-      iff <- as.logical(outer(abs(predictions[i] - predictions[j]) > max(delta.pred[i], delta.pred[j]), abs(observations[i] - observations[j]) > max(delta.obs[i], delta.obs[j]), logic.operator))
-      if(logic.operator == "&"){
-        ife <- abs(predictions[i] - predictions[j]) == max(delta.pred[i], delta.pred[j])
-      }else{
-        ife <- !iff
-      }
-      if(iff){ #add flag to replace 'or' behaviour with 'xor' behaviour
+  if(!CPP){
+    N <- length(which(cc.ix))
+    if(length(delta.pred) == 1){
+      delta.pred <- rep(delta.pred, N)
+    }else{
+      delta.pred <- delta.pred[which(cc.ix)]
+    }
+    if(length(delta.obs) == 1){
+      delta.obs <- rep(delta.obs, N)
+    }else{
+      delta.obs <- delta.obs[which(cc.ix)]
+    }
+    c <- d <- u <- matrix(0, nrow = 1, ncol = N)
+    c.d.seq <- NULL
+    for (i in seq(from = 1, to = N - 1)) {
+      for (j in seq(from = i + 1, to = N)) {
+        pair <- c(i, j)
+        iff <- as.logical(outer(abs(predictions[i] - predictions[j]) > max(delta.pred[i], delta.pred[j]), abs(observations[i] - observations[j]) > max(delta.obs[i], delta.obs[j]), logic.operator))
+        if(logic.operator == "&"){
+          ife <- abs(predictions[i] - predictions[j]) == max(delta.pred[i], delta.pred[j])
+        }else{
+          ife <- !iff
+        }
+        if(iff){ #add flag to replace 'or' behaviour with 'xor' behaviour
           pp <- (predictions[i] < predictions[j])
           oo <- (observations[i] < observations[j])
           if (pp == oo) {
@@ -76,10 +77,22 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0.2, 
             c.d.seq <- c(c.d.seq, FALSE)
           }
         }
+      }
     }
+    C <- sum(c)
+    D <- sum(d)
+  }else{
+    values <- concordanceIndex_modified_helper(x=predictions, y=observations,
+                                               deltaX=delta.pred, deltaY=delta.obs,
+                                               alpha=alpha, outx=outx, alternative=alternative, logicOp=logic.operator)
+    C <- values$C
+    D <- values$D
+    CC <- values$CC
+    DD <- values$DD
+    CD <- values$CD
+    N <- values$N
+    c.d.seq <- values$cdseq
   }
-  C <- sum(c)
-  D <- sum(d)
 
   if (N < 3 || (C == 0 && D == 0)) {
     return(list("cindex"=NA, "p.value"=NA, "lower"=NA, "upper"=NA, "relevant.pairs.no"=0))
