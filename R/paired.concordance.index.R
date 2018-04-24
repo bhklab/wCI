@@ -23,16 +23,16 @@
 #' along with the lower and upper confidence intervals
 #' @export
 
-paired.concordance.index <- function(predictions, observations, delta.pred=0.2, delta.obs=0.2, alpha = 0.05, outx = TRUE, alternative = c("two.sided", "less", "greater"), logic.operator=c("and", "or"), CPP=TRUE) {
+paired.concordance.index <- function(predictions, observations, delta.pred=0.2, delta.obs=0.2, alpha = 0.05, outx = TRUE, alternative = c("two.sided", "less", "greater"), logic.operator=c("and", "or"), CPP=TRUE, comppairs=10) {
   alternative <- match.arg(alternative)
   logic.operator <- match.arg(logic.operator)
-  logic.operator <- ifelse(logic.operator=="or", "|", "&")
   predictions[which(is.nan(predictions))] <- NA
   observations[which(is.nan(observations))] <- NA
   cc.ix <- complete.cases(predictions, observations)
   predictions <- predictions[which(cc.ix)]
   observations <- observations[which(cc.ix)]
   if(!CPP){
+    logic.operator <- ifelse(logic.operator=="or", "|", "&")
     N <- length(which(cc.ix))
     if(length(delta.pred) == 1){
       delta.pred <- rep(delta.pred, N)
@@ -97,7 +97,9 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0.2, 
   if (N < 3 || (C == 0 && D == 0)) {
     return(list("cindex"=NA, "p.value"=NA, "lower"=NA, "upper"=NA, "relevant.pairs.no"=0))
   }
-
+  if(C==0 || D==0 || C * (C - 1)==0 || D * (D - 1)==0 || C * D==0 || (C + D) < comppairs){
+    return(list("cindex"=NA, "p.value"=NA, "lower"=NA, "upper"=NA, "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
+  }
   cindex <- C / (C + D)
 
   CC <- sum(c * (c - 1))
