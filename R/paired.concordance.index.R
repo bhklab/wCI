@@ -81,6 +81,9 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0.2, 
     }
     C <- sum(c)
     D <- sum(d)
+    CC <- sum(c * (c - 1))
+    DD <- sum(d * (d - 1))
+    CD <- sum(c * d)
   }else{
     values <- concordanceIndex_modified_helper(x=predictions, y=observations,
                                                deltaX=delta.pred, deltaY=delta.obs,
@@ -97,14 +100,10 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0.2, 
   if (N < 3 || (C == 0 && D == 0)) {
     return(list("cindex"=NA, "p.value"=NA, "lower"=NA, "upper"=NA, "relevant.pairs.no"=0))
   }
-  if(C==0 || D==0 || C * (C - 1)==0 || D * (D - 1)==0 || C * D==0 || (C + D) < comppairs){
+  if(C==0 || D==0 || C * (C - 1))==0 || D * (D - 1)==0 || C * D==0 || (C + D) < comppairs){
     return(list("cindex"=NA, "p.value"=NA, "lower"=NA, "upper"=NA, "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
   }
   cindex <- C / (C + D)
-
-  CC <- sum(c * (c - 1))
-  DD <- sum(d * (d - 1))
-  CD <- sum(c * d)
   varp <- 4 * ((D ^ 2 * CC - 2 * C * D * CD + C ^ 2 * DD) / (C + D) ^ 4) * N * (N - 1) / (N - 2)
   if (varp >= 0) {
     sterr <- sqrt(varp / N)
