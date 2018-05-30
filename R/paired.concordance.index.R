@@ -97,20 +97,20 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0.2, 
     c.d.seq <- values$cdseq
   }
 
+  cindex <- C / (C + D)
   if (N < 3 || (C == 0 && D == 0)) {
-    return(list("cindex"=NA, "p.value"=NA, "lower"=NA, "upper"=NA, "relevant.pairs.no"=0))
+    return(list("cindex"=cindex, "p.value"=NA, "lower"=NA, "upper"=NA, , "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
   }
   if(C==0 || D==0 || C * (C - 1)==0 || D * (D - 1)==0 || C * D==0 || (C + D) < comppairs){
-    return(list("cindex"=NA, "p.value"=NA, "lower"=NA, "upper"=NA, "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
+    return(list("cindex"=cindex, "p.value"=NA, "lower"=NA, "upper"=NA, "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
   }
-  cindex <- C / (C + D)
   varp <- 4 * ((D ^ 2 * CC - 2 * C * D * CD + C ^ 2 * DD) / (C + D) ^ 4) * N * (N - 1) / (N - 2)
   if (varp >= 0) {
     sterr <- sqrt(varp / N)
-    ci <- qnorm(p = alpha / 2, lower.tail = FALSE) * sterr
+    ci <- qnorm(p=alpha / 2, lower.tail=FALSE) * sterr
     p <- pnorm((cindex - 0.5) / sterr)
   } else {
     return(list("cindex"=cindex, "p.value"=1, "lower"=0, "upper"=0, "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
   }
-  return(list("cindex" = cindex, "p.value" = switch(alternative, less = p, greater = 1 - p, two.sided = 2 * min(p, 1 - p)), "lower" = max(cindex - ci, 0), "upper" = min(cindex + ci, 1), "relevant.pairs.no" = (C + D) / 2, "concordant.pairs"=c.d.seq))
+  return(list("cindex"=cindex, "p.value"=switch(alternative, less=p, greater=1 - p, two.sided=2 * min(p, 1 - p)), "lower"=max(cindex - ci, 0), "upper"=min(cindex + ci, 1), "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
 }
