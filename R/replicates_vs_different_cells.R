@@ -1,8 +1,6 @@
 library(PharmacoGx)
-load("Psets/CTRPv2.RData")
+load("~/Google Drive/Psets/CTRPv2.RData")
 load("results/aac_param_bs.RData", verbose=T)
-pdf("results/ctrpv2_aac.pdf", height=7, width=10)
-dev.off()
 
 null_aac <- hist(CTRPv2@sensitivity$profiles$auc_recomputed, main="CTRPv2", xlab="AUC", breaks=100, col="gray", ylim=c(0, 10000))
 hist(aac[[1]][[1]]$`17596`$`bootstrapped AUCs`, col="red", xlim=c(0, 1), add=T)
@@ -75,14 +73,15 @@ hist(diff_dist)
 hist(same_dist)
 mean(diff_dist)
 
-pdf("results/replicates_vs_different.pdf", height=5, width=5)
-hist(diff_dist, col=rgb(1,0,0,0.5),xlim=c(0,1), ylim=c(0,4e5), main=sprintf("The likelihood of pairs mark as different \nonly goes high if delta aac > 0.07"), xlab="delta aac", cex.main=.8)
+pdf("results/replicates_vs_different.pdf", height=7, width=7)
+#hist(diff_dist, col=rgb(1,0,0,0.5),xlim=c(0,1), ylim=c(0,4e5), main=sprintf("The likelihood of pairs mark as different \nonly goes high if delta aac > 0.07"), xlab="delta aac", cex.main=.8)
+hist(diff_dist, col=rgb(1,0,0,0.5),xlim=c(0,1), ylim=c(0,4e5), main=sprintf("Variation in biological replicates versus individual experiments"), xlab=expression(paste(Delta, " AAC")), cex.main=.8)
 hist(same_dist, col=rgb(0,0,1,0.5), add=T)
 abline(v=mean(diff_dist), col=rgb(1,0,0))
 text(x=mean(diff_dist)+.065, y=3e5, labels=sprintf("mu=%.2f\nsd=%.2f", mean(diff_dist), sd(diff_dist)), col=rgb(1,0,0))
 abline(v=mean(same_dist), col=rgb(0,0,1))
 text(x=mean(same_dist)+.065, y=35e4, labels=sprintf("mu=%.2f\nsd=%.2f", mean(same_dist), sd(same_dist)), col=rgb(0,0,1))
-legend("topright", legend=c("different", "replicates"), col=c(rgb(1,0,0), rgb(0,0,1)), pch=18, bty="n")
+legend("topright", legend=c("Non replicates", "Replicates"), col=c(rgb(1,0,0), rgb(0,0,1)), pch=18, bty="n")
 dev.off()
 
 
