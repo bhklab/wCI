@@ -98,10 +98,10 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0.2, 
   }
 
   if (N < 3 || (C == 0 && D == 0)) {
-    return(list("cindex"=NA, "p.value"=NA, "lower"=NA, "upper"=NA, "relevant.pairs.no"=0))
+    return(list("cindex"=NA, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA, "relevant.pairs.no"=0))
   }
   if(C==0 || D==0 || C * (C - 1)==0 || D * (D - 1)==0 || C * D==0 || (C + D) < comppairs){
-    return(list("cindex"=NA, "p.value"=NA, "lower"=NA, "upper"=NA, "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
+    return(list("cindex"=NA, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA, "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
   }
   cindex <- C / (C + D)
   varp <- 4 * ((D ^ 2 * CC - 2 * C * D * CD + C ^ 2 * DD) / (C + D) ^ 4) * N * (N - 1) / (N - 2)
