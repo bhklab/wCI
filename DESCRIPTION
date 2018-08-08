@@ -11,7 +11,7 @@ Encoding: UTF-8
 LazyData: true
 Imports: Rcpp (>= 0.12.12)
 LinkingTo: Rcpp
-SystemRequirements: C++11, Rcpp, foreach, parallel, doParallel, BiocStyle
+SystemRequirements: C++11, Rcpp, parallel, doParallel, BiocStyle
 RoxygenNote: 6.0.1
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
