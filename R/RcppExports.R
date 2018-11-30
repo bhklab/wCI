@@ -5,6 +5,10 @@ concordanceIndex_modified_helper <- function(x, y, deltaX, deltaY, alpha, outx, 
     .Call('_mCI_concordanceIndex_modified_helper', PACKAGE = 'mCI', x, y, deltaX, deltaY, alpha, outx, alternative, logicOp)
 }
 
+concordanceIndex_modified_helper_weighted <- function(x, y, deltaX, deltaY, weightingFun_pred, weightingFun_obs, alpha, outx, alternative, logicOp) {
+    .Call('_mCI_concordanceIndex_modified_helper_weighted', PACKAGE = 'mCI', x, y, deltaX, deltaY, weightingFun_pred, weightingFun_obs, alpha, outx, alternative, logicOp)
+}
+
 concordanceIndex_modified_helper_parallel <- function(x, y, deltaX, deltaY, alpha, outx, alternative, logicOp) {
     .Call('_mCI_concordanceIndex_modified_helper_parallel', PACKAGE = 'mCI', x, y, deltaX, deltaY, alpha, outx, alternative, logicOp)
 }
