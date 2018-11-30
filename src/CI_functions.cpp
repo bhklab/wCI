@@ -159,6 +159,101 @@ List concordanceIndex_modified_helper(std::vector<double> x, std::vector<double>
 
 
 
+
+/* function calculates modified concordance index.
+ Input: predictions x, observations y, cutoffs for x and y, deltas for x and y, confidence level alpha, flag outx, string alternative*/
+// [[Rcpp::export]]
+List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY,std::string weightingFun_pred,std::string weightingFun_obs, double alpha, bool outx, std::string alternative, std::string logicOp) {
+
+  int N = static_cast<int>(x.size());
+  std::vector<int> c(N);
+  std::vector<int> d(N);
+
+
+  std::list<bool> cdseq;
+
+  for (int i = 0; i < N; ++i) {
+    c[i] = 0;
+    d[i] = 0;
+  }
+
+  double numOfPairs = 0;
+  double w = 0;
+
+  for (int i = 0; i < N - 1; ++i) {
+    for (int j = i + 1; j < N; ++j) {
+
+      if((weightingFun_obs.compare("f1") == 0 & weightingFun_pred.compare("f1") == 0) | (weightingFun_obs.compare("f2") == 0 & weightingFun_pred.compare("f2") == 0)){
+        // w <- abs(log10(weightingFun_obs(observations[i] - observations[j]))) * abs(log10(weightingFun_obs(predictions[i] - predictions[j])))
+        w = 1;
+      }else if((weightingFun_obs.compare("f1") == 0) | (weightingFun_obs.compare("f2") == 0)){
+        // w <- abs(log10(weightingFun_obs(observations[i] - observations[j])))
+        w = 1;
+      }else{
+        w = 1;
+      }
+
+      if (logicOpF(usable(x[i],x[j], deltaX), usable(y[i],y[j], deltaY), logicOp)) {
+        if(y[i]!=y[j]){
+          ++numOfPairs;
+          if (outx == false && (x[i] == x[j])) {
+            d[i] = d[i] + w;
+            c[i] = c[i] + w;
+            cdseq.push_back(true);
+            cdseq.push_back(false);
+          } else {
+
+
+            if ((x[i] > x[j] & y[i] > y[j]) || (x[i] < x[j] & y[i] < y[j])) {
+              c[i] = c[i] + w;
+              c[j] = c[j] + w;
+              cdseq.push_back(true);
+              cdseq.push_back(true);
+            } else {
+              if(outx == true && (x[i] == x[j])){
+                --numOfPairs;
+              }else{
+                d[i] = d[i] + w;
+                d[j] = d[j] + w;
+                cdseq.push_back(false);
+                cdseq.push_back(false);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  double C = 0.0;
+  double D = 0.0;
+  double CC = 0.0;
+  double CD = 0.0;
+  double DD = 0.0;
+
+  for (int i = 0; i < N; ++i) {
+    C += c[i];
+    D += d[i];
+    CC += c[i] * (c[i] - 1);
+    DD += d[i] * (d[i] - 1);
+    CD += c[i] * d[i];
+  }
+
+  List ret;
+  ret["C"] = C;
+  ret["D"] = D;
+  ret["CC"] = CC;
+  ret["DD"] = DD;
+  ret["CD"] = CD;
+  ret["N"] = N;
+  ret["cdseq"] = cdseq;
+  return ret;
+
+
+}
+
+
+
 /* function calculates modified concordance index.
  Input: predictions x, observations y, cutoffs for x and y, deltas for x and y, confidence level alpha, flag outx, string alternative*/
 // [[Rcpp::export]]
