@@ -99,10 +99,12 @@ List concordanceIndex_modified_helper(std::vector<double> x, std::vector<double>
       if (logicOpF(usable(x[i],x[j], deltaX), usable(y[i],y[j], deltaY), logicOp)) {
         if(y[i]!=y[j]){
           ++numOfPairs;
-          if (outx == false && (x[i] == x[j])) { // should this be an xor?
-            ++d[i];
-            ++d[j];
-            cdseq.push_back(false);
+          if (outx == false && (x[i] == x[j])) {
+            d[i] = d[i] + 1;
+            //d[j] = d[j] + 0.25;
+            c[i] = c[i] + 1;
+            //c[j] = c[j] + 0.25;
+            cdseq.push_back(true);
             cdseq.push_back(false);
           } else {
 
@@ -116,8 +118,8 @@ List concordanceIndex_modified_helper(std::vector<double> x, std::vector<double>
               if(outx == true && (x[i] == x[j])){
                 --numOfPairs;
               }else{
-                ++d[i];
-                ++d[j];
+                d[i] = d[i] + 1;
+                d[j] = d[j] + 1;
                 cdseq.push_back(false);
                 cdseq.push_back(false);
               }
