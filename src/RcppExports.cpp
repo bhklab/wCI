@@ -23,6 +23,32 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// kernel_gaussian_C
+double kernel_gaussian_C(double x, double m, double s);
+RcppExport SEXP _mCI_kernel_gaussian_C(SEXP xSEXP, SEXP mSEXP, SEXP sSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type m(mSEXP);
+    Rcpp::traits::input_parameter< double >::type s(sSEXP);
+    rcpp_result_gen = Rcpp::wrap(kernel_gaussian_C(x, m, s));
+    return rcpp_result_gen;
+END_RCPP
+}
+// kernel_laplace_C
+double kernel_laplace_C(double x, double m, double b);
+RcppExport SEXP _mCI_kernel_laplace_C(SEXP xSEXP, SEXP mSEXP, SEXP bSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type m(mSEXP);
+    Rcpp::traits::input_parameter< double >::type b(bSEXP);
+    rcpp_result_gen = Rcpp::wrap(kernel_laplace_C(x, m, b));
+    return rcpp_result_gen;
+END_RCPP
+}
 // concordanceIndex_modified_helper_weighted
 List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY, std::string weightingFun_pred, std::string weightingFun_obs, double alpha, bool outx, std::string alternative, std::string logicOp);
 RcppExport SEXP _mCI_concordanceIndex_modified_helper_weighted(SEXP xSEXP, SEXP ySEXP, SEXP deltaXSEXP, SEXP deltaYSEXP, SEXP weightingFun_predSEXP, SEXP weightingFun_obsSEXP, SEXP alphaSEXP, SEXP outxSEXP, SEXP alternativeSEXP, SEXP logicOpSEXP) {
@@ -121,6 +147,8 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_mCI_concordanceIndex_modified_helper", (DL_FUNC) &_mCI_concordanceIndex_modified_helper, 8},
+    {"_mCI_kernel_gaussian_C", (DL_FUNC) &_mCI_kernel_gaussian_C, 3},
+    {"_mCI_kernel_laplace_C", (DL_FUNC) &_mCI_kernel_laplace_C, 3},
     {"_mCI_concordanceIndex_modified_helper_weighted", (DL_FUNC) &_mCI_concordanceIndex_modified_helper_weighted, 10},
     {"_mCI_concordanceIndex_modified_helper_parallel", (DL_FUNC) &_mCI_concordanceIndex_modified_helper_parallel, 8},
     {"_mCI_concordanceIndex_modified_AllinC", (DL_FUNC) &_mCI_concordanceIndex_modified_AllinC, 8},

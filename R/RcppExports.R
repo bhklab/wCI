@@ -5,6 +5,14 @@ concordanceIndex_modified_helper <- function(x, y, deltaX, deltaY, alpha, outx, 
     .Call('_mCI_concordanceIndex_modified_helper', PACKAGE = 'mCI', x, y, deltaX, deltaY, alpha, outx, alternative, logicOp)
 }
 
+kernel_gaussian_C <- function(x, m, s) {
+    .Call('_mCI_kernel_gaussian_C', PACKAGE = 'mCI', x, m, s)
+}
+
+kernel_laplace_C <- function(x, m, b) {
+    .Call('_mCI_kernel_laplace_C', PACKAGE = 'mCI', x, m, b)
+}
+
 concordanceIndex_modified_helper_weighted <- function(x, y, deltaX, deltaY, weightingFun_pred, weightingFun_obs, alpha, outx, alternative, logicOp) {
     .Call('_mCI_concordanceIndex_modified_helper_weighted', PACKAGE = 'mCI', x, y, deltaX, deltaY, weightingFun_pred, weightingFun_obs, alpha, outx, alternative, logicOp)
 }
