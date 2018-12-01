@@ -97,14 +97,23 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
     CD <- sum(c * d)
   }else{
 
-    if(missing(weightingFun_pred)){
-      weightingFun_pred <- "ignore"
-    }
     if(missing(weightingFun_obs)){
-      weightingFun_obs <- "ignore"
+      f_obs <- "ignore"
+    }else{
+      f_obs <- find.original.name(weightingFun_obs)
     }
+
+    if(missing(weightingFun_pred)){
+      f_pred <- "ignore"
+    }else{
+      f_pred <- find.original.name(weightingFun_pred)
+    }
+
+
+
+
     values <- concordanceIndex_modified_helper_weighted(x=predictions, y=observations,
-                                               deltaX=delta.pred, deltaY=delta.obs,weightingFun_pred = weightingFun_pred,weightingFun_obs = weightingFun_obs,
+                                               deltaX=delta.pred, deltaY=delta.obs,weightingFun_pred = f_pred,weightingFun_obs = f_obs,
                                                alpha=alpha, outx=outx, alternative=alternative, logicOp=logic.operator)
     C <- values$C
     D <- values$D
