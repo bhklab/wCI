@@ -160,14 +160,32 @@ List concordanceIndex_modified_helper(std::vector<double> x, std::vector<double>
 
 
 
+
+/* functions to calculate kernels for weights
+ */
+// [[Rcpp::export]]
+double kernel_gaussian_C( double x, double m, double s){
+
+  const double PI_cons = 3.141592653589793238463;
+
+  return((1/sqrt(2*PI_cons*pow(s,2)))*exp(-pow((x-m),2)/(2*pow(s,2))));
+
+}
+
+// [[Rcpp::export]]
+double kernel_laplace_C( double x, double m, double b){
+
+  return((1/(2*b)) * exp(-fabs(x - m) / b));
+
+}
 /* function calculates modified concordance index.
  Input: predictions x, observations y, cutoffs for x and y, deltas for x and y, confidence level alpha, flag outx, string alternative*/
 // [[Rcpp::export]]
 List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY,std::string weightingFun_pred,std::string weightingFun_obs, double alpha, bool outx, std::string alternative, std::string logicOp) {
 
   int N = static_cast<int>(x.size());
-  std::vector<int> c(N);
-  std::vector<int> d(N);
+  std::vector<double> c(N);
+  std::vector<double> d(N);
 
 
   std::list<bool> cdseq;
@@ -183,15 +201,29 @@ List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vecto
   for (int i = 0; i < N - 1; ++i) {
     for (int j = i + 1; j < N; ++j) {
 
-      if((weightingFun_obs.compare("f1") == 0 & weightingFun_pred.compare("f1") == 0) | (weightingFun_obs.compare("f2") == 0 & weightingFun_pred.compare("f2") == 0)){
+      if((weightingFun_obs.compare("kernel_gaussian") == 0 & weightingFun_pred.compare("kernel_gaussian") == 0) | (weightingFun_obs.compare("kernel_laplace") == 0 & weightingFun_pred.compare("kernel_laplace") == 0)){
+
+        if(weightingFun_obs.compare("kernel_gaussian") == 0){
+          w = fabs(log10(kernel_gaussian_C(y[i] - y[j],0.0002037366,0.0919937995))) * fabs(log10(kernel_gaussian_C(x[i] - x[j],0.0002037366,0.0919937995)));
+        }else if(weightingFun_obs.compare("kernel_laplace") == 0){
+          w = fabs(log10(kernel_laplace_C(y[i] - y[j],-0.001630207,0.060597464))) * fabs(log10(kernel_laplace_C(x[i] - x[j],-0.001630207,0.060597464)));
+        }
+
         // w <- abs(log10(weightingFun_obs(observations[i] - observations[j]))) * abs(log10(weightingFun_obs(predictions[i] - predictions[j])))
-        w = 1;
-      }else if((weightingFun_obs.compare("f1") == 0) | (weightingFun_obs.compare("f2") == 0)){
+       // w = 1;
+      }else if((weightingFun_obs.compare("kernel_gaussian") == 0) | (weightingFun_obs.compare("kernel_laplace") == 0)){
+        if(weightingFun_obs.compare("kernel_gaussian") == 0){
+          w = fabs(log10(kernel_gaussian_C(y[i] - y[j],0.0002037366,0.0919937995)));
+        }else if(weightingFun_obs.compare("kernel_laplace") == 0){
+          w = fabs(log10(kernel_laplace_C(y[i] - y[j],-0.001630207,0.060597464)));
+        }
+
         // w <- abs(log10(weightingFun_obs(observations[i] - observations[j])))
-        w = 1;
+        //w = 1;
       }else{
         w = 1;
       }
+
 
       if (logicOpF(usable(x[i],x[j], deltaX), usable(y[i],y[j], deltaY), logicOp)) {
         if(y[i]!=y[j]){
