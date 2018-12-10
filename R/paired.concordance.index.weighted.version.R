@@ -26,7 +26,7 @@
 paired.concordance.index.weighted.version <- function(predictions, observations,
                                                       delta.pred=.2, delta.obs=.2,
                                                       weightingFun_pred, weightingFun_obs,
-                                                      alpha=0.05, outx=TRUE, alternative=c("two.sided", "less", "greater"), logic.operator=c("and", "or"), CPP=TRUE, comppairs=10) {
+                                                      alpha=0.05, outx=FALSE, alternative=c("two.sided", "less", "greater"), logic.operator=c("and", "or"), CPP=TRUE, comppairs=10) {
   alternative <- match.arg(alternative)
   logic.operator <- match.arg(logic.operator)
   predictions[which(is.nan(predictions))] <- NA
