@@ -23,7 +23,7 @@
 #' along with the lower and upper confidence intervals
 #' @export
 
-paired.concordance.index <- function(predictions, observations, delta.pred=0.2, delta.obs=0.2, alpha = 0.05, outx=,FALSE alternative = c("two.sided", "less", "greater"), logic.operator=c("and", "or"), CPP=TRUE, comppairs=10) {
+paired.concordance.index <- function(predictions, observations, delta.pred=0.2, delta.obs=0.2, alpha = 0.05, outx=FALSE, alternative = c("two.sided", "less", "greater"), logic.operator=c("and", "or"), CPP=TRUE, comppairs=10) {
   alternative <- match.arg(alternative)
   logic.operator <- match.arg(logic.operator)
   predictions[which(is.nan(predictions))] <- NA
