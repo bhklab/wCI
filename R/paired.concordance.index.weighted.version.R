@@ -28,7 +28,7 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
                                                       weightingFun_pred, weightingFun_obs,
                                                       alpha=0.05, outx=FALSE, alternative=c("two.sided", "less", "greater"), logic.operator=c("and", "or"), CPP=TRUE, comppairs=10) {
   if(!missing(weightingFun_obs) & !missing(weightingFun_pred)){
-    obs_weights <- abs(log10weightingFun_obs(outer(observations, observations, FUN="-")))
+    obs_weights <- abs(log10(weightingFun_obs(outer(observations, observations, FUN="-"))))
     pred_weights <- abs(log10(weightingFun_pred(outer(predictions, predictions, FUN="-"))))
     max_weight <- max(pred_weights * obs_weights, na.rm=TRUE)
     max_weight_obs <- max(obs_weights, na.rm=TRUE)
