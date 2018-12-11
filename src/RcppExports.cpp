@@ -50,8 +50,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // concordanceIndex_modified_helper_weighted
-List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY, std::string weightingFun_pred, std::string weightingFun_obs, double alpha, bool outx, std::string alternative, std::string logicOp);
-RcppExport SEXP _mCI_concordanceIndex_modified_helper_weighted(SEXP xSEXP, SEXP ySEXP, SEXP deltaXSEXP, SEXP deltaYSEXP, SEXP weightingFun_predSEXP, SEXP weightingFun_obsSEXP, SEXP alphaSEXP, SEXP outxSEXP, SEXP alternativeSEXP, SEXP logicOpSEXP) {
+List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY, std::string weightingFun_pred, std::string weightingFun_obs, double alpha, bool outx, std::string alternative, std::string logicOp, double max_weight, double max_weight_obs);
+RcppExport SEXP _mCI_concordanceIndex_modified_helper_weighted(SEXP xSEXP, SEXP ySEXP, SEXP deltaXSEXP, SEXP deltaYSEXP, SEXP weightingFun_predSEXP, SEXP weightingFun_obsSEXP, SEXP alphaSEXP, SEXP outxSEXP, SEXP alternativeSEXP, SEXP logicOpSEXP, SEXP max_weightSEXP, SEXP max_weight_obsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -65,7 +65,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< bool >::type outx(outxSEXP);
     Rcpp::traits::input_parameter< std::string >::type alternative(alternativeSEXP);
     Rcpp::traits::input_parameter< std::string >::type logicOp(logicOpSEXP);
-    rcpp_result_gen = Rcpp::wrap(concordanceIndex_modified_helper_weighted(x, y, deltaX, deltaY, weightingFun_pred, weightingFun_obs, alpha, outx, alternative, logicOp));
+    Rcpp::traits::input_parameter< double >::type max_weight(max_weightSEXP);
+    Rcpp::traits::input_parameter< double >::type max_weight_obs(max_weight_obsSEXP);
+    rcpp_result_gen = Rcpp::wrap(concordanceIndex_modified_helper_weighted(x, y, deltaX, deltaY, weightingFun_pred, weightingFun_obs, alpha, outx, alternative, logicOp, max_weight, max_weight_obs));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -149,7 +151,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_mCI_concordanceIndex_modified_helper", (DL_FUNC) &_mCI_concordanceIndex_modified_helper, 8},
     {"_mCI_kernel_gaussian_C", (DL_FUNC) &_mCI_kernel_gaussian_C, 3},
     {"_mCI_kernel_laplace_C", (DL_FUNC) &_mCI_kernel_laplace_C, 3},
-    {"_mCI_concordanceIndex_modified_helper_weighted", (DL_FUNC) &_mCI_concordanceIndex_modified_helper_weighted, 10},
+    {"_mCI_concordanceIndex_modified_helper_weighted", (DL_FUNC) &_mCI_concordanceIndex_modified_helper_weighted, 12},
     {"_mCI_concordanceIndex_modified_helper_parallel", (DL_FUNC) &_mCI_concordanceIndex_modified_helper_parallel, 8},
     {"_mCI_concordanceIndex_modified_AllinC", (DL_FUNC) &_mCI_concordanceIndex_modified_AllinC, 8},
     {"_mCI_shuffle", (DL_FUNC) &_mCI_shuffle, 1},

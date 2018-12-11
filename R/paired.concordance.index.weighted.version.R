@@ -28,10 +28,13 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
                                                       weightingFun_pred, weightingFun_obs,
                                                       alpha=0.05, outx=FALSE, alternative=c("two.sided", "less", "greater"), logic.operator=c("and", "or"), CPP=TRUE, comppairs=10) {
   if(!missing(weightingFun_obs) & !missing(weightingFun_pred)){
-    obs_weights <- abs(log10weightingFun_obs(outer(observations, observations, FUN="-")))
+    obs_weights <- abs(log10(weightingFun_obs(outer(observations, observations, FUN="-"))))
     pred_weights <- abs(log10(weightingFun_pred(outer(predictions, predictions, FUN="-"))))
     max_weight <- max(pred_weights * obs_weights, na.rm=TRUE)
     max_weight_obs <- max(obs_weights, na.rm=TRUE)
+  }else{
+    max_weight <- 1
+    max_weight_obs <- 1
   }
   alternative <- match.arg(alternative)
   logic.operator <- match.arg(logic.operator)
@@ -120,7 +123,7 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
 
     values <- concordanceIndex_modified_helper_weighted(x=predictions, y=observations,
                                                deltaX=delta.pred, deltaY=delta.obs,weightingFun_pred = f_pred,weightingFun_obs = f_obs,
-                                               alpha=alpha, outx=outx, alternative=alternative, logicOp=logic.operator)
+                                               alpha=alpha, outx=outx, alternative=alternative, logicOp=logic.operator,max_weight,max_weight_obs)
     C <- values$C
     D <- values$D
     CC <- values$CC
