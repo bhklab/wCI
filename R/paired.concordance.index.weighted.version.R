@@ -28,7 +28,6 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
                                                       weightingFun_pred, weightingFun_obs,
                                                       alpha=0.05, outx=FALSE, alternative=c("two.sided", "less", "greater"), logic.operator=c("and", "or"), CPP=TRUE, comppairs=10) {
   max_weight <- 1
-  max_weight_obs <- 1
 
   if(!missing(weightingFun_obs) & !missing(weightingFun_pred)){
     obs_weights <- -log10(abs(weightingFun_obs(outer(observations, observations, FUN="-"))))
@@ -36,7 +35,7 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
     max_weight <- max(pred_weights * obs_weights, na.rm=TRUE)
   }else if(!missing(weightingFun_obs)){
     obs_weights <- -log10(abs(weightingFun_obs(outer(observations, observations, FUN="-"))))
-    max_weight_obs <- max(obs_weights, na.rm=TRUE)
+    max_weight <- max(obs_weights, na.rm=TRUE)
   }
   alternative <- match.arg(alternative)
   logic.operator <- match.arg(logic.operator)
@@ -67,7 +66,7 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
           #w <- sqrt(abs(log(weightingFun_obs(observations[i] - observations[j]))) * abs(log(weightingFun_obs(predictions[i] - predictions[j]))))
           w <- 1/max_weight * -log10(abs(weightingFun_obs(observations[i] - observations[j]))) * -log10(abs(weightingFun_pred(predictions[i] - predictions[j])))
         }else if(!missing(weightingFun_obs)){
-          w <- 1/max_weight_obs * -log10(abs(weightingFun_obs(observations[i] - observations[j])))
+          w <- 1/max_weight * -log10(abs(weightingFun_obs(observations[i] - observations[j])))
         }else{
           w <- 1
         }
@@ -124,8 +123,8 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
 
 
     values <- concordanceIndex_modified_helper_weighted(x=predictions, y=observations,
-                                               deltaX=delta.pred, deltaY=delta.obs,weightingFun_pred = f_pred,weightingFun_obs = f_obs,
-                                               alpha=alpha, outx=outx, alternative=alternative, logicOp=logic.operator,max_weight,max_weight_obs)
+                                               deltaX=delta.pred, deltaY=delta.obs, weightingFun_pred=f_pred, weightingFun_obs=f_obs,
+                                               alpha=alpha, outx=outx, alternative=alternative, logicOp=logic.operator, max_weight, max_weight)
     C <- values$C
     D <- values$D
     CC <- values$CC
