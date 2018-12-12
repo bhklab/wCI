@@ -206,18 +206,18 @@ List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vecto
 
         if(weightingFun_obs.compare("kernel_gaussian") == 0){
           //w = fabs(log10(kernel_gaussian_C(y[i] - y[j],0.0002037366,0.0919937995))) * fabs(log10(kernel_gaussian_C(x[i] - x[j],0.0002037366,0.0919937995)));
-          w = 1/max_weight * fabs(log10(kernel_gaussian_C(y[i] - y[j],0.0002037366,0.0919937995))) * fabs(log10(kernel_gaussian_C(x[i] - x[j],0.0002037366,0.0919937995)));
+          w = 1/max_weight * -log10(fabs(kernel_gaussian_C(y[i] - y[j],0.0002037366,0.0919937995))) * -log10(fabs(kernel_gaussian_C(x[i] - x[j],0.0002037366,0.0919937995)));
         }else if(weightingFun_obs.compare("kernel_laplace") == 0){
-          w = 1/max_weight * fabs(log10(kernel_laplace_C(y[i] - y[j],-0.001630207,0.060597464))) * fabs(log10(kernel_laplace_C(x[i] - x[j],-0.001630207,0.060597464)));
+          w = 1/max_weight * -log10(fabs(kernel_laplace_C(y[i] - y[j],-0.001630207,0.060597464))) * -log10(fabs(kernel_laplace_C(x[i] - x[j],-0.001630207,0.060597464)));
         }
 
         // w <- abs(log10(weightingFun_obs(observations[i] - observations[j]))) * abs(log10(weightingFun_obs(predictions[i] - predictions[j])))
        // w = 1;
       }else if((weightingFun_obs.compare("kernel_gaussian") == 0) | (weightingFun_obs.compare("kernel_laplace") == 0)){
         if(weightingFun_obs.compare("kernel_gaussian") == 0){
-          w = 1/max_weight_obs * fabs(log10(kernel_gaussian_C(y[i] - y[j],0.0002037366,0.0919937995)));
+          w = 1/max_weight_obs * -log10(fabs(kernel_gaussian_C(y[i] - y[j],0.0002037366,0.0919937995)));
         }else if(weightingFun_obs.compare("kernel_laplace") == 0){
-          w = 1/max_weight_obs * fabs(log10(kernel_laplace_C(y[i] - y[j],-0.001630207,0.060597464)));
+          w = 1/max_weight_obs * -log10(fabs(kernel_laplace_C(y[i] - y[j],-0.001630207,0.060597464)));
         }
 
         // w <- abs(log10(weightingFun_obs(observations[i] - observations[j])))

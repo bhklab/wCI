@@ -27,14 +27,16 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
                                                       delta.pred=.2, delta.obs=.2,
                                                       weightingFun_pred, weightingFun_obs,
                                                       alpha=0.05, outx=FALSE, alternative=c("two.sided", "less", "greater"), logic.operator=c("and", "or"), CPP=TRUE, comppairs=10) {
+  max_weight <- 1
+  max_weight_obs <- 1
+
   if(!missing(weightingFun_obs) & !missing(weightingFun_pred)){
-    obs_weights <- abs(log10(weightingFun_obs(outer(observations, observations, FUN="-"))))
-    pred_weights <- abs(log10(weightingFun_pred(outer(predictions, predictions, FUN="-"))))
+    obs_weights <- -log10(abs(weightingFun_obs(outer(observations, observations, FUN="-"))))
+    pred_weights <- -log10(abs(weightingFun_pred(outer(predictions, predictions, FUN="-"))))
     max_weight <- max(pred_weights * obs_weights, na.rm=TRUE)
+  }else if(!missing(weightingFun_obs)){
+    obs_weights <- -log10(abs(weightingFun_obs(outer(observations, observations, FUN="-"))))
     max_weight_obs <- max(obs_weights, na.rm=TRUE)
-  }else{
-    max_weight <- 1
-    max_weight_obs <- 1
   }
   alternative <- match.arg(alternative)
   logic.operator <- match.arg(logic.operator)
@@ -63,9 +65,9 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
         pair <- c(i, j)
         if(!missing(weightingFun_obs) & !missing(weightingFun_pred)){
           #w <- sqrt(abs(log(weightingFun_obs(observations[i] - observations[j]))) * abs(log(weightingFun_obs(predictions[i] - predictions[j]))))
-          w <- 1/max_weight * abs(log10(weightingFun_obs(observations[i] - observations[j]))) * abs(log10(weightingFun_pred(predictions[i] - predictions[j])))
+          w <- 1/max_weight * -log10(abs(eightingFun_obs(observations[i] - observations[j]))) * -log10(abs(weightingFun_pred(predictions[i] - predictions[j])))
         }else if(!missing(weightingFun_obs)){
-          w <- 1/max_weight_obs * abs(log10(weightingFun_obs(observations[i] - observations[j])))
+          w <- 1/max_weight_obs * -log10(abs(weightingFun_obs(observations[i] - observations[j])))
         }else{
           w <- 1
         }
