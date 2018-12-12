@@ -65,7 +65,7 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
         pair <- c(i, j)
         if(!missing(weightingFun_obs) & !missing(weightingFun_pred)){
           #w <- sqrt(abs(log(weightingFun_obs(observations[i] - observations[j]))) * abs(log(weightingFun_obs(predictions[i] - predictions[j]))))
-          w <- 1/max_weight * -log10(abs(eightingFun_obs(observations[i] - observations[j]))) * -log10(abs(weightingFun_pred(predictions[i] - predictions[j])))
+          w <- 1/max_weight * -log10(abs(weightingFun_obs(observations[i] - observations[j]))) * -log10(abs(weightingFun_pred(predictions[i] - predictions[j])))
         }else if(!missing(weightingFun_obs)){
           w <- 1/max_weight_obs * -log10(abs(weightingFun_obs(observations[i] - observations[j])))
         }else{
