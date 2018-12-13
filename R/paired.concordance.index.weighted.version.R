@@ -27,16 +27,6 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
                                                       delta.pred=.2, delta.obs=.2,
                                                       weightingFun_pred, weightingFun_obs,
                                                       alpha=0.05, outx=FALSE, alternative=c("two.sided", "less", "greater"), logic.operator=c("and", "or"), CPP=TRUE, comppairs=10) {
-  max_weight <- 1
-
-  if(!missing(weightingFun_obs) & !missing(weightingFun_pred)){
-    obs_weights <- abs(log10(weightingFun_obs(outer(observations, observations, FUN="-"))))
-    pred_weights <-  abs(log10(weightingFun_pred(outer(predictions, predictions, FUN="-"))))
-    max_weight <- max(pred_weights * obs_weights, na.rm=TRUE)
-  }else if(!missing(weightingFun_obs)){
-    obs_weights <-  abs(log10(weightingFun_obs(outer(observations, observations, FUN="-"))))
-    max_weight <- max(obs_weights, na.rm=TRUE)
-  }
   alternative <- match.arg(alternative)
   logic.operator <- match.arg(logic.operator)
   predictions[which(is.nan(predictions))] <- NA
@@ -44,7 +34,28 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
   cc.ix <- complete.cases(predictions, observations)
   predictions <- predictions[which(cc.ix)]
   observations <- observations[which(cc.ix)]
-  if(!CPP){
+  max_weight <- 1
+  obs_dist <- upper.tri(outer(observations, observations, FUN="-"))
+  pred_dist <- upper.tri(outer(predictions, predictions, FUN="-"))
+  if(!missing(weightingFun_obs)){
+    obs_weights <- abs(log10(weightingFun_obs(obs_dist)))
+    #obs_weights[which(obs_weights < 0)] <- 0
+    if(sum(obs_weights)!=0){
+      max_weight <- sum(obs_weights)
+    }
+  }
+  if(!missing(weightingFun_obs) & !missing(weightingFun_pred)){
+    pred_weights <- abs(log10(weightingFun_pred(pred_dist)))
+    #pred_weights[which(pred_weights < 0)] <- 0
+    obs_weights <- obs_weights/sum(obs_weights)
+    pred_weights <- pred_weights/sum(pred_weights)
+    jj <- sapply(1:length(obs_weights), function(i){max(obs_weights[i], pred_weights[i])})
+    if(sum(jj)!=0){
+      max_weight <- sum(jj)
+    }
+  }
+
+    if(!CPP){
     logic.operator <- ifelse(logic.operator=="or", "|", "&")
     N <- length(which(cc.ix))
     if(length(delta.pred) == 1){
@@ -64,9 +75,15 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
         pair <- c(i, j)
         if(!missing(weightingFun_obs) & !missing(weightingFun_pred)){
           #w <- sqrt(abs(log(weightingFun_obs(observations[i] - observations[j]))) * abs(log(weightingFun_obs(predictions[i] - predictions[j]))))
-          w <- 1/max_weight *  abs(log10(weightingFun_obs(observations[i] - observations[j]))) *  abs(log10(weightingFun_pred(predictions[i] - predictions[j])))
+          obs_w <- abs(log10(weightingFun_obs(observations[i] - observations[j])))
+          #obs_w <- ifelse(obs_w < 0, 0, obs_w)
+          pred_w <- abs(log10(weightingFun_pred(predictions[i] - predictions[j])))
+          #pred_w <- ifelse(pred_w < 0, 0, pred_w)
+          w <- 1/max_weight *  max(obs_w, pred_w)
         }else if(!missing(weightingFun_obs)){
-          w <- 1/max_weight *  abs(log10(weightingFun_obs(observations[i] - observations[j])))
+          obs_w <- abs(log10(weightingFun_obs(observations[i] - observations[j])))
+          #obs_w <- ifelse(obs_w < 0, 0, obs_w)
+          w <- 1/max_weight *  max(obs_w, pred_w)
         }else{
           w <- 1
         }
