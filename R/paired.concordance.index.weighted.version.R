@@ -35,8 +35,8 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
   predictions <- predictions[which(cc.ix)]
   observations <- observations[which(cc.ix)]
   max_weight <- 1
-  obs_dist <- upper.tri(outer(observations, observations, FUN="-"))
-  pred_dist <- upper.tri(outer(predictions, predictions, FUN="-"))
+  obs_dist <- outer(predictions, predictions, FUN="-")
+  pred_dist <- outer(observations, observations, FUN="-")
   if(!missing(weightingFun_obs)){
     obs_weights <- abs(log10(weightingFun_obs(obs_dist)))
     #obs_weights[which(obs_weights < 0)] <- 0
@@ -83,7 +83,7 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
         }else if(!missing(weightingFun_obs)){
           obs_w <- abs(log10(weightingFun_obs(observations[i] - observations[j])))
           #obs_w <- ifelse(obs_w < 0, 0, obs_w)
-          w <- 1/max_weight *  max(obs_w, pred_w)
+          w <- 1/max_weight *  obs_w
         }else{
           w <- 1
         }
@@ -155,7 +155,7 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
     return(list("cindex"=NA, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA, "relevant.pairs.no"=0))
   }
   if(C==0 || D==0 || C * (C - 1)==0 || D * (D - 1)==0 || C * D==0 || (C + D) < comppairs){
-    return(list("cindex"=NA, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA, "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
+    return(list("cindex"=cindex, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA, "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
   }
   cindex <- C / (C + D)
   varp <- 4 * ((D ^ 2 * CC - 2 * C * D * CD + C ^ 2 * DD) / (C + D) ^ 4) * N * (N - 1) / (N - 2)
