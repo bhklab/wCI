@@ -1,8 +1,8 @@
-kernel_gaussian <- function(x, m=0.0007073701, s=0.0944041824){
+kernel_gaussian <- function(x, m=0.0002001131, s=0.0939948369){
   #dnorm(x, m, s)
   (1/sqrt(2*pi*s^2))*exp(-(x-m)^2/(2*s^2))
 }
-kernel_laplace <- function(x, m=-0.001521505, b=0.062240875){
+kernel_laplace <- function(x, m=-0.001785626, b=0.061982848){
   (1/(2*b)) * exp(-abs(x - m) / b)
 }
 
