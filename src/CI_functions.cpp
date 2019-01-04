@@ -208,21 +208,21 @@ List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vecto
 
         if(weightingFun_obs.compare("kernel_gaussian") == 0){
           //w = fabs(log10(kernel_gaussian_C(y[i] - y[j],0.0002037366,0.0919937995))) * fabs(log10(kernel_gaussian_C(x[i] - x[j],0.0002037366,0.0919937995)));
-          obs_w = fabs(log10(kernel_gaussian_C(y[i] - y[j],0.0002037366,0.0919937995)));
+          obs_w = fabs(log10(kernel_gaussian_C(y[i] - y[j],0.0007073701,0.0944041824)));
           //if(obs_w < 0){
           //  obs_w = 0;
           //}
-          pred_w = fabs(log10(kernel_gaussian_C(x[i] - x[j],0.0002037366,0.0919937995)));
+          pred_w = fabs(log10(kernel_gaussian_C(x[i] - x[j],0.0007073701,0.0944041824)));
           //if(pred_w < 0){
           //  pred_w = 0;
           //}
           w = 1/max_weight * std::max(obs_w, pred_w);
         }else if(weightingFun_obs.compare("kernel_laplace") == 0){
-          obs_w = fabs(log10(kernel_laplace_C(y[i] - y[j],-0.001630207,0.060597464)));
+          obs_w = fabs(log10(kernel_laplace_C(y[i] - y[j],-0.001521505,0.062240875)));
           //if(obs_w < 0){
           //  obs_w = 0;
           //}
-          pred_w = fabs(log10(kernel_laplace_C(x[i] - x[j],-0.001630207,0.060597464)));
+          pred_w = fabs(log10(kernel_laplace_C(x[i] - x[j],-0.001521505,0.062240875)));
           //if(pred_w < 0){
           //  pred_w = 0;
           //}
@@ -233,12 +233,12 @@ List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vecto
        // w = 1;
       }else if((weightingFun_obs.compare("kernel_gaussian") == 0) | (weightingFun_obs.compare("kernel_laplace") == 0)){
         if(weightingFun_obs.compare("kernel_gaussian") == 0){
-          obs_w = 1/max_weight_obs * fabs(log10(kernel_gaussian_C(y[i] - y[j],0.0002037366,0.0919937995)));
+          obs_w = 1/max_weight_obs * fabs(log10(kernel_gaussian_C(y[i] - y[j],0.0007073701,0.0944041824)));
           //if(obs_w < 0){
           //  obs_w = 0;
           //}
         }else if(weightingFun_obs.compare("kernel_laplace") == 0){
-          obs_w = 1/max_weight_obs * fabs(log10(kernel_laplace_C(y[i] - y[j],-0.001630207,0.060597464)));
+          obs_w = 1/max_weight_obs * fabs(log10(kernel_laplace_C(y[i] - y[j],-0.001521505,0.062240875)));
           //if(obs_w < 0){
           //  obs_w = 0;
           //}
