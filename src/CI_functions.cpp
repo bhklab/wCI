@@ -182,12 +182,20 @@ double kernel_laplace_C( double x, double m, double b){
  Input: predictions x, observations y, cutoffs for x and y, deltas for x and y, confidence level alpha, flag outx, string alternative*/
 // [[Rcpp::export]]
 List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY,std::string weightingFun_pred,std::string weightingFun_obs,
-                                               double alpha, bool outx, std::string alternative, std::string logicOp,double max_weight, double max_weight_obs) {
+                                               double alpha, bool outx, std::string alternative, std::string logicOp,double max_weight, double max_weight_obs, bool permute) {
 
   int N = static_cast<int>(x.size());
   std::vector<double> c(N);
   std::vector<double> d(N);
 
+  NumericVector w_order(N);
+
+  for (int i = 0; i < N; ++i) {
+    w_order[i] = i;
+  }
+  if (permute == true){
+    w_order = Rcpp::sample(w_order,N,false,R_NilValue);
+  }
 
   std::list<bool> cdseq;
 
@@ -208,21 +216,21 @@ List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vecto
 
         if(weightingFun_obs.compare("kernel_gaussian") == 0){
           //w = fabs(log10(kernel_gaussian_C(y[i] - y[j],0.0002037366,0.0919937995))) * fabs(log10(kernel_gaussian_C(x[i] - x[j],0.0002037366,0.0919937995)));
-          obs_w = fabs(log10(kernel_gaussian_C(y[i] - y[j],0.0002001131,0.0939948369)));
+          obs_w = fabs(log10(kernel_gaussian_C(y[w_order[i]] - y[w_order[j]],0.0002001131,0.0939948369)));
           //if(obs_w < 0){
           //  obs_w = 0;
           //}
-          pred_w = fabs(log10(kernel_gaussian_C(x[i] - x[j],0.0002001131,0.0939948369)));
+          pred_w = fabs(log10(kernel_gaussian_C(x[w_order[i]] - x[w_order[j]],0.0002001131,0.0939948369)));
           //if(pred_w < 0){
           //  pred_w = 0;
           //}
           w = 1/max_weight * std::max(obs_w, pred_w);
         }else if(weightingFun_obs.compare("kernel_laplace") == 0){
-          obs_w = fabs(log10(kernel_laplace_C(y[i] - y[j],-0.001785626,0.061982848)));
+          obs_w = fabs(log10(kernel_laplace_C(y[w_order[i]] - y[w_order[j]],-0.001785626,0.061982848)));
           //if(obs_w < 0){
           //  obs_w = 0;
           //}
-          pred_w = fabs(log10(kernel_laplace_C(x[i] - x[j],-0.001785626,0.061982848)));
+          pred_w = fabs(log10(kernel_laplace_C(x[w_order[i]] - x[w_order[j]],-0.001785626,0.061982848)));
           //if(pred_w < 0){
           //  pred_w = 0;
           //}
@@ -233,12 +241,12 @@ List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vecto
        // w = 1;
       }else if((weightingFun_obs.compare("kernel_gaussian") == 0) | (weightingFun_obs.compare("kernel_laplace") == 0)){
         if(weightingFun_obs.compare("kernel_gaussian") == 0){
-          obs_w = 1/max_weight_obs * fabs(log10(kernel_gaussian_C(y[i] - y[j],0.0002001131,0.0939948369)));
+          obs_w = 1/max_weight_obs * fabs(log10(kernel_gaussian_C(y[w_order[i]] - y[w_order[j]],0.0002001131,0.0939948369)));
           //if(obs_w < 0){
           //  obs_w = 0;
           //}
         }else if(weightingFun_obs.compare("kernel_laplace") == 0){
-          obs_w = 1/max_weight_obs * fabs(log10(kernel_laplace_C(y[i] - y[j],-0.001785626,0.061982848)));
+          obs_w = 1/max_weight_obs * fabs(log10(kernel_laplace_C(y[w_order[i]] - y[w_order[j]],-0.001785626,0.061982848)));
           //if(obs_w < 0){
           //  obs_w = 0;
           //}
@@ -513,6 +521,22 @@ std::vector<double> shuffle(std::vector<double> array) {
 
   int n =  array.size();
   std::vector<double> array1(n);
+  for(int i=0; i< n;i++){
+    array1[i] = array[i];
+  }
+  srand (time(NULL));
+  std::random_device rd;
+  std::mt19937_64 g(rd());
+  std::shuffle(array1.begin(),array1.end(),g);
+  return(array1);
+}
+
+
+// [[Rcpp::export]]
+std::vector<int> shuffleInt(std::vector<int> array) {
+
+  int n =  array.size();
+  std::vector<int> array1(n);
   for(int i=0; i< n;i++){
     array1[i] = array[i];
   }
