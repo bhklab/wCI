@@ -26,7 +26,7 @@
 paired.concordance.index.weighted.version <- function(predictions, observations,
                                                       delta.pred=.2, delta.obs=.2,
                                                       weightingFun_pred, weightingFun_obs,
-                                                      alpha=0.05, outx=FALSE, alternative=c("two.sided", "less", "greater"), logic.operator=c("and", "or"), CPP=TRUE, comppairs=10) {
+                                                      alpha=0.05, outx=FALSE, alternative=c("two.sided", "less", "greater"), logic.operator=c("and", "or"), CPP=TRUE, comppairs=10, permute=FALSE) {
   alternative <- match.arg(alternative)
   logic.operator <- match.arg(logic.operator)
   predictions[which(is.nan(predictions))] <- NA
@@ -39,6 +39,11 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
   pred_dist <- outer(observations, observations, FUN="-")
   if(!missing(weightingFun_obs)){
     obs_weights <- abs(log10(weightingFun_obs(obs_dist)))
+    if(permute){
+      w_order <- sample(1:length(observations))
+    }else{
+      w_order <- 1:length(observations)
+    }
     #obs_weights[which(obs_weights < 0)] <- 0
     if(sum(obs_weights)!=0){
       max_weight <- sum(obs_weights)
@@ -75,13 +80,13 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
         pair <- c(i, j)
         if(!missing(weightingFun_obs) & !missing(weightingFun_pred)){
           #w <- sqrt(abs(log(weightingFun_obs(observations[i] - observations[j]))) * abs(log(weightingFun_obs(predictions[i] - predictions[j]))))
-          obs_w <- abs(log10(weightingFun_obs(observations[i] - observations[j])))
+          obs_w <- abs(log10(weightingFun_obs(observations[w_order[i]] - observations[w_order[j]])))
           #obs_w <- ifelse(obs_w < 0, 0, obs_w)
-          pred_w <- abs(log10(weightingFun_pred(predictions[i] - predictions[j])))
+          pred_w <- abs(log10(weightingFun_pred(predictions[w_order[i]] - predictions[w_order[j]])))
           #pred_w <- ifelse(pred_w < 0, 0, pred_w)
           w <- 1/max_weight *  max(obs_w, pred_w)
         }else if(!missing(weightingFun_obs)){
-          obs_w <- abs(log10(weightingFun_obs(observations[i] - observations[j])))
+          obs_w <- abs(log10(weightingFun_obs(observations[w_order[i]] - observations[w_order[j]])))
           #obs_w <- ifelse(obs_w < 0, 0, obs_w)
           w <- 1/max_weight *  obs_w
         }else{
