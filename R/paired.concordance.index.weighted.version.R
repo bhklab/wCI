@@ -37,6 +37,7 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
   max_weight <- 1
   obs_dist <- outer(predictions, predictions, FUN="-")
   pred_dist <- outer(observations, observations, FUN="-")
+
   if(!missing(weightingFun_obs)){
     obs_weights <- abs(log10(weightingFun_obs(obs_dist)))
     if(permute){
@@ -146,7 +147,7 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
 
     values <- concordanceIndex_modified_helper_weighted(x=predictions, y=observations,
                                                deltaX=delta.pred, deltaY=delta.obs, weightingFun_pred=f_pred, weightingFun_obs=f_obs,
-                                               alpha=alpha, outx=outx, alternative=alternative, logicOp=logic.operator, max_weight, max_weight)
+                                               alpha=alpha, outx=outx, alternative=alternative, logicOp=logic.operator, max_weight, max_weight,permute)
     C <- values$C
     D <- values$D
     CC <- values$CC
