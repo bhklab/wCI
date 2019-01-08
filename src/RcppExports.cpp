@@ -50,8 +50,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // concordanceIndex_modified_helper_weighted
-List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY, std::string weightingFun_pred, std::string weightingFun_obs, double alpha, bool outx, std::string alternative, std::string logicOp, double max_weight, double max_weight_obs, bool permute);
-RcppExport SEXP _mCI_concordanceIndex_modified_helper_weighted(SEXP xSEXP, SEXP ySEXP, SEXP deltaXSEXP, SEXP deltaYSEXP, SEXP weightingFun_predSEXP, SEXP weightingFun_obsSEXP, SEXP alphaSEXP, SEXP outxSEXP, SEXP alternativeSEXP, SEXP logicOpSEXP, SEXP max_weightSEXP, SEXP max_weight_obsSEXP, SEXP permuteSEXP) {
+List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY, std::string weightingFun_pred, std::string weightingFun_obs, double alpha, bool outx, std::string alternative, std::string logicOp, double max_weight, double max_weight_obs, bool permute_weights);
+RcppExport SEXP _mCI_concordanceIndex_modified_helper_weighted(SEXP xSEXP, SEXP ySEXP, SEXP deltaXSEXP, SEXP deltaYSEXP, SEXP weightingFun_predSEXP, SEXP weightingFun_obsSEXP, SEXP alphaSEXP, SEXP outxSEXP, SEXP alternativeSEXP, SEXP logicOpSEXP, SEXP max_weightSEXP, SEXP max_weight_obsSEXP, SEXP permute_weightsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -67,8 +67,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::string >::type logicOp(logicOpSEXP);
     Rcpp::traits::input_parameter< double >::type max_weight(max_weightSEXP);
     Rcpp::traits::input_parameter< double >::type max_weight_obs(max_weight_obsSEXP);
-    Rcpp::traits::input_parameter< bool >::type permute(permuteSEXP);
-    rcpp_result_gen = Rcpp::wrap(concordanceIndex_modified_helper_weighted(x, y, deltaX, deltaY, weightingFun_pred, weightingFun_obs, alpha, outx, alternative, logicOp, max_weight, max_weight_obs, permute));
+    Rcpp::traits::input_parameter< bool >::type permute_weights(permute_weightsSEXP);
+    rcpp_result_gen = Rcpp::wrap(concordanceIndex_modified_helper_weighted(x, y, deltaX, deltaY, weightingFun_pred, weightingFun_obs, alpha, outx, alternative, logicOp, max_weight, max_weight_obs, permute_weights));
     return rcpp_result_gen;
 END_RCPP
 }

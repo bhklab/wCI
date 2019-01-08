@@ -13,8 +13,8 @@ kernel_laplace_C <- function(x, m, b) {
     .Call('_mCI_kernel_laplace_C', PACKAGE = 'mCI', x, m, b)
 }
 
-concordanceIndex_modified_helper_weighted <- function(x, y, deltaX, deltaY, weightingFun_pred, weightingFun_obs, alpha, outx, alternative, logicOp, max_weight, max_weight_obs, permute) {
-    .Call('_mCI_concordanceIndex_modified_helper_weighted', PACKAGE = 'mCI', x, y, deltaX, deltaY, weightingFun_pred, weightingFun_obs, alpha, outx, alternative, logicOp, max_weight, max_weight_obs, permute)
+concordanceIndex_modified_helper_weighted <- function(x, y, deltaX, deltaY, weightingFun_pred, weightingFun_obs, alpha, outx, alternative, logicOp, max_weight, max_weight_obs, permute_weights) {
+    .Call('_mCI_concordanceIndex_modified_helper_weighted', PACKAGE = 'mCI', x, y, deltaX, deltaY, weightingFun_pred, weightingFun_obs, alpha, outx, alternative, logicOp, max_weight, max_weight_obs, permute_weights)
 }
 
 concordanceIndex_modified_helper_parallel <- function(x, y, deltaX, deltaY, alpha, outx, alternative, logicOp) {
