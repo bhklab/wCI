@@ -26,7 +26,7 @@
 paired.concordance.index.weighted.version <- function(predictions, observations,
                                                       delta.pred=.2, delta.obs=.2,
                                                       weightingFun_pred, weightingFun_obs,
-                                                      alpha=0.05, outx=FALSE, alternative=c("two.sided", "less", "greater"), logic.operator=c("and", "or"), CPP=TRUE, comppairs=10, permute=FALSE) {
+                                                      alpha=0.05, outx=FALSE, alternative=c("two.sided", "less", "greater"), logic.operator=c("and", "or"), CPP=TRUE, comppairs=10, permute_weights=FALSE) {
   alternative <- match.arg(alternative)
   logic.operator <- match.arg(logic.operator)
   predictions[which(is.nan(predictions))] <- NA
@@ -40,7 +40,7 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
 
   if(!missing(weightingFun_obs)){
     obs_weights <- abs(log10(weightingFun_obs(obs_dist)))
-    if(permute){
+    if(permute_weights){
       w_order <- sample(1:length(observations))
     }else{
       w_order <- 1:length(observations)
@@ -147,7 +147,7 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
 
     values <- concordanceIndex_modified_helper_weighted(x=predictions, y=observations,
                                                deltaX=delta.pred, deltaY=delta.obs, weightingFun_pred=f_pred, weightingFun_obs=f_obs,
-                                               alpha=alpha, outx=outx, alternative=alternative, logicOp=logic.operator, max_weight, max_weight, permute)
+                                               alpha=alpha, outx=outx, alternative=alternative, logicOp=logic.operator, max_weight, max_weight, permute_weights)
     C <- values$C
     D <- values$D
     CC <- values$CC
