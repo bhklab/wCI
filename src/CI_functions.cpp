@@ -182,7 +182,7 @@ double kernel_laplace_C( double x, double m, double b){
  Input: predictions x, observations y, cutoffs for x and y, deltas for x and y, confidence level alpha, flag outx, string alternative*/
 // [[Rcpp::export]]
 List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY,std::string weightingFun_pred,std::string weightingFun_obs,
-                                               double alpha, bool outx, std::string alternative, std::string logicOp,double max_weight, double max_weight_obs, bool permute) {
+                                               double alpha, bool outx, std::string alternative, std::string logicOp,double max_weight, double max_weight_obs, bool permute_weights) {
 
   int N = static_cast<int>(x.size());
   std::vector<double> c(N);
@@ -193,7 +193,7 @@ List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vecto
   for (int i = 0; i < N; ++i) {
     w_order[i] = i;
   }
-  if (permute == true){
+  if (permute_weights == true){
     w_order = Rcpp::sample(w_order,N,false,R_NilValue);
   }
 
@@ -209,6 +209,8 @@ List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vecto
   double obs_w = 0;
   double pred_w = 0;
 
+  #pragma omp parallel
+  #pragma omp for
   for (int i = 0; i < N - 1; ++i) {
     for (int j = i + 1; j < N; ++j) {
 
