@@ -154,7 +154,8 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
     DD <- values$DD
     CD <- values$CD
     N <- values$N
-    c.d.seq <- values$cdseq
+  #  c.d.seq <- values$cdseq
+    c.d.seq <- NA
   }
 
   if (N < 3 || (C == 0 && D == 0)) {

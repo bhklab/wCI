@@ -197,7 +197,7 @@ List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vecto
     w_order = Rcpp::sample(w_order,N,false,R_NilValue);
   }
 
-  std::list<bool> cdseq;
+//  std::list<bool> cdseq;
 
   for (int i = 0; i < N; ++i) {
     c[i] = 0;
@@ -264,24 +264,24 @@ List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vecto
           if (outx == false && (x[i] == x[j])) {
             d[i] = d[i] + w;
             c[i] = c[i] + w;
-            cdseq.push_back(true);
-            cdseq.push_back(false);
+//            cdseq.push_back(true);
+ //           cdseq.push_back(false);
           } else {
 
 
             if ((x[i] > x[j] & y[i] > y[j]) || (x[i] < x[j] & y[i] < y[j])) {
               c[i] = c[i] + w;
               c[j] = c[j] + w;
-              cdseq.push_back(true);
-              cdseq.push_back(true);
+//              cdseq.push_back(true);
+ //             cdseq.push_back(true);
             } else {
               if(outx == true && (x[i] == x[j])){
                 --numOfPairs;
               }else{
                 d[i] = d[i] + w;
                 d[j] = d[j] + w;
-                cdseq.push_back(false);
-                cdseq.push_back(false);
+//                cdseq.push_back(false);
+ //               cdseq.push_back(false);
               }
             }
           }
@@ -311,7 +311,7 @@ List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vecto
   ret["DD"] = DD;
   ret["CD"] = CD;
   ret["N"] = N;
-  ret["cdseq"] = cdseq;
+//  ret["cdseq"] = cdseq;
   return ret;
 
 
