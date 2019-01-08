@@ -209,8 +209,6 @@ List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vecto
   double obs_w = 0;
   double pred_w = 0;
 
-  #pragma omp parallel
-  #pragma omp for
   for (int i = 0; i < N - 1; ++i) {
     for (int j = i + 1; j < N; ++j) {
 
@@ -564,7 +562,7 @@ std::vector<int> shuffleInt(std::vector<int> array) {
  */
 
 // [[Rcpp::export]]
-std::vector<double> permute_weights_concordanceIndex_modified(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY, double alpha, int outx, int permutations,int nThreads) {
+std::vector<double> permute_concordanceIndex_modified(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY, double alpha, int outx, int permutations,int nThreads) {
 
   std::vector<double> randomPermut(permutations);
 
