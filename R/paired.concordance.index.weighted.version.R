@@ -112,8 +112,8 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
             c.d.seq <- c(c.d.seq, FALSE)
           }
         }else if (ife){
-          if(outx){
-            u[pair] <- u[pair] + w
+          if(outx | abs(observations[i] - observations[j]) <= max(delta.obs[i], delta.obs[j])){
+           u[pair] <- u[pair] + w
           }else{
             d[pair] <- d[pair] + w/2
             c[pair] <- c[pair] + w/2
