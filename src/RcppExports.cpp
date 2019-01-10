@@ -5,6 +5,32 @@
 
 using namespace Rcpp;
 
+// usable
+bool usable(double x1, double x2, double delta);
+RcppExport SEXP _mCI_usable(SEXP x1SEXP, SEXP x2SEXP, SEXP deltaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type x1(x1SEXP);
+    Rcpp::traits::input_parameter< double >::type x2(x2SEXP);
+    Rcpp::traits::input_parameter< double >::type delta(deltaSEXP);
+    rcpp_result_gen = Rcpp::wrap(usable(x1, x2, delta));
+    return rcpp_result_gen;
+END_RCPP
+}
+// usable_2
+double usable_2(double x1, double x2, double delta);
+RcppExport SEXP _mCI_usable_2(SEXP x1SEXP, SEXP x2SEXP, SEXP deltaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type x1(x1SEXP);
+    Rcpp::traits::input_parameter< double >::type x2(x2SEXP);
+    Rcpp::traits::input_parameter< double >::type delta(deltaSEXP);
+    rcpp_result_gen = Rcpp::wrap(usable_2(x1, x2, delta));
+    return rcpp_result_gen;
+END_RCPP
+}
 // concordanceIndex_modified_helper
 List concordanceIndex_modified_helper(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY, double alpha, bool outx, std::string alternative, std::string logicOp);
 RcppExport SEXP _mCI_concordanceIndex_modified_helper(SEXP xSEXP, SEXP ySEXP, SEXP deltaXSEXP, SEXP deltaYSEXP, SEXP alphaSEXP, SEXP outxSEXP, SEXP alternativeSEXP, SEXP logicOpSEXP) {
@@ -160,6 +186,8 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_mCI_usable", (DL_FUNC) &_mCI_usable, 3},
+    {"_mCI_usable_2", (DL_FUNC) &_mCI_usable_2, 3},
     {"_mCI_concordanceIndex_modified_helper", (DL_FUNC) &_mCI_concordanceIndex_modified_helper, 8},
     {"_mCI_kernel_gaussian_C", (DL_FUNC) &_mCI_kernel_gaussian_C, 3},
     {"_mCI_kernel_laplace_C", (DL_FUNC) &_mCI_kernel_laplace_C, 3},
