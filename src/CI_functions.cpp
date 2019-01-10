@@ -28,12 +28,24 @@ using namespace Rcpp;
 // Enable C++11 via this plugin (Rcpp 0.10.3 or later)
 // [[Rcpp::plugins(cpp11)]]
 
+
 /* function tests whether a pair is usable for concordance index calculation purposes. */
+// [[Rcpp::export]]
 bool usable (double x1, double x2, double delta) {
-  if (std::abs(x1 - x2) >= delta) {
+  if (fabs(x1 - x2) >= delta) {
     return true;
   } else {
     return false;
+  }
+}
+
+/* function tests whether a pair is usable for concordance index calculation purposes. */
+// [[Rcpp::export]]
+double usable_2 (double x1, double x2, double delta) {
+  if (fabs(x1 - x2) >= delta) {
+    return fabs(x1 - x2);
+  } else {
+    return fabs(x1 - x2);
   }
 }
 
@@ -241,16 +253,19 @@ List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vecto
        // w = 1;
       }else if((weightingFun_obs.compare("kernel_gaussian") == 0) | (weightingFun_obs.compare("kernel_laplace") == 0)){
         if(weightingFun_obs.compare("kernel_gaussian") == 0){
-          obs_w = 1/max_weight_obs * fabs(log10(kernel_gaussian_C(y[w_order[i]] - y[w_order[j]],0.0002001131,0.0939948369)));
+          obs_w = fabs(log10(kernel_gaussian_C(y[w_order[i]] - y[w_order[j]],0.0002001131,0.0939948369)));
           //if(obs_w < 0){
           //  obs_w = 0;
           //}
         }else if(weightingFun_obs.compare("kernel_laplace") == 0){
-          obs_w = 1/max_weight_obs * fabs(log10(kernel_laplace_C(y[w_order[i]] - y[w_order[j]],-0.001785626,0.061982848)));
+          obs_w = fabs(log10(kernel_laplace_C(y[w_order[i]] - y[w_order[j]],-0.001785626,0.061982848)));
           //if(obs_w < 0){
           //  obs_w = 0;
           //}
+
         }
+
+        w = 1/max_weight * obs_w;
         // w <- abs(log10(weightingFun_obs(observations[i] - observations[j])))
         //w = 1;
       }else{
