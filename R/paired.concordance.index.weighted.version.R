@@ -76,8 +76,8 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
         delta.obs <- delta.obs[which(cc.ix)]
       }
     }else{
-      delta.pred <- sample(0, delta.pred, length(which(cc.ix)))
-      delta.obs <- sample(0, delta.obs, length(which(cc.ix)))
+      delta.pred <- sample(c(0, delta.pred), length(which(cc.ix)), replace=T)
+      delta.obs <- sample(c(0, delta.obs), length(which(cc.ix)), replace=T)
     }
 
     c <- d <- u <- matrix(0, nrow = 1, ncol = N)
