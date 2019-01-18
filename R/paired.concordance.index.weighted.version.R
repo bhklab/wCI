@@ -24,7 +24,7 @@
 #' @export
 
 paired.concordance.index.weighted.version <- function(predictions, observations,
-                                                      delta.pred=.2, delta.obs=.2,
+                                                      delta.pred=0, delta.obs=0,
                                                       weightingFun_pred, weightingFun_obs,
                                                       alpha=0.05, outx=FALSE, alternative=c("two.sided", "less", "greater"), logic.operator=c("and", "or"), CPP=TRUE, comppairs=10, permute_weights=FALSE) {
   alternative <- match.arg(alternative)
@@ -64,16 +64,22 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
     if(!CPP){
     logic.operator <- ifelse(logic.operator=="or", "|", "&")
     N <- length(which(cc.ix))
-    if(length(delta.pred) == 1){
-      delta.pred <- rep(delta.pred, N)
+    if(!permute_weights){
+      if(length(delta.pred) == 1){
+        delta.pred <- rep(delta.pred, N)
+      }else{
+        delta.pred <- delta.pred[which(cc.ix)]
+      }
+      if(length(delta.obs) == 1){
+        delta.obs <- rep(delta.obs, N)
+      }else{
+        delta.obs <- delta.obs[which(cc.ix)]
+      }
     }else{
-      delta.pred <- delta.pred[which(cc.ix)]
+      delta.pred <- sample(0, delta.pred, length(which(cc.ix)))
+      delta.obs <- sample(0, delta.obs, length(which(cc.ix)))
     }
-    if(length(delta.obs) == 1){
-      delta.obs <- rep(delta.obs, N)
-    }else{
-      delta.obs <- delta.obs[which(cc.ix)]
-    }
+
     c <- d <- u <- matrix(0, nrow = 1, ncol = N)
     c.d.seq <- NULL
     for (i in seq(from = 1, to = N - 1)) {
