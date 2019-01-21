@@ -193,7 +193,7 @@ double kernel_laplace_C( double x, double m, double b){
 /* function calculates modified concordance index.
  Input: predictions x, observations y, cutoffs for x and y, deltas for x and y, confidence level alpha, flag outx, string alternative*/
 // [[Rcpp::export]]
-List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY,std::string weightingFun_pred,std::string weightingFun_obs,
+List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vector<double> y, std::vector<double> deltaX, std::vector<double> deltaY,std::string weightingFun_pred,std::string weightingFun_obs,
                                                double alpha, bool outx, std::string alternative, std::string logicOp,double max_weight, double max_weight_obs, bool permute_weights) {
 
   int N = static_cast<int>(x.size());
@@ -273,7 +273,23 @@ List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vecto
       }
 
 
-      if (logicOpF(usable(x[i],x[j], deltaX), usable(y[i],y[j], deltaY), logicOp)) {
+      NumericVector dX(2);
+      NumericVector dY(2);
+
+      dX[0] = deltaX[i];
+      dX[1] = deltaX[j];
+
+
+      dY[0] = deltaY[i];
+      dY[1] = deltaY[j];
+
+      double deltaXF = Rcpp::sample(dX,2,false,R_NilValue)[1];
+      double deltaYF = Rcpp::sample(dY,2,false,R_NilValue)[1];
+
+//     std::cout << "deltaXF: " << deltaXF << ", deltaYF:" << deltaYF << "\n";
+//     std::cout << "X: " << deltaX[i] << ", Y:" << deltaX[j] << "\n";
+
+      if (logicOpF(usable(x[i],x[j], deltaXF), usable(y[i],y[j], deltaYF), logicOp)) {
         if(y[i]!=y[j]){
           ++numOfPairs;
           if (outx == false && (x[i] == x[j])) {
