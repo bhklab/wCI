@@ -61,24 +61,26 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
     }
   }
 
+  N <- length(which(cc.ix))
+  if(!permute_weights){
+    if(length(delta.pred) == 1){
+      delta.pred <- rep(delta.pred, N)
+    }else{
+      delta.pred <- delta.pred[which(cc.ix)]
+    }
+    if(length(delta.obs) == 1){
+      delta.obs <- rep(delta.obs, N)
+    }else{
+      delta.obs <- delta.obs[which(cc.ix)]
+    }
+  }else{
+    delta.pred <- sample(c(0, delta.pred), length(which(cc.ix)), replace=T)
+    delta.obs <- sample(c(0, delta.obs), length(which(cc.ix)), replace=T)
+  }
     if(!CPP){
     logic.operator <- ifelse(logic.operator=="or", "|", "&")
-    N <- length(which(cc.ix))
-    if(!permute_weights){
-      if(length(delta.pred) == 1){
-        delta.pred <- rep(delta.pred, N)
-      }else{
-        delta.pred <- delta.pred[which(cc.ix)]
-      }
-      if(length(delta.obs) == 1){
-        delta.obs <- rep(delta.obs, N)
-      }else{
-        delta.obs <- delta.obs[which(cc.ix)]
-      }
-    }else{
-      delta.pred <- sample(c(0, delta.pred), length(which(cc.ix)), replace=T)
-      delta.obs <- sample(c(0, delta.obs), length(which(cc.ix)), replace=T)
-    }
+
+
 
     c <- d <- u <- matrix(0, nrow = 1, ncol = N)
     c.d.seq <- NULL
@@ -99,9 +101,9 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
         }else{
           w <- 1
         }
-        iff <- as.logical(outer(abs(predictions[i] - predictions[j]) > max(delta.pred[i], delta.pred[j]), abs(observations[i] - observations[j]) > max(delta.obs[i], delta.obs[j]), logic.operator))
+        iff <- as.logical(outer(abs(predictions[i] - predictions[j]) > sample(c(delta.pred[i], delta.pred[j]),size = 1), abs(observations[i] - observations[j]) > sample(c(delta.obs[i], delta.obs[j]),size = 1), logic.operator))
         if(logic.operator == "&"){
-          ife <- abs(predictions[i] - predictions[j]) == max(delta.pred[i], delta.pred[j])
+          ife <- abs(predictions[i] - predictions[j]) == sample(c(delta.pred[i], delta.pred[j]),size = 1)
         }else{
           ife <- !iff
         }
