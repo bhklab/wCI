@@ -76,15 +76,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // concordanceIndex_modified_helper_weighted
-List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY, std::string weightingFun_pred, std::string weightingFun_obs, double alpha, bool outx, std::string alternative, std::string logicOp, double max_weight, double max_weight_obs, bool permute_weights);
+List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vector<double> y, std::vector<double> deltaX, std::vector<double> deltaY, std::string weightingFun_pred, std::string weightingFun_obs, double alpha, bool outx, std::string alternative, std::string logicOp, double max_weight, double max_weight_obs, bool permute_weights);
 RcppExport SEXP _mCI_concordanceIndex_modified_helper_weighted(SEXP xSEXP, SEXP ySEXP, SEXP deltaXSEXP, SEXP deltaYSEXP, SEXP weightingFun_predSEXP, SEXP weightingFun_obsSEXP, SEXP alphaSEXP, SEXP outxSEXP, SEXP alternativeSEXP, SEXP logicOpSEXP, SEXP max_weightSEXP, SEXP max_weight_obsSEXP, SEXP permute_weightsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::vector<double> >::type x(xSEXP);
     Rcpp::traits::input_parameter< std::vector<double> >::type y(ySEXP);
-    Rcpp::traits::input_parameter< double >::type deltaX(deltaXSEXP);
-    Rcpp::traits::input_parameter< double >::type deltaY(deltaYSEXP);
+    Rcpp::traits::input_parameter< std::vector<double> >::type deltaX(deltaXSEXP);
+    Rcpp::traits::input_parameter< std::vector<double> >::type deltaY(deltaYSEXP);
     Rcpp::traits::input_parameter< std::string >::type weightingFun_pred(weightingFun_predSEXP);
     Rcpp::traits::input_parameter< std::string >::type weightingFun_obs(weightingFun_obsSEXP);
     Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
