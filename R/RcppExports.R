@@ -25,6 +25,10 @@ concordanceIndex_modified_helper_weighted <- function(x, y, deltaX, deltaY, weig
     .Call('_mCI_concordanceIndex_modified_helper_weighted', PACKAGE = 'mCI', x, y, deltaX, deltaY, weightingFun_pred, weightingFun_obs, alpha, outx, alternative, logicOp, max_weight, max_weight_obs, permute_weights)
 }
 
+concordanceIndex_modified_helper_weighted_withStratify <- function(x, y, deltaX, deltaY, weightingFun_pred, weightingFun_obs, alpha, outx, alternative, logicOp, max_weight, max_weight_obs, permute_weights, groups) {
+    .Call('_mCI_concordanceIndex_modified_helper_weighted_withStratify', PACKAGE = 'mCI', x, y, deltaX, deltaY, weightingFun_pred, weightingFun_obs, alpha, outx, alternative, logicOp, max_weight, max_weight_obs, permute_weights, groups)
+}
+
 concordanceIndex_modified_helper_parallel <- function(x, y, deltaX, deltaY, alpha, outx, alternative, logicOp) {
     .Call('_mCI_concordanceIndex_modified_helper_parallel', PACKAGE = 'mCI', x, y, deltaX, deltaY, alpha, outx, alternative, logicOp)
 }
