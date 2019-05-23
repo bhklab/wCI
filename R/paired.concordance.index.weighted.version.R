@@ -35,10 +35,11 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
   predictions <- predictions[which(cc.ix)]
   observations <- observations[which(cc.ix)]
   max_weight <- 1
-  obs_dist <- outer(predictions, predictions, FUN="-")
-  pred_dist <- outer(observations, observations, FUN="-")
+
+
 
   if(!missing(weightingFun_obs)){
+    obs_dist <- outer(predictions, predictions, FUN="-")
     obs_weights <- abs(log10(weightingFun_obs(obs_dist)))
     if(permute_weights){
       w_order <- sample(1:length(observations))
@@ -51,6 +52,7 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
     }
   }
   if(!missing(weightingFun_obs) & !missing(weightingFun_pred)){
+    pred_dist <- outer(observations, observations, FUN="-")
     pred_weights <- abs(log10(weightingFun_pred(pred_dist)))
     #pred_weights[which(pred_weights < 0)] <- 0
     obs_weights <- obs_weights/sum(obs_weights)
