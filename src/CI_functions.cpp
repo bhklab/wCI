@@ -41,6 +41,16 @@ bool usable (double x1, double x2, double delta) {
 
 /* function tests whether a pair is usable for concordance index calculation purposes. */
 // [[Rcpp::export]]
+bool usableHard (double x1, double x2, double delta) {
+  if (fabs(x1 - x2) > delta) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+/* function tests whether a pair is usable for concordance index calculation purposes. */
+// [[Rcpp::export]]
 double usable_2 (double x1, double x2, double delta) {
   if (fabs(x1 - x2) >= delta) {
     return fabs(x1 - x2);
@@ -75,6 +85,7 @@ double erfinv(double x){
 
 //function to do and, or
 double logicOpF(bool x, bool y, std::string logicOp){
+
   if (logicOp.compare("and") == 0){
     return(x && y);
   }else if(logicOp.compare("or") == 0){
@@ -109,27 +120,26 @@ List concordanceIndex_modified_helper(std::vector<double> x, std::vector<double>
     for (int j = i + 1; j < N; ++j) {
 
       if (logicOpF(usable(x[i],x[j], deltaX), usable(y[i],y[j], deltaY), logicOp)) {
-        if(y[i]!=y[j]){
+        if(usableHard(y[i],y[j], deltaY) && logicOp.compare("and") == 0){
           ++numOfPairs;
-          if (outx == false && (x[i] == x[j])) {
+
+          if (outx == false && (!usableHard(x[i],x[j], deltaX))) {
             d[i] = d[i] + 1;
-            //d[j] = d[j] + 0.25;
             c[i] = c[i] + 1;
-            //c[j] = c[j] + 0.25;
             cdseq.push_back(true);
             cdseq.push_back(false);
           } else {
 
-
             if ((x[i] > x[j] & y[i] > y[j]) || (x[i] < x[j] & y[i] < y[j])) {
-              ++c[i];
-              ++c[j];
+              c[i] = c[i] + 1;
+              c[j] = c[j] + 1;
               cdseq.push_back(true);
               cdseq.push_back(true);
             } else {
-              if(outx == true && (x[i] == x[j])){
+              if(outx == true && (!usableHard(x[i],x[j], deltaX))){
                 --numOfPairs;
               }else{
+
                 d[i] = d[i] + 1;
                 d[j] = d[j] + 1;
                 cdseq.push_back(false);
@@ -137,6 +147,94 @@ List concordanceIndex_modified_helper(std::vector<double> x, std::vector<double>
               }
             }
           }
+        }else if (logicOp.compare("or") == 0){
+
+          if(logicOpF(usable(x[i],x[j], deltaX), usableHard(y[i],y[j], deltaY), "and")){
+            ++numOfPairs;
+
+            if (outx == false && (!usableHard(x[i],x[j], deltaX))) {
+              d[i] = d[i] + 1;
+              c[i] = c[i] + 1;
+              cdseq.push_back(true);
+              cdseq.push_back(false);
+            } else {
+
+              if ((x[i] > x[j] & y[i] > y[j]) || (x[i] < x[j] & y[i] < y[j])) {
+                c[i] = c[i] + 1;
+                c[j] = c[j] + 1;
+                cdseq.push_back(true);
+                cdseq.push_back(true);
+              } else {
+                if(outx == true && (!usableHard(x[i],x[j], deltaX))){
+                  --numOfPairs;
+                }else{
+
+                  d[i] = d[i] + 1;
+                  d[j] = d[j] + 1;
+                  cdseq.push_back(false);
+                  cdseq.push_back(false);
+                }
+              }
+            }
+          }else if(usable(x[i],x[j], deltaX)){
+
+            if(y[i]!=y[j]){
+              ++numOfPairs;
+              if (outx == false && (!usableHard(x[i],x[j], deltaX))) {
+                d[i] = d[i] + 1;
+                c[i] = c[i] + 1;
+                cdseq.push_back(true);
+                cdseq.push_back(false);
+
+              } else {
+
+                if ((x[i] > x[j] & y[i] > y[j]) || (x[i] < x[j] & y[i] < y[j])) {
+                  c[i] = c[i] + 1;
+                  c[j] = c[j] + 1;
+                  cdseq.push_back(true);
+                  cdseq.push_back(true);
+                } else {
+                  if(outx == true && (!usableHard(x[i],x[j], deltaX))){
+                    --numOfPairs;
+                  }else{
+                    d[i] = d[i] + 1;
+                    d[j] = d[j] + 1;
+                    cdseq.push_back(false);
+                    cdseq.push_back(false);
+                  }
+                }
+              }
+            }
+          }else if(usableHard(y[i],y[j], deltaY)){
+            ++numOfPairs;
+
+            if (outx == false && (x[i]==x[j])) {
+              d[i] = d[i] + 1;
+              c[i] = c[i] + 1;
+              cdseq.push_back(true);
+              cdseq.push_back(false);
+            } else {
+
+              if ((x[i] > x[j] & y[i] > y[j]) || (x[i] < x[j] & y[i] < y[j])) {
+                c[i] = c[i] + 1;
+                c[j] = c[j] + 1;
+                cdseq.push_back(true);
+                cdseq.push_back(true);
+              } else {
+                if(outx == true && (x[i]==x[j])){
+                  --numOfPairs;
+                }else{
+
+                  d[i] = d[i] + 1;
+                  d[j] = d[j] + 1;
+                  cdseq.push_back(false);
+                  cdseq.push_back(false);
+                }
+              }
+            }
+          }
+
+
         }
       }
     }
@@ -209,7 +307,7 @@ List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vecto
     w_order = Rcpp::sample(w_order,N,false,R_NilValue);
   }
 
-//  std::list<bool> cdseq;
+  std::list<bool> cdseq;
 
   for (int i = 0; i < N; ++i) {
     c[i] = 0;
@@ -289,33 +387,125 @@ List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vecto
 //     std::cout << "deltaXF: " << deltaXF << ", deltaYF:" << deltaYF << "\n";
 //     std::cout << "X: " << deltaX[i] << ", Y:" << deltaX[j] << "\n";
 
+
+
+
       if (logicOpF(usable(x[i],x[j], deltaXF), usable(y[i],y[j], deltaYF), logicOp)) {
-        if(y[i]!=y[j]){
+        if(usableHard(y[i],y[j], deltaYF) && logicOp.compare("and") == 0){
           ++numOfPairs;
-          if (outx == false && (x[i] == x[j])) {
+
+          if (outx == false && (!usableHard(x[i],x[j], deltaXF))) {
             d[i] = d[i] + w;
             c[i] = c[i] + w;
-//            cdseq.push_back(true);
- //           cdseq.push_back(false);
+            cdseq.push_back(true);
+            cdseq.push_back(false);
           } else {
-
 
             if ((x[i] > x[j] & y[i] > y[j]) || (x[i] < x[j] & y[i] < y[j])) {
               c[i] = c[i] + w;
               c[j] = c[j] + w;
-//              cdseq.push_back(true);
- //             cdseq.push_back(true);
+              cdseq.push_back(true);
+              cdseq.push_back(true);
             } else {
-              if(outx == true && (x[i] == x[j])){
+              if(outx == true && (!usableHard(x[i],x[j], deltaXF))){
                 --numOfPairs;
               }else{
+
                 d[i] = d[i] + w;
                 d[j] = d[j] + w;
-//                cdseq.push_back(false);
- //               cdseq.push_back(false);
+                cdseq.push_back(false);
+                cdseq.push_back(false);
               }
             }
           }
+        }else if (logicOp.compare("or") == 0){
+
+          if(logicOpF(usable(x[i],x[j], deltaXF), usableHard(y[i],y[j], deltaYF), "and")){
+            ++numOfPairs;
+
+            if (outx == false && (!usableHard(x[i],x[j], deltaXF))) {
+              d[i] = d[i] + w;
+              c[i] = c[i] + w;
+              cdseq.push_back(true);
+              cdseq.push_back(false);
+            } else {
+
+              if ((x[i] > x[j] & y[i] > y[j]) || (x[i] < x[j] & y[i] < y[j])) {
+                c[i] = c[i] + w;
+                c[j] = c[j] + w;
+                cdseq.push_back(true);
+                cdseq.push_back(true);
+              } else {
+                if(outx == true && (!usableHard(x[i],x[j], deltaXF))){
+                  --numOfPairs;
+                }else{
+
+                  d[i] = d[i] + w;
+                  d[j] = d[j] + w;
+                  cdseq.push_back(false);
+                  cdseq.push_back(false);
+                }
+              }
+            }
+          }else if(usable(x[i],x[j], deltaXF)){
+
+            if(y[i]!=y[j]){
+              ++numOfPairs;
+              if (outx == false && (!usableHard(x[i],x[j], deltaXF))) {
+                d[i] = d[i] + w;
+                c[i] = c[i] + w;
+                cdseq.push_back(true);
+                cdseq.push_back(false);
+
+              } else {
+
+                if ((x[i] > x[j] & y[i] > y[j]) || (x[i] < x[j] & y[i] < y[j])) {
+                  c[i] = c[i] + w;
+                  c[j] = c[j] + w;
+                  cdseq.push_back(true);
+                  cdseq.push_back(true);
+                } else {
+                  if(outx == true && (!usableHard(x[i],x[j], deltaXF))){
+                    --numOfPairs;
+                  }else{
+                    d[i] = d[i] + w;
+                    d[j] = d[j] + w;
+                    cdseq.push_back(false);
+                    cdseq.push_back(false);
+                  }
+                }
+              }
+            }
+          }else if(usableHard(y[i],y[j], deltaYF)){
+            ++numOfPairs;
+
+            if (outx == false && (x[i]==x[j])) {
+              d[i] = d[i] + w;
+              c[i] = c[i] + w;
+              cdseq.push_back(true);
+              cdseq.push_back(false);
+            } else {
+
+              if ((x[i] > x[j] & y[i] > y[j]) || (x[i] < x[j] & y[i] < y[j])) {
+                c[i] = c[i] + w;
+                c[j] = c[j] + w;
+                cdseq.push_back(true);
+                cdseq.push_back(true);
+              } else {
+                if(outx == true && (x[i]==x[j])){
+                  --numOfPairs;
+                }else{
+
+                  d[i] = d[i] + w;
+                  d[j] = d[j] + w;
+                  cdseq.push_back(false);
+                  cdseq.push_back(false);
+                }
+              }
+            }
+          }
+
+
         }
       }
     }
@@ -327,6 +517,8 @@ List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vecto
   double CD = 0.0;
   double DD = 0.0;
 
+
+
   for (int i = 0; i < N; ++i) {
     C += c[i];
     D += d[i];
@@ -335,6 +527,7 @@ List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vecto
     CD += c[i] * d[i];
   }
 
+
   List ret;
   ret["C"] = C;
   ret["D"] = D;
@@ -342,7 +535,7 @@ List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vecto
   ret["DD"] = DD;
   ret["CD"] = CD;
   ret["N"] = N;
-//  ret["cdseq"] = cdseq;
+  ret["cdseq"] = cdseq;
   return ret;
 
 

@@ -5,6 +5,10 @@ usable <- function(x1, x2, delta) {
     .Call('_mCI_usable', PACKAGE = 'mCI', x1, x2, delta)
 }
 
+usableHard <- function(x1, x2, delta) {
+    .Call('_mCI_usableHard', PACKAGE = 'mCI', x1, x2, delta)
+}
+
 usable_2 <- function(x1, x2, delta) {
     .Call('_mCI_usable_2', PACKAGE = 'mCI', x1, x2, delta)
 }
