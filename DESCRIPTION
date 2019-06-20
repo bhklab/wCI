@@ -2,13 +2,32 @@ Package: mCI
 Type: Package
 Title: What the Package Does (Title Case)
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Authors@R: c(
+  person("Zhaleh","Safikhani", email = "zhaleh.safikhani@utoronto.ca", 
+    role = c("aut")),
+  person("Wail","Ba-alawi", email = "Wail.ba-alawi@uhnresearch.ca", 
+    role = c("aut")),
+  person("Ian","Smith", email = "ianc.smith@mail.utoronto.ca", 
+    role = c("aut")),
+  person("Petr","Smirnov", email = "petr.smirnov@uhnresearch.ca", 
+    role = c("aut")),
+  person("Benjamin","Haibe-Kains", email = "benjamin.haibe.kains@utoronto.ca",
+    role = c("aut","cre"))
+  )  
+Description: The concordance index (CI) is a widely used to assess the 
+    predictive value of biomedical assays. CI has previously been used in 
+    cell line-based drug screening to estimate the probability that two 
+    randomly-chosen cell lines are ranked identically across biological replicates 
+    or independent studies based on their drug response. However, the conventional 
+    formulation of CI does not account for the high level noise in drug response 
+    measurements. Here we introduce the mCI package implementing a modification 
+    of the concordance index (CI), called the robust concordance index (rCI) to 
+    explicitly accounts for the intrinsic variability of the pharmacological assays. 
+    For more details please see the included documentation.
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
+Encoding: UTF-8
 Imports: Rcpp (>= 0.12.12)
 LinkingTo: Rcpp
 SystemRequirements: C++11, Rcpp, parallel, doParallel, BiocStyle
