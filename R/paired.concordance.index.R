@@ -11,14 +11,17 @@
 #'
 #' @param predictions {numeric} A vector of predicted drug responces which could be either continuous or discrete
 #' @param observations {numeric} A vector of observed continuous drug responces
-#' @param cutoff {numeric} A drug responce threshold which is used to classify cells to sensitive vs resistant to drug.
-#' @param delta {numeric} The minimunm reliable difference between two drug sensitivity values to be considered as significantly various responses.
-#' default value for delta is picked by looking into delta auc values between biological replicates across three
-#' large pharmacogenomic studies, CTRPv2(370 drugs over ~15-20 cells) , GDSC(1 drug over ~600 cells), GRAY (85 drugs over ~10-50)
+#' @param delta.pred {numeric} The minimunm reliable difference between two values in the predictions vector to be considered as significantly various values.
+#' @param delta.obs {numeric} The minimunm reliable difference between two values in the observations vector to be considered as significantly various values.
+#' In drug sensitivity , default value for delta.pred is picked by looking into delta auc values (drug response metric) between biological replicates across three
+#' large pharmacogenomic studies, CTRPv2(370 drugs over ~15-20 cells) , GDSC(1 drug over ~600 cells), GRAY (85 drugs over ~10-50 cells)
 #' @param alpha {numeric} alpha level to compute confidence interval
-#' @param outx {boolean} set to TRUE to not count pairs of observations tied on x as a relevant pair.
+#' @param outx {boolean} set to TRUE to not count pairs of predictions that are tied as a relevant pair.
 #' This results in a Goodman-Kruskal gamma type rank correlation.
-#' @param alternative {character} what is the alternative hypothesis? Must be one of "two.sides", "less", and "greater".
+#' @param alternative {character} what is the alternative hypothesis? Must be one of "two.sides", "less", and "greater" and defaults to two.sides".
+#' @param logic.operator {character} determines how strict should the test be to remove noisy pairs. Must be one of "and" or "or" and defaults to "and".
+#' @param CPP {boolean} whether to use the C version of the code for faster execution
+#' @param comppairs {numeric} minimum number of pairs to calculate a valid CI
 #' @return [list] ! list of concordance index and its pvalue
 #' along with the lower and upper confidence intervals
 #' @export
@@ -68,7 +71,7 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0, de
             c.d.seq <- c(c.d.seq, FALSE)
           }
         }else if (ife){
-          if(outx){
+          if(outx | abs(observations[i] - observations[j]) <= max(delta.obs[i], delta.obs[j])){
             u[pair] <- u[pair] + 1
           }else{
             d[pair] <- d[pair] + 0.5

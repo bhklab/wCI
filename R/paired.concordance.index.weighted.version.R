@@ -11,14 +11,19 @@
 #'
 #' @param predictions {numeric} A vector of predicted drug responces which could be either continuous or discrete
 #' @param observations {numeric} A vector of observed continuous drug responces
-#' @param cutoff {numeric} A drug responce threshold which is used to classify cells to sensitive vs resistant to drug.
-#' @param delta {numeric} The minimunm reliable difference between two drug sensitivity values to be considered as significantly various responses.
-#' default value for delta is picked by looking into delta auc values between biological replicates across three
-#' large pharmacogenomic studies, CTRPv2(370 drugs over ~15-20 cells) , GDSC(1 drug over ~600 cells), GRAY (85 drugs over ~10-50)
+#' @param delta.pred {numeric} The minimunm reliable difference between two values in the predictions vector to be considered as significantly various values.
+#' @param delta.obs {numeric} The minimunm reliable difference between two values in the observations vector to be considered as significantly various values.
+#' In drug sensitivity , default value for delta.pred is picked by looking into delta auc values (drug response metric) between biological replicates across three
+#' large pharmacogenomic studies, CTRPv2(370 drugs over ~15-20 cells) , GDSC(1 drug over ~600 cells), GRAY (85 drugs over ~10-50 cells)
+#' @param weightingFun_pred {function} function to weight the delta values of predictions
+#' @param weightingFun_obs {function} function to weight the delta values of observations
 #' @param alpha {numeric} alpha level to compute confidence interval
-#' @param outx {boolean} set to TRUE to not count pairs of observations tied on x as a relevant pair.
+#' @param outx {boolean} set to TRUE to not count pairs of predictions that are tied as a relevant pair.
 #' This results in a Goodman-Kruskal gamma type rank correlation.
-#' @param alternative {character} what is the alternative hypothesis? Must be one of "two.sides", "less", and "greater".
+#' @param alternative {character} what is the alternative hypothesis? Must be one of "two.sides", "less", and "greater" and defaults to two.sides".
+#' @param logic.operator {character} determines how strict should be the test to remove noisy pairs. Must be one of "and" or "or" and defaults to "and".
+#' @param CPP {boolean} whether to use the C version of the code for faster execution
+#' @param comppairs {numeric} minimum number of pairs to calculate a valid CI
 #' @return [list] ! list of concordance index and its pvalue
 #' along with the lower and upper confidence intervals
 #' @export
@@ -26,7 +31,7 @@
 paired.concordance.index.weighted.version <- function(predictions, observations,
                                                       delta.pred=0, delta.obs=0,
                                                       weightingFun_pred, weightingFun_obs,
-                                                      alpha=0.05, outx=FALSE, alternative=c("two.sided", "less", "greater"), logic.operator=c("and", "or"), CPP=TRUE, comppairs=10, permute_weights=FALSE) {
+                                                      alpha=0.05, outx=FALSE, alternative=c("two.sided", "less", "greater"), logic.operator=c("and", "or"), CPP=TRUE, comppairs=10) {
   alternative <- match.arg(alternative)
   logic.operator <- match.arg(logic.operator)
   predictions[which(is.nan(predictions))] <- NA
@@ -41,12 +46,9 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
   if(!missing(weightingFun_obs)){
     obs_dist <- outer(predictions, predictions, FUN="-")
     obs_weights <- abs(log10(weightingFun_obs(obs_dist)))
-    if(permute_weights){
-      w_order <- sample(1:length(observations))
-    }else{
-      w_order <- 1:length(observations)
-    }
-    #obs_weights[which(obs_weights < 0)] <- 0
+
+    w_order <- 1:length(observations)
+
     if(sum(obs_weights)!=0){
       max_weight <- sum(obs_weights)
     }
@@ -64,7 +66,7 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
   }
 
   N <- length(which(cc.ix))
-  if(!permute_weights){
+
     if(length(delta.pred) == 1){
       delta.pred <- rep(delta.pred, N)
     }else{
@@ -75,10 +77,8 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
     }else{
       delta.obs <- delta.obs[which(cc.ix)]
     }
-  }else{
-    delta.pred <- sample(c(0, delta.pred), length(which(cc.ix)), replace=T)
-    delta.obs <- sample(c(0, delta.obs), length(which(cc.ix)), replace=T)
-  }
+
+
     if(!CPP){
     logic.operator <- ifelse(logic.operator=="or", "|", "&")
 
@@ -157,7 +157,7 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
 
     values <- concordanceIndex_modified_helper_weighted(x=predictions, y=observations,
                                                deltaX=delta.pred, deltaY=delta.obs, weightingFun_pred=f_pred, weightingFun_obs=f_obs,
-                                               alpha=alpha, outx=outx, alternative=alternative, logicOp=logic.operator, max_weight, max_weight, permute_weights)
+                                               alpha=alpha, outx=outx, alternative=alternative, logicOp=logic.operator, max_weight, max_weight)
     C <- values$C
     D <- values$D
     CC <- values$CC
