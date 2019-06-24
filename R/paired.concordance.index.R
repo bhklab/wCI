@@ -22,10 +22,11 @@
 #' @param logic.operator {character} determines how strict should the test be to remove noisy pairs. Must be one of "and" or "or" and defaults to "and".
 #' @param CPP {boolean} whether to use the C version of the code for faster execution
 #' @param comppairs {numeric} minimum number of pairs to calculate a valid CI
+#' @importFrom stats complete.cases qnorm pnorm
 #' @return [list] ! list of concordance index and its pvalue
 #' along with the lower and upper confidence intervals
 #' @export
-
+#'
 paired.concordance.index <- function(predictions, observations, delta.pred=0, delta.obs=0, alpha = 0.05, outx=FALSE, alternative = c("two.sided", "less", "greater"), logic.operator=c("and", "or"), CPP=TRUE, comppairs=10) {
   alternative <- match.arg(alternative)
   logic.operator <- match.arg(logic.operator)

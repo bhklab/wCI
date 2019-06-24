@@ -2,8 +2,6 @@
 
 export(paired.concordance.index)
 export(paired.concordance.index.weighted.version)
-import(Rcpp)
-importFrom(PharmacoGx,summarizeSensitivityProfiles)
 importFrom(stats,complete.cases)
 importFrom(stats,pnorm)
 importFrom(stats,qnorm)

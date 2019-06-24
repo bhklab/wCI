@@ -43,7 +43,7 @@ This function return the concordance index and its p-value
 along with the lower and upper confidence intervals of said p-value.
 }
 \examples{
-gdsc.auc <- PharmacoGx::summarizeSensitivityProfiles(GDSC, sensitivity.measure='auc_published')
-xx <- PharmacoGx::summarizeSensitivityProfiles(predicted.by.model, gdsc.auc$Erlotinib)
+PLX4720_data <- readRDS("../data/PLX4720_data.rds")
+paired.concordance.index(predictions = PLX4720_data[,"AAC_CTRPv2"], observations = PLX4720_data[,"AAC_GDSC"], delta.pred = 0, delta.obs = 0,outx = T)$cindex
 
 }

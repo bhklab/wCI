@@ -40,7 +40,7 @@ This results in a Goodman-Kruskal gamma type rank correlation.}
 \item{comppairs}{{numeric} minimum number of pairs to calculate a valid CI}
 }
 \value{
-[list] list of concordance index and its pvalue
+[list] ! list of concordance index and its pvalue
 along with the lower and upper confidence intervals
 }
 \description{
@@ -48,7 +48,7 @@ This function return the concordance index and its p-value
 along with the lower and upper confidence intervals of said p-value.
 }
 \examples{
-gdsc.auc <- summarizeSensitivityProfiles(GDSC, sensitivity.measure='auc_published')
-xx <- summarizeSensitivityProfiles(predicted.by.model, gdsc.auc$Erlotinib)
+PLX4720_data <- readRDS("../data/PLX4720_data.rds")
+paired.concordance.index(predictions = PLX4720_data[,"AAC_CTRPv2"], observations = PLX4720_data[,"AAC_GDSC"], delta.pred = 0, delta.obs = 0,outx = T)$cindex
 
 }
