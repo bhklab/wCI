@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #' Takes two numerical vectors and computes the concordance index between them
 #' by comparing the order of values for two pairs of data each time
 #'
