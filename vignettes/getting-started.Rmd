@@ -1,0 +1,64 @@
+---
+title: "Modified Concordance Index (mCI)"
+author: ""
+output:
+  BiocStyle::pdf_document
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+Modified concordance index (mCI) is an extension to the method of calculating regualr concordance index, where 1 indicates perfect concordance, -1 indicates perfect anti-concordance, and 0 indicates randomness and no concordance. mCI accounts for noise introduced when replicating one of the vectors. The main motivation of this addition is the inconsistency observed between the responses of the same drug applied on the same cell lines in two different centres. mCI accounts for the noise introduced when replicating the sensitivity experiments. 
+
+
+## Installing the package
+```{r, results='hide',warning=FALSE,error=FALSE}
+  devtools::install_github("bhklab/mCI")
+```
+
+## Using the package
+
+Load library
+```{r ci1}
+library(mCI)
+```
+
+
+Load real data example. In this example we load the responses of applying PLX4720 drug in two big pharmacogenomic datasets (CTRPv2 and GDSC) on the same cell lines.
+```{r ci2,results='hold'}
+PLX4720_data <- readRDS("../data/PLX4720_data.rds")
+```
+
+Below is a plot of the Area-Above-the-dose-response-Curve of all points in the experiment mentined above.
+```{r, fig.show='hold'}
+plot(PLX4720_data[,"AAC_CTRPv2"],PLX4720_data[,"AAC_GDSC"]
+     ,main = "AAC drug response consistency between CTRPv2 and GDSC\nPLX4720 drug as an example"
+     ,xlab = "CTRPv2[AAC]", ylab = "GDSC[AAC]",xlim = c(0,0.5),ylim = c(0,0.5))
+```
+
+
+
+
+If we calculate the regular concordance index, we find that the two datasets disagree a lot!
+```{r ci3}
+paired.concordance.index(predictions = PLX4720_data[,"AAC_CTRPv2"],
+                         observations = PLX4720_data[,"AAC_GDSC"],
+                         delta.pred = 0, delta.obs = 0,outx = T)$cindex
+```
+
+
+
+
+However, if we account for the noise when replicating the experiments and use mCI, we are able to capture the true similarity between the experiments in the two datasets
+```{r ci4}
+paired.concordance.index(predictions = PLX4720_data[,"AAC_CTRPv2"]
+                         , observations = PLX4720_data[,"AAC_GDSC"]
+                         ,delta.pred = 0.2, delta.obs = 0.2,outx = T)$cindex
+```
+
