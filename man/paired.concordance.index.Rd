@@ -39,7 +39,7 @@ This results in a Goodman-Kruskal gamma type rank correlation.}
 along with the lower and upper confidence intervals
 }
 \description{
-This function return the concordance index and its p-value
+This function returns the concordance index and its p-value
 along with the lower and upper confidence intervals of said p-value.
 }
 \examples{

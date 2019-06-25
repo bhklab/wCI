@@ -1,7 +1,7 @@
 #' Takes two numerical vectors and computes the concordance index between them
 #' by comparing the order of values for two pairs of data each time
 #'
-#' This function return the concordance index and its p-value
+#' This function returns the concordance index and its p-value
 #' along with the lower and upper confidence intervals of said p-value.
 #'
 #'
@@ -24,7 +24,8 @@
 #' @param CPP {boolean} whether to use the C version of the code for faster execution
 #' @param comppairs {numeric} minimum number of pairs to calculate a valid CI
 #' @importFrom stats complete.cases qnorm pnorm
-# @useDynLib mCI _mCI_concordanceIndex_modified_helper
+#' @import Rcpp
+#' @useDynLib mCI _mCI_concordanceIndex_modified_helper
 #' @return [list] ! list of concordance index and its pvalue
 #' along with the lower and upper confidence intervals
 #' @export

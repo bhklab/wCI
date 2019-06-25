@@ -2,6 +2,7 @@
 
 export(paired.concordance.index)
 export(paired.concordance.index.weighted.version)
+import(Rcpp)
 importFrom(stats,complete.cases)
 importFrom(stats,pnorm)
 importFrom(stats,qnorm)

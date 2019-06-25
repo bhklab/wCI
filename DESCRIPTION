@@ -33,4 +33,4 @@ LinkingTo: Rcpp
 SystemRequirements: C++11, Rcpp, parallel, doParallel, BiocStyle
 RoxygenNote: 6.1.1
 VignetteBuilder: knitr
-Suggests: BiocStyle, knitr, rmarkdown
+Suggests: BiocStyle, knitr, rmarkdown, devtools
