@@ -6,4 +6,4 @@ src/*.o
 src/*.so
 src/*.dll
 inst/doc
-*.gz
+mCI_0.1.0.tar.gz
