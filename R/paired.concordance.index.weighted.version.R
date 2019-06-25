@@ -6,14 +6,9 @@
 #'
 #'
 #' @examples
-<<<<<<< HEAD
-#' PLX4720_data <- readRDS("../data/PLX4720_data.rds")
-#' paired.concordance.index(predictions = PLX4720_data[,"AAC_CTRPv2"], observations = PLX4720_data[,"AAC_GDSC"], delta.pred = 0, delta.obs = 0,outx = T)$cindex
-=======
 #' data(PLX4720_data)
 #' pciw_PLX4720 <- paired.concordance.index.weighted.version(predictions = PLX4720_data[ ,"AAC_CTRPv2"], observations = PLX4720_data[ ,"AAC_GDSC"], delta.pred = 0, delta.obs = 0, outx = TRUE)
 #' pciw_PLX4720$cindex
->>>>>>> mCI_Chris
 #'
 #' @param predictions {numeric} A vector of predicted drug responces which could be either continuous or discrete
 #' @param observations {numeric} A vector of observed continuous drug responces
@@ -30,18 +25,11 @@
 #' @param logic.operator {character} determines how strict should be the test to remove noisy pairs. Must be one of "and" or "or" and defaults to "and".
 #' @param CPP {boolean} whether to use the C version of the code for faster execution
 #' @param comppairs {numeric} minimum number of pairs to calculate a valid CI
-<<<<<<< HEAD
-#' @return [list] ! list of concordance index and its pvalue
-#' along with the lower and upper confidence intervals
-#' @export
-
-=======
 #' @importFrom stats complete.cases qnorm pnorm
 #' @return [list] ! list of concordance index and its pvalue
 #' along with the lower and upper confidence intervals
 #' @export
 #'
->>>>>>> mCI_Chris
 paired.concordance.index.weighted.version <- function(predictions, observations,
                                                       delta.pred=0, delta.obs=0,
                                                       weightingFun_pred, weightingFun_obs,

@@ -19,12 +19,8 @@ Modified concordance index (mCI) is an extension to the method of calculating re
 
 ## Installing the package
 ```{r, results='hide',warning=FALSE,error=FALSE}
-<<<<<<< HEAD
-  devtools::install_github("bhklab/mCI")
-=======
 library(devtools)
 devtools::install_github("bhklab/mCI")
->>>>>>> mCI_Chris
 ```
 
 ## Using the package
@@ -37,11 +33,7 @@ library(mCI)
 
 Load real data example. In this example we load the responses of applying PLX4720 drug in two big pharmacogenomic datasets (CTRPv2 and GDSC) on the same cell lines.
 ```{r ci2,results='hold'}
-<<<<<<< HEAD
-PLX4720_data <- readRDS("../data/PLX4720_data.rds")
-=======
 load("../data/PLX4720_data.rda")
->>>>>>> mCI_Chris
 ```
 
 Below is a plot of the Area-Above-the-dose-response-Curve of all points in the experiment mentined above.

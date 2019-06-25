@@ -27,14 +27,6 @@ Description: The concordance index (CI) is a widely used to assess the
 License: GPL-3
 LazyData: true
 Encoding: UTF-8
-<<<<<<< HEAD
-Imports: Rcpp (>= 0.12.12)
-LinkingTo: Rcpp
-SystemRequirements: C++11, Rcpp, parallel, doParallel, BiocStyle
-RoxygenNote: 6.0.1
-Suggests: knitr, rmarkdown
-VignetteBuilder: knitr
-=======
 Depends: R (>= 3.5.0)
 Imports: Rcpp (>= 0.12.12)
 LinkingTo: Rcpp
@@ -42,4 +34,3 @@ SystemRequirements: C++11, Rcpp, parallel, doParallel, BiocStyle
 RoxygenNote: 6.1.1
 VignetteBuilder: knitr
 Suggests: BiocStyle, knitr, rmarkdown
->>>>>>> mCI_Chris

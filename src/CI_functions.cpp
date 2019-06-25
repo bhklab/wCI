@@ -123,11 +123,7 @@ List concordanceIndex_modified_helper(std::vector<double> x, std::vector<double>
             cdseq.push_back(false);
           } else {
 
-<<<<<<< HEAD
-            if ((x[i] > x[j] & y[i] > y[j]) || (x[i] < x[j] & y[i] < y[j])) {
-=======
             if ((x[i] > x[j] && y[i] > y[j]) || (x[i] < x[j] && y[i] < y[j])) {
->>>>>>> mCI_Chris
               c[i] = c[i] + 1;
               c[j] = c[j] + 1;
               cdseq.push_back(true);
@@ -156,11 +152,7 @@ List concordanceIndex_modified_helper(std::vector<double> x, std::vector<double>
               cdseq.push_back(false);
             } else {
 
-<<<<<<< HEAD
-              if ((x[i] > x[j] & y[i] > y[j]) || (x[i] < x[j] & y[i] < y[j])) {
-=======
               if ((x[i] > x[j]&&y[i] > y[j]) || (x[i] < x[j] && y[i] < y[j])) {
->>>>>>> mCI_Chris
                 c[i] = c[i] + 1;
                 c[j] = c[j] + 1;
                 cdseq.push_back(true);
@@ -189,11 +181,7 @@ List concordanceIndex_modified_helper(std::vector<double> x, std::vector<double>
 
               } else {
 
-<<<<<<< HEAD
-                if ((x[i] > x[j] & y[i] > y[j]) || (x[i] < x[j] & y[i] < y[j])) {
-=======
                 if ((x[i] > x[j] && y[i] > y[j]) || (x[i] < x[j] && y[i] < y[j])) {
->>>>>>> mCI_Chris
                   c[i] = c[i] + 1;
                   c[j] = c[j] + 1;
                   cdseq.push_back(true);
@@ -220,11 +208,7 @@ List concordanceIndex_modified_helper(std::vector<double> x, std::vector<double>
               cdseq.push_back(false);
             } else {
 
-<<<<<<< HEAD
-              if ((x[i] > x[j] & y[i] > y[j]) || (x[i] < x[j] & y[i] < y[j])) {
-=======
               if ((x[i] > x[j] && y[i] > y[j]) || (x[i] < x[j] && y[i] < y[j])) {
->>>>>>> mCI_Chris
                 c[i] = c[i] + 1;
                 c[j] = c[j] + 1;
                 cdseq.push_back(true);
@@ -333,11 +317,7 @@ List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vecto
   for (int i = 0; i < N - 1; ++i) {
     for (int j = i + 1; j < N; ++j) {
 
-<<<<<<< HEAD
-      if((weightingFun_obs.compare("kernel_gaussian") == 0 & weightingFun_pred.compare("kernel_gaussian") == 0) | (weightingFun_obs.compare("kernel_laplace") == 0 & weightingFun_pred.compare("kernel_laplace") == 0)){
-=======
       if((weightingFun_obs.compare("kernel_gaussian") == 0 && weightingFun_pred.compare("kernel_gaussian") == 0) | (weightingFun_obs.compare("kernel_laplace") == 0 && weightingFun_pred.compare("kernel_laplace") == 0)){
->>>>>>> mCI_Chris
 
         if(weightingFun_obs.compare("kernel_gaussian") == 0){
           obs_w = fabs(log10(kernel_gaussian_C(y[w_order[i]] - y[w_order[j]],0.0002001131,0.0939948369)));
@@ -388,11 +368,7 @@ List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vecto
             cdseq.push_back(false);
           } else {
 
-<<<<<<< HEAD
-            if ((x[i] > x[j] & y[i] > y[j]) || (x[i] < x[j] & y[i] < y[j])) {
-=======
             if ((x[i] > x[j] && y[i] > y[j]) || (x[i] < x[j] && y[i] < y[j])) {
->>>>>>> mCI_Chris
               c[i] = c[i] + w;
               c[j] = c[j] + w;
               cdseq.push_back(true);
@@ -421,11 +397,7 @@ List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vecto
               cdseq.push_back(false);
             } else {
 
-<<<<<<< HEAD
-              if ((x[i] > x[j] & y[i] > y[j]) || (x[i] < x[j] & y[i] < y[j])) {
-=======
               if ((x[i] > x[j] && y[i] > y[j]) || (x[i] < x[j] && y[i] < y[j])) {
->>>>>>> mCI_Chris
                 c[i] = c[i] + w;
                 c[j] = c[j] + w;
                 cdseq.push_back(true);
@@ -454,11 +426,7 @@ List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vecto
 
               } else {
 
-<<<<<<< HEAD
-                if ((x[i] > x[j] & y[i] > y[j]) || (x[i] < x[j] & y[i] < y[j])) {
-=======
                 if ((x[i] > x[j] && y[i] > y[j]) || (x[i] < x[j] && y[i] < y[j])) {
->>>>>>> mCI_Chris
                   c[i] = c[i] + w;
                   c[j] = c[j] + w;
                   cdseq.push_back(true);
@@ -485,11 +453,7 @@ List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vecto
               cdseq.push_back(false);
             } else {
 
-<<<<<<< HEAD
-              if ((x[i] > x[j] & y[i] > y[j]) || (x[i] < x[j] & y[i] < y[j])) {
-=======
               if ((x[i] > x[j] && y[i] > y[j]) || (x[i] < x[j] && y[i] < y[j])) {
->>>>>>> mCI_Chris
                 c[i] = c[i] + w;
                 c[j] = c[j] + w;
                 cdseq.push_back(true);
