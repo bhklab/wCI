@@ -1,6 +1,11 @@
 ---
 title: "Modified Concordance Index (mCI)"
-author: ""
+author:
+- "Zhaleh Safikhani"
+- "Wail Ba-alawi"
+- "Ian Smith"
+- "Petr Smirnov"
+- "Benjamin Haibe-Kains"
 output:
   BiocStyle::pdf_document
 vignette: >
