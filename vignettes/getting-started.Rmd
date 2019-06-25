@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Introduction
-Modified concordance index (mCI) is an extension to the method of calculating regualr concordance index, where 1 indicates perfect concordance, -1 indicates perfect anti-concordance, and 0 indicates randomness and no concordance. mCI accounts for noise introduced when replicating one of the vectors. The main motivation of this addition is the inconsistency observed between the responses of the same drug applied on the same cell lines in two different centres. mCI accounts for the noise introduced when replicating the sensitivity experiments. 
+The concordance index (CI) is a widely used to assess the predictive value of biomedical assays. CI has previously been used in cell line-based drug screening to estimate the probability that two randomly-chosen cell lines are ranked identically across biological replicates or independent studies based on their drug response. However, the conventional formulation of CI does not account for the high level noise in drug response measurements. Here we introduce the mCI package implementing a modification of the concordance index (CI), called the robust concordance index (rCI) to explicitly accounts for the intrinsic variability of the pharmacological assays. 
 
 
 ## Installing the package
@@ -33,7 +33,7 @@ library(mCI)
 
 Load real data example. In this example we load the responses of applying PLX4720 drug in two big pharmacogenomic datasets (CTRPv2 and GDSC) on the same cell lines.
 ```{r ci2,results='hold'}
-load("../data/PLX4720_data.rda")
+  load("../data/PLX4720_data.rda")
 ```
 
 Below is a plot of the Area-Above-the-dose-response-Curve of all points in the experiment mentined above.
