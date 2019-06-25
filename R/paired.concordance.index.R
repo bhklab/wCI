@@ -6,8 +6,9 @@
 #'
 #'
 #' @examples
-#' PLX4720_data <- readRDS("../data/PLX4720_data.rds")
-#' paired.concordance.index(predictions = PLX4720_data[,"AAC_CTRPv2"], observations = PLX4720_data[,"AAC_GDSC"], delta.pred = 0, delta.obs = 0,outx = T)$cindex
+#' data(PLX4720_data)
+#' pci_PLX4720 <- paired.concordance.index(predictions = PLX4720_data[ ,"AAC_CTRPv2"], observations = PLX4720_data[ ,"AAC_GDSC"], delta.pred = 0, delta.obs = 0,outx = TRUE)
+#' pci_PLX4720$cindex
 #'
 #' @param predictions {numeric} A vector of predicted drug responces which could be either continuous or discrete
 #' @param observations {numeric} A vector of observed continuous drug responces

@@ -19,6 +19,7 @@ Modified concordance index (mCI) is an extension to the method of calculating re
 
 ## Installing the package
 ```{r, results='hide',warning=FALSE,error=FALSE}
+library(devtools)
 devtools::install_github("bhklab/mCI")
 ```
 
