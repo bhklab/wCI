@@ -19,4 +19,8 @@ find.original.name <- function(fun) {
       return(i)
     }
   }
+<<<<<<< HEAD:R/kernels.R
 }
+=======
+}
+>>>>>>> mCI_Chris:R/kernel.R
