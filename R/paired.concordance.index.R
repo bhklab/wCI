@@ -7,21 +7,34 @@
 #'
 #' @examples
 #' data(PLX4720_data)
-#' pci_PLX4720 <- paired.concordance.index(predictions = PLX4720_data[ ,"AAC_CTRPv2"], observations = PLX4720_data[ ,"AAC_GDSC"], delta.pred = 0, delta.obs = 0,outx = TRUE)
+#' pci_PLX4720 <- paired.concordance.index(predictions = PLX4720_data[ ,"AAC_CTRPv2"],
+#' observations = PLX4720_data[ ,"AAC_GDSC"], delta.pred = 0, delta.obs = 0,
+#' outx = TRUE)
 #' pci_PLX4720$cindex
 #'
-#' @param predictions {numeric} A vector of predicted drug responces which could be either continuous or discrete
+#' @param predictions {numeric} A vector of predicted drug responces which could
+#' be either continuous or discrete
 #' @param observations {numeric} A vector of observed continuous drug responces
-#' @param delta.pred {numeric} The minimunm reliable difference between two values in the predictions vector to be considered as significantly various values.
-#' @param delta.obs {numeric} The minimunm reliable difference between two values in the observations vector to be considered as significantly various values.
-#' In drug sensitivity , default value for delta.pred is picked by looking into delta auc values (drug response metric) between biological replicates across three
-#' large pharmacogenomic studies, CTRPv2(370 drugs over ~15-20 cells) , GDSC(1 drug over ~600 cells), GRAY (85 drugs over ~10-50 cells)
+#' @param delta.pred {numeric} The minimunm reliable difference between two
+#' values in the predictions vector to be considered as significantly various
+#' values.
+#' @param delta.obs {numeric} The minimunm reliable difference between two
+#' values in the observations vector to be considered as significantly various
+#' values. In drug sensitivity , default value for delta.pred is picked by
+#' looking into delta auc values (drug response metric) between biological
+#' replicates across three large pharmacogenomic studies,
+#' CTRPv2 (370 drugs over ~15-20 cells), GDSC (1 drug over ~600 cells),
+#' GRAY (85 drugs over ~10-50 cells)
 #' @param alpha {numeric} alpha level to compute confidence interval
-#' @param outx {boolean} set to TRUE to not count pairs of predictions that are tied as a relevant pair.
-#' This results in a Goodman-Kruskal gamma type rank correlation.
-#' @param alternative {character} what is the alternative hypothesis? Must be one of "two.sides", "less", and "greater" and defaults to two.sides".
-#' @param logic.operator {character} determines how strict should the test be to remove noisy pairs. Must be one of "and" or "or" and defaults to "and".
-#' @param CPP {boolean} whether to use the C version of the code for faster execution
+#' @param outx {boolean} set to TRUE to not count pairs of predictions that are
+#' tied as a relevant pair. This results in a Goodman-Kruskal gamma type rank
+#' correlation.
+#' @param alternative {character} What is the alternative hypothesis? Must be
+#' one of "two.sides", "less", and "greater" and defaults to two.sides".
+#' @param logic.operator {character} determines how strict should the test be to
+#' remove noisy pairs. Must be one of "and" or "or" and defaults to "and".
+#' @param CPP {boolean} Whether to use the C version of the code for faster
+#' execution
 #' @param comppairs {numeric} minimum number of pairs to calculate a valid CI
 #' @importFrom stats complete.cases qnorm pnorm
 #' @import Rcpp
@@ -30,7 +43,11 @@
 #' along with the lower and upper confidence intervals
 #' @export
 #'
-paired.concordance.index <- function(predictions, observations, delta.pred=0, delta.obs=0, alpha = 0.05, outx=FALSE, alternative = c("two.sided", "less", "greater"), logic.operator=c("and", "or"), CPP=TRUE, comppairs=10) {
+paired.concordance.index <- function(predictions, observations, delta.pred=0,
+                                     delta.obs=0, alpha = 0.05, outx=FALSE,
+                                     alternative = c("two.sided", "less", "greater"),
+                                     logic.operator=c("and", "or"),
+                                     CPP=TRUE, comppairs=10) {
   alternative <- match.arg(alternative)
   logic.operator <- match.arg(logic.operator)
   predictions[which(is.nan(predictions))] <- NA

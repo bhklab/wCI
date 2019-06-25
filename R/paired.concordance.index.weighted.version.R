@@ -51,7 +51,7 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
     obs_dist <- outer(predictions, predictions, FUN="-")
     obs_weights <- abs(log10(weightingFun_obs(obs_dist)))
 
-    w_order <- 1:length(observations)
+    w_order <- seq_along(observations)
 
     if(sum(obs_weights)!=0){
       max_weight <- sum(obs_weights)
@@ -63,7 +63,7 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
     #pred_weights[which(pred_weights < 0)] <- 0
     obs_weights <- obs_weights/sum(obs_weights)
     pred_weights <- pred_weights/sum(pred_weights)
-    jj <- sapply(1:length(obs_weights), function(i){max(obs_weights[i], pred_weights[i])})
+    jj <- vapply(seq_along(length(obs_weights)), function(i){max(obs_weights[i], pred_weights[i])}, numeric())
     if(sum(jj)!=0){
       max_weight <- sum(jj)
     }

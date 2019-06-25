@@ -1,6 +1,6 @@
 Package: mCI
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Modified Concordance Index
 Version: 0.1.0
 Authors@R: c(
   person("Zhaleh","Safikhani", email = "zhaleh.safikhani@utoronto.ca", 
@@ -25,10 +25,11 @@ Description: The concordance index (CI) is a widely used to assess the
     explicitly accounts for the intrinsic variability of the pharmacological assays. 
     For more details please see the included documentation.
 License: GPL-3
+biocViews: Software, StatisticalMethod, CellBasedAssays
 LazyData: true
 Encoding: UTF-8
-Depends: R (>= 3.4.0)
-Imports: Rcpp (>= 0.12.12)
+Depends: R (>= 3.6.0)
+Imports: Rcpp (>= 0.12.12), stats
 LinkingTo: Rcpp
 SystemRequirements: C++11, Rcpp, parallel, doParallel, BiocStyle
 RoxygenNote: 6.1.1
