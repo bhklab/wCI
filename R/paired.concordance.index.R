@@ -73,9 +73,13 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0,
     for (i in seq(from = 1, to = N - 1)) {
       for (j in seq(from = i + 1, to = N)) {
         pair <- c(i, j)
-        iff <- as.logical(outer(abs(predictions[i] - predictions[j]) > max(delta.pred[i], delta.pred[j]), abs(observations[i] - observations[j]) > max(delta.obs[i], delta.obs[j]), logic.operator))
+        iff <- as.logical(outer(abs(predictions[i] - predictions[j]) >
+                                  max(delta.pred[i], delta.pred[j]),
+                                abs(observations[i] - observations[j]) >
+                                  max(delta.obs[i], delta.obs[j]), logic.operator))
         if(logic.operator == "&"){
-          ife <- abs(predictions[i] - predictions[j]) == max(delta.pred[i], delta.pred[j])
+          ife <- abs(predictions[i] - predictions[j]) == max(delta.pred[i],
+                                                             delta.pred[j])
         }else{
           ife <- !iff
         }
@@ -92,7 +96,8 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0,
             c.d.seq <- c(c.d.seq, FALSE)
           }
         }else if (ife){
-          if(outx | abs(observations[i] - observations[j]) <= max(delta.obs[i], delta.obs[j])){
+          if(outx | abs(observations[i] - observations[j]) <= max(delta.obs[i],
+                                                                  delta.obs[j])){
             u[pair] <- u[pair] + 1
           }else{
             d[pair] <- d[pair] + 0.5
@@ -111,7 +116,9 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0,
   }else{
     values <- concordanceIndex_modified_helper(x=predictions, y=observations,
                                                deltaX=delta.pred, deltaY=delta.obs,
-                                               alpha=alpha, outx=outx, alternative=alternative, logicOp=logic.operator)
+                                               alpha=alpha, outx=outx,
+                                               alternative=alternative,
+                                               logicOp=logic.operator)
     C <- values$C
     D <- values$D
     CC <- values$CC
@@ -122,16 +129,21 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0,
   }
 
   if (N < 3 || (C == 0 && D == 0)) {
-    return(list("cindex"=NA, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA, "relevant.pairs.no"=0))
+    return(list("cindex"=NA, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA,
+                "relevant.pairs.no"=0))
   }
   if(C!=0 & D==0){
-    return(list("cindex"=1, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA, "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
+    return(list("cindex"=1, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA,
+                "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
   }
-  if(C==0 || D==0 || C * (C - 1)==0 || D * (D - 1)==0 || C * D==0 || (C + D) < comppairs){
-    return(list("cindex"=NA, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA, "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
+  if(C==0 || D==0 || C * (C - 1)==0 || D * (D - 1)==0 || C * D==0 || (C + D) <
+     comppairs){
+    return(list("cindex"=NA, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA,
+                "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
   }
   cindex <- C / (C + D)
-  varp <- 4 * ((D ^ 2 * CC - 2 * C * D * CD + C ^ 2 * DD) / (C + D) ^ 4) * N * (N - 1) / (N - 2)
+  varp <- 4 * ((D ^ 2 * CC - 2 * C * D * CD + C ^ 2 * DD) / (C + D) ^ 4) * N *
+    (N - 1) / (N - 2)
   if (varp >= 0) {
     sterr <- sqrt(varp / N)
     ci <- qnorm(p = alpha / 2, lower.tail = FALSE) * sterr
@@ -146,7 +158,8 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0,
                 "concordant.pairs"=c.d.seq))
   }
   return(list("cindex"=cindex,
-              "p.value"=switch(alternative, less=p, greater=1 - p, two.sided=2 * min(p, 1 - p)),
+              "p.value"=switch(alternative, less=p, greater=1 - p, two.sided=2 *
+                                min(p, 1 - p)),
               "sterr"=sterr,
               "lower"=max(cindex - ci, 0),
               "upper"=min(cindex + ci, 1),

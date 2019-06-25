@@ -17,13 +17,14 @@ Authors@R: c(
 Description: The concordance index (CI) is a widely used to assess the 
     predictive value of biomedical assays. CI has previously been used in 
     cell line-based drug screening to estimate the probability that two 
-    randomly-chosen cell lines are ranked identically across biological replicates 
-    or independent studies based on their drug response. However, the conventional 
-    formulation of CI does not account for the high level noise in drug response 
-    measurements. Here we introduce the mCI package implementing a modification 
-    of the concordance index (CI), called the robust concordance index (rCI) to 
-    explicitly accounts for the intrinsic variability of the pharmacological assays. 
-    For more details please see the included documentation.
+    randomly-chosen cell lines are ranked identically across biological 
+    replicates or independent studies based on their drug response. However, the 
+    conventional formulation of CI does not account for the high level noise in 
+    drug response measurements. Here we introduce the mCI package implementing a
+    modification of the concordance index (CI), called the robust concordance 
+    index (rCI) to explicitly accounts for the intrinsic variability of the 
+    pharmacological assays. For more details please see the included 
+    documentation.
 License: GPL-3
 biocViews: Software, StatisticalMethod, CellBasedAssays
 LazyData: true

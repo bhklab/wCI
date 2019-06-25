@@ -7,23 +7,41 @@
 #'
 #' @examples
 #' data(PLX4720_data)
-#' pciw_PLX4720 <- paired.concordance.index.weighted.version(predictions = PLX4720_data[ ,"AAC_CTRPv2"], observations = PLX4720_data[ ,"AAC_GDSC"], delta.pred = 0, delta.obs = 0, outx = TRUE)
+#'
+#' pciw_PLX4720 <- paired.concordance.index.weighted.version(
+#'   predictions = PLX4720_data[ ,"AAC_CTRPv2"],
+#'   observations = PLX4720_data[ ,"AAC_GDSC"], delta.pred = 0, delta.obs = 0,
+#'   outx = TRUE)
+#'
 #' pciw_PLX4720$cindex
 #'
-#' @param predictions {numeric} A vector of predicted drug responces which could be either continuous or discrete
+#' @param predictions {numeric} A vector of predicted drug responces which could
+#'   be either continuous or discrete
 #' @param observations {numeric} A vector of observed continuous drug responces
-#' @param delta.pred {numeric} The minimunm reliable difference between two values in the predictions vector to be considered as significantly various values.
-#' @param delta.obs {numeric} The minimunm reliable difference between two values in the observations vector to be considered as significantly various values.
-#' In drug sensitivity , default value for delta.pred is picked by looking into delta auc values (drug response metric) between biological replicates across three
-#' large pharmacogenomic studies, CTRPv2(370 drugs over ~15-20 cells) , GDSC(1 drug over ~600 cells), GRAY (85 drugs over ~10-50 cells)
-#' @param weightingFun_pred {function} function to weight the delta values of predictions
-#' @param weightingFun_obs {function} function to weight the delta values of observations
+#' @param delta.pred {numeric} The minimunm reliable difference between two
+#'   values in the predictions vector to be considered as significantly various
+#'   values.
+#' @param delta.obs {numeric} The minimunm reliable difference between
+#'   two values in the observations vector to be considered as significantly
+#'   various values. In drug sensitivity , default value for delta.pred is
+#'   picked by looking into delta auc values (drug response metric) between
+#'   biological replicates across three large pharmacogenomic studies,
+#'   CTRPv2 (370 drugs over ~15-20 cells) , GDSC (1 drug over ~600 cells),
+#'   GRAY (85 drugs over ~10-50 cells)
+#' @param weightingFun_pred {function} function to weight the delta values of
+#'   predictions
+#' @param weightingFun_obs {function} function to weight the delta values of
+#'   observations
 #' @param alpha {numeric} alpha level to compute confidence interval
-#' @param outx {boolean} set to TRUE to not count pairs of predictions that are tied as a relevant pair.
-#' This results in a Goodman-Kruskal gamma type rank correlation.
-#' @param alternative {character} what is the alternative hypothesis? Must be one of "two.sides", "less", and "greater" and defaults to two.sides".
-#' @param logic.operator {character} determines how strict should be the test to remove noisy pairs. Must be one of "and" or "or" and defaults to "and".
-#' @param CPP {boolean} whether to use the C version of the code for faster execution
+#' @param outx {boolean} set to TRUE to not count pairs of predictions that are
+#'   tied as a relevant pair. This results in a Goodman-Kruskal gamma type rank
+#'  correlation.
+#' @param alternative {character} what is the alternative hypothesis? Must be
+#'   one of "two.sides", "less", and "greater" and defaults to two.sides".
+#' @param logic.operator {character} determines how strict should be the test
+#'   to remove noisy pairs. Must be one of "and" or "or" and defaults to "and".
+#' @param CPP {boolean} whether to use the C version of the code for faster
+#'   execution
 #' @param comppairs {numeric} minimum number of pairs to calculate a valid CI
 #' @importFrom stats complete.cases qnorm pnorm
 #' @import Rcpp
@@ -34,8 +52,18 @@
 #'
 paired.concordance.index.weighted.version <- function(predictions, observations,
                                                       delta.pred=0, delta.obs=0,
-                                                      weightingFun_pred, weightingFun_obs,
-                                                      alpha=0.05, outx=FALSE, alternative=c("two.sided", "less", "greater"), logic.operator=c("and", "or"), CPP=TRUE, comppairs=10) {
+                                                      weightingFun_pred,
+                                                      weightingFun_obs,
+                                                      alpha=0.05,
+                                                      outx=FALSE,
+                                                      alternative=c("two.sided",
+                                                                    "less",
+                                                                    "greater"
+                                                                    ),
+                                                      logic.operator=c("and", "or"),
+                                                      CPP=TRUE,
+                                                      comppairs=10)
+{
   alternative <- match.arg(alternative)
   logic.operator <- match.arg(logic.operator)
   predictions[which(is.nan(predictions))] <- NA
@@ -63,7 +91,12 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
     #pred_weights[which(pred_weights < 0)] <- 0
     obs_weights <- obs_weights/sum(obs_weights)
     pred_weights <- pred_weights/sum(pred_weights)
-    jj <- vapply(seq_along(length(obs_weights)), function(i){max(obs_weights[i], pred_weights[i])}, numeric())
+    jj <- vapply(seq_along(length(obs_weights)),
+                 function(i){max(obs_weights[i],
+                                 pred_weights[i]
+                                 )},
+                 numeric()
+                 )
     if(sum(jj)!=0){
       max_weight <- sum(jj)
     }
@@ -94,26 +127,37 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
       for (j in seq(from = i + 1, to = N)) {
         pair <- c(i, j)
         if(!missing(weightingFun_obs) & !missing(weightingFun_pred)){
-          #w <- sqrt(abs(log(weightingFun_obs(observations[i] - observations[j]))) * abs(log(weightingFun_obs(predictions[i] - predictions[j]))))
-          obs_w <- abs(log10(weightingFun_obs(observations[w_order[i]] - observations[w_order[j]])))
+          #w <- sqrt(abs(log(weightingFun_obs(observations[i] - observations[j]))) *
+          # abs(log(weightingFun_obs(predictions[i] - predictions[j]))))
+          obs_w <- abs(log10(weightingFun_obs(
+            observations[w_order[i]] - observations[w_order[j]])))
           #obs_w <- ifelse(obs_w < 0, 0, obs_w)
-          pred_w <- abs(log10(weightingFun_pred(predictions[w_order[i]] - predictions[w_order[j]])))
+          pred_w <- abs(log10(weightingFun_pred(
+            predictions[w_order[i]] - predictions[w_order[j]])))
           #pred_w <- ifelse(pred_w < 0, 0, pred_w)
           w <- 1/max_weight *  max(obs_w, pred_w)
         }else if(!missing(weightingFun_obs)){
-          obs_w <- abs(log10(weightingFun_obs(observations[w_order[i]] - observations[w_order[j]])))
+          obs_w <- abs(log10(weightingFun_obs(
+            observations[w_order[i]] - observations[w_order[j]])))
           #obs_w <- ifelse(obs_w < 0, 0, obs_w)
           w <- 1/max_weight *  obs_w
         }else{
           w <- 1
         }
-        iff <- as.logical(outer(abs(predictions[i] - predictions[j]) > sample(c(delta.pred[i], delta.pred[j]),size = 1), abs(observations[i] - observations[j]) > sample(c(delta.obs[i], delta.obs[j]),size = 1), logic.operator))
+        iff <- as.logical(outer(abs(predictions[i] - predictions[j]) > sample(c(
+          delta.pred[i], delta.pred[j]),size = 1),
+          abs(observations[i] - observations[j]) > sample(c(delta.obs[i],
+                                                            delta.obs[j]),
+                                                          size = 1), logic.operator))
         if(logic.operator == "&"){
-          ife <- abs(predictions[i] - predictions[j]) == sample(c(delta.pred[i], delta.pred[j]),size = 1)
+          ife <- abs(predictions[i] - predictions[j]) == sample(c(delta.pred[i],
+                                                                  delta.pred[j]),
+                                                                size = 1)
         }else{
           ife <- !iff
         }
-        if(iff | !missing(weightingFun_obs)){ #add flag to replace 'or' behaviour with 'xor' behaviour
+        #add flag to replace 'or' behaviour with 'xor' behaviour
+        if(iff | !missing(weightingFun_obs)){
           pp <- (predictions[i] < predictions[j])
           oo <- (observations[i] < observations[j])
           if (pp == oo) {
@@ -126,7 +170,8 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
             c.d.seq <- c(c.d.seq, FALSE)
           }
         }else if (ife){
-          if(outx | abs(observations[i] - observations[j]) <= max(delta.obs[i], delta.obs[j])){
+          if(outx | abs(observations[i] - observations[j]) <= max(delta.obs[i],
+                                                                  delta.obs[j])){
            u[pair] <- u[pair] + w
           }else{
             d[pair] <- d[pair] + w/2
@@ -159,9 +204,16 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
 
 
 
-    values <- concordanceIndex_modified_helper_weighted(x=predictions, y=observations,
-                                               deltaX=delta.pred, deltaY=delta.obs, weightingFun_pred=f_pred, weightingFun_obs=f_obs,
-                                               alpha=alpha, outx=outx, alternative=alternative, logicOp=logic.operator, max_weight, max_weight)
+    values <- concordanceIndex_modified_helper_weighted(x=predictions,
+                                                        y=observations,
+                                                        deltaX=delta.pred,
+                                                        deltaY=delta.obs,
+                                                        weightingFun_pred=f_pred,
+                                                        weightingFun_obs=f_obs,
+                                                        alpha=alpha, outx=outx,
+                                                        alternative=alternative,
+                                                        logicOp=logic.operator,
+                                                        max_weight, max_weight)
     C <- values$C
     D <- values$D
     CC <- values$CC
@@ -173,16 +225,21 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
   }
 
   if (N < 3 || (C == 0 && D == 0)) {
-    return(list("cindex"=NA, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA, "relevant.pairs.no"=0))
+    return(list("cindex"=NA, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA,
+                "relevant.pairs.no"=0))
   }
   if(C!=0 & D==0){
-    return(list("cindex"=1, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA, "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
+    return(list("cindex"=1, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA,
+                "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
   }
-  if(C==0 || D==0 || C * (C - 1)==0 || D * (D - 1)==0 || C * D==0 || (C + D) < comppairs){
-    return(list("cindex"=NA, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA, "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
+  if(C==0 || D==0 || C * (C - 1)==0 || D * (D - 1)==0 || C * D==0 ||
+     (C + D) < comppairs){
+    return(list("cindex"=NA, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA,
+                "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
   }
   cindex <- C / (C + D)
-  varp <- 4 * ((D ^ 2 * CC - 2 * C * D * CD + C ^ 2 * DD) / (C + D) ^ 4) * N * (N - 1) / (N - 2)
+  varp <- 4 * ((D ^ 2 * CC - 2 * C * D * CD + C ^ 2 * DD) / (C + D) ^ 4) * N *
+    (N - 1) / (N - 2)
   if (varp >= 0) {
     sterr <- sqrt(varp / N)
     ci <- qnorm(p = alpha / 2, lower.tail = FALSE) * sterr
@@ -197,7 +254,8 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
                 "concordant.pairs"=c.d.seq))
   }
   return(list("cindex"=cindex,
-              "p.value"=switch(alternative, less=p, greater=1 - p, two.sided=2 * min(p, 1 - p)),
+              "p.value"=switch(alternative, less=p, greater=1 - p, two.sided=2 *
+                                min(p, 1 - p)),
               "sterr"=sterr,
               "lower"=max(cindex - ci, 0),
               "upper"=min(cindex + ci, 1),

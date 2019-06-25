@@ -11,26 +11,37 @@ paired.concordance.index(predictions, observations, delta.pred = 0,
   logic.operator = c("and", "or"), CPP = TRUE, comppairs = 10)
 }
 \arguments{
-\item{predictions}{{numeric} A vector of predicted drug responces which could be either continuous or discrete}
+\item{predictions}{{numeric} A vector of predicted drug responces which could
+be either continuous or discrete}
 
 \item{observations}{{numeric} A vector of observed continuous drug responces}
 
-\item{delta.pred}{{numeric} The minimunm reliable difference between two values in the predictions vector to be considered as significantly various values.}
+\item{delta.pred}{{numeric} The minimunm reliable difference between two
+values in the predictions vector to be considered as significantly various
+values.}
 
-\item{delta.obs}{{numeric} The minimunm reliable difference between two values in the observations vector to be considered as significantly various values.
-In drug sensitivity , default value for delta.pred is picked by looking into delta auc values (drug response metric) between biological replicates across three
-large pharmacogenomic studies, CTRPv2(370 drugs over ~15-20 cells) , GDSC(1 drug over ~600 cells), GRAY (85 drugs over ~10-50 cells)}
+\item{delta.obs}{{numeric} The minimunm reliable difference between two
+values in the observations vector to be considered as significantly various
+values. In drug sensitivity , default value for delta.pred is picked by
+looking into delta auc values (drug response metric) between biological
+replicates across three large pharmacogenomic studies,
+CTRPv2 (370 drugs over ~15-20 cells), GDSC (1 drug over ~600 cells),
+GRAY (85 drugs over ~10-50 cells)}
 
 \item{alpha}{{numeric} alpha level to compute confidence interval}
 
-\item{outx}{{boolean} set to TRUE to not count pairs of predictions that are tied as a relevant pair.
-This results in a Goodman-Kruskal gamma type rank correlation.}
+\item{outx}{{boolean} set to TRUE to not count pairs of predictions that are
+tied as a relevant pair. This results in a Goodman-Kruskal gamma type rank
+correlation.}
 
-\item{alternative}{{character} what is the alternative hypothesis? Must be one of "two.sides", "less", and "greater" and defaults to two.sides".}
+\item{alternative}{{character} What is the alternative hypothesis? Must be
+one of "two.sides", "less", and "greater" and defaults to two.sides".}
 
-\item{logic.operator}{{character} determines how strict should the test be to remove noisy pairs. Must be one of "and" or "or" and defaults to "and".}
+\item{logic.operator}{{character} determines how strict should the test be to
+remove noisy pairs. Must be one of "and" or "or" and defaults to "and".}
 
-\item{CPP}{{boolean} whether to use the C version of the code for faster execution}
+\item{CPP}{{boolean} Whether to use the C version of the code for faster
+execution}
 
 \item{comppairs}{{numeric} minimum number of pairs to calculate a valid CI}
 }
@@ -44,7 +55,9 @@ along with the lower and upper confidence intervals of said p-value.
 }
 \examples{
 data(PLX4720_data)
-pci_PLX4720 <- paired.concordance.index(predictions = PLX4720_data[ ,"AAC_CTRPv2"], observations = PLX4720_data[ ,"AAC_GDSC"], delta.pred = 0, delta.obs = 0,outx = TRUE)
+pci_PLX4720 <- paired.concordance.index(predictions = PLX4720_data[ ,"AAC_CTRPv2"],
+observations = PLX4720_data[ ,"AAC_GDSC"], delta.pred = 0, delta.obs = 0,
+outx = TRUE)
 pci_PLX4720$cindex
 
 }
