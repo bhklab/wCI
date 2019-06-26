@@ -8,12 +8,17 @@ install.packages("devtools")
 library(devtools) #load library
 ```
 
-1- Download zip file from mCI github page. Unzip it. and install 
+1. Download zip file from mCI github page. Unzip it. and install 
 ```R
 devtools::install("mCI-mCI_Chris")
 ```
  
-2- Using install_github :  
+2. Using install_github :  
 ```R
 devtools::install_github("bhklab/mCI", ref="mCI_Chris")
+```
+
+3. This is private repository, you will required a a personal access tokens on github. Go to the url https://github.com/settings/tokens and login to your account. Type a Token description and click on Generate Token. Copy the token text. Now in R:
+```R
+devtools::install_github("bhklab/mCI", ref="mCI_Chris", auth_token = "your access token")
 ```
