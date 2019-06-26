@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 // usable
 bool usable(double x1, double x2, double delta);
-RcppExport SEXP _mCI_usable(SEXP x1SEXP, SEXP x2SEXP, SEXP deltaSEXP) {
+RcppExport SEXP _wCI_usable(SEXP x1SEXP, SEXP x2SEXP, SEXP deltaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -20,7 +20,7 @@ END_RCPP
 }
 // usableHard
 bool usableHard(double x1, double x2, double delta);
-RcppExport SEXP _mCI_usableHard(SEXP x1SEXP, SEXP x2SEXP, SEXP deltaSEXP) {
+RcppExport SEXP _wCI_usableHard(SEXP x1SEXP, SEXP x2SEXP, SEXP deltaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -33,7 +33,7 @@ END_RCPP
 }
 // concordanceIndex_modified_helper
 List concordanceIndex_modified_helper(std::vector<double> x, std::vector<double> y, double deltaX, double deltaY, double alpha, bool outx, std::string alternative, std::string logicOp);
-RcppExport SEXP _mCI_concordanceIndex_modified_helper(SEXP xSEXP, SEXP ySEXP, SEXP deltaXSEXP, SEXP deltaYSEXP, SEXP alphaSEXP, SEXP outxSEXP, SEXP alternativeSEXP, SEXP logicOpSEXP) {
+RcppExport SEXP _wCI_concordanceIndex_modified_helper(SEXP xSEXP, SEXP ySEXP, SEXP deltaXSEXP, SEXP deltaYSEXP, SEXP alphaSEXP, SEXP outxSEXP, SEXP alternativeSEXP, SEXP logicOpSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -51,7 +51,7 @@ END_RCPP
 }
 // kernel_gaussian_C
 double kernel_gaussian_C(double x, double m, double s);
-RcppExport SEXP _mCI_kernel_gaussian_C(SEXP xSEXP, SEXP mSEXP, SEXP sSEXP) {
+RcppExport SEXP _wCI_kernel_gaussian_C(SEXP xSEXP, SEXP mSEXP, SEXP sSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -64,7 +64,7 @@ END_RCPP
 }
 // kernel_laplace_C
 double kernel_laplace_C(double x, double m, double b);
-RcppExport SEXP _mCI_kernel_laplace_C(SEXP xSEXP, SEXP mSEXP, SEXP bSEXP) {
+RcppExport SEXP _wCI_kernel_laplace_C(SEXP xSEXP, SEXP mSEXP, SEXP bSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -77,7 +77,7 @@ END_RCPP
 }
 // concordanceIndex_modified_helper_weighted
 List concordanceIndex_modified_helper_weighted(std::vector<double> x, std::vector<double> y, std::vector<double> deltaX, std::vector<double> deltaY, std::string weightingFun_pred, std::string weightingFun_obs, double alpha, bool outx, std::string alternative, std::string logicOp, double max_weight, double max_weight_obs);
-RcppExport SEXP _mCI_concordanceIndex_modified_helper_weighted(SEXP xSEXP, SEXP ySEXP, SEXP deltaXSEXP, SEXP deltaYSEXP, SEXP weightingFun_predSEXP, SEXP weightingFun_obsSEXP, SEXP alphaSEXP, SEXP outxSEXP, SEXP alternativeSEXP, SEXP logicOpSEXP, SEXP max_weightSEXP, SEXP max_weight_obsSEXP) {
+RcppExport SEXP _wCI_concordanceIndex_modified_helper_weighted(SEXP xSEXP, SEXP ySEXP, SEXP deltaXSEXP, SEXP deltaYSEXP, SEXP weightingFun_predSEXP, SEXP weightingFun_obsSEXP, SEXP alphaSEXP, SEXP outxSEXP, SEXP alternativeSEXP, SEXP logicOpSEXP, SEXP max_weightSEXP, SEXP max_weight_obsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -99,16 +99,16 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_mCI_usable", (DL_FUNC) &_mCI_usable, 3},
-    {"_mCI_usableHard", (DL_FUNC) &_mCI_usableHard, 3},
-    {"_mCI_concordanceIndex_modified_helper", (DL_FUNC) &_mCI_concordanceIndex_modified_helper, 8},
-    {"_mCI_kernel_gaussian_C", (DL_FUNC) &_mCI_kernel_gaussian_C, 3},
-    {"_mCI_kernel_laplace_C", (DL_FUNC) &_mCI_kernel_laplace_C, 3},
-    {"_mCI_concordanceIndex_modified_helper_weighted", (DL_FUNC) &_mCI_concordanceIndex_modified_helper_weighted, 12},
+    {"_wCI_usable", (DL_FUNC) &_wCI_usable, 3},
+    {"_wCI_usableHard", (DL_FUNC) &_wCI_usableHard, 3},
+    {"_wCI_concordanceIndex_modified_helper", (DL_FUNC) &_wCI_concordanceIndex_modified_helper, 8},
+    {"_wCI_kernel_gaussian_C", (DL_FUNC) &_wCI_kernel_gaussian_C, 3},
+    {"_wCI_kernel_laplace_C", (DL_FUNC) &_wCI_kernel_laplace_C, 3},
+    {"_wCI_concordanceIndex_modified_helper_weighted", (DL_FUNC) &_wCI_concordanceIndex_modified_helper_weighted, 12},
     {NULL, NULL, 0}
 };
 
-RcppExport void R_init_mCI(DllInfo *dll) {
+RcppExport void R_init_wCI(DllInfo *dll) {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }

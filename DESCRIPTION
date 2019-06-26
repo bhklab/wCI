@@ -1,4 +1,4 @@
-Package: mCI
+Package: wCI
 Type: Package
 Title: Modified Concordance Index
 Version: 0.1.0
@@ -20,7 +20,7 @@ Description: The concordance index (CI) is a widely used to assess the
     randomly-chosen cell lines are ranked identically across biological 
     replicates or independent studies based on their drug response. However, the 
     conventional formulation of CI does not account for the high level noise in 
-    drug response measurements. Here we introduce the mCI package implementing a
+    drug response measurements. Here we introduce the wCI package implementing a
     modification of the concordance index (CI), called the robust concordance 
     index (rCI) to explicitly accounts for the intrinsic variability of the 
     pharmacological assays. For more details please see the included 

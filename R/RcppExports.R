@@ -2,26 +2,26 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 usable <- function(x1, x2, delta) {
-    .Call('_mCI_usable', PACKAGE = 'mCI', x1, x2, delta)
+    .Call('_wCI_usable', PACKAGE = 'wCI', x1, x2, delta)
 }
 
 usableHard <- function(x1, x2, delta) {
-    .Call('_mCI_usableHard', PACKAGE = 'mCI', x1, x2, delta)
+    .Call('_wCI_usableHard', PACKAGE = 'wCI', x1, x2, delta)
 }
 
 concordanceIndex_modified_helper <- function(x, y, deltaX, deltaY, alpha, outx, alternative, logicOp) {
-    .Call('_mCI_concordanceIndex_modified_helper', PACKAGE = 'mCI', x, y, deltaX, deltaY, alpha, outx, alternative, logicOp)
+    .Call('_wCI_concordanceIndex_modified_helper', PACKAGE = 'wCI', x, y, deltaX, deltaY, alpha, outx, alternative, logicOp)
 }
 
 kernel_gaussian_C <- function(x, m, s) {
-    .Call('_mCI_kernel_gaussian_C', PACKAGE = 'mCI', x, m, s)
+    .Call('_wCI_kernel_gaussian_C', PACKAGE = 'wCI', x, m, s)
 }
 
 kernel_laplace_C <- function(x, m, b) {
-    .Call('_mCI_kernel_laplace_C', PACKAGE = 'mCI', x, m, b)
+    .Call('_wCI_kernel_laplace_C', PACKAGE = 'wCI', x, m, b)
 }
 
 concordanceIndex_modified_helper_weighted <- function(x, y, deltaX, deltaY, weightingFun_pred, weightingFun_obs, alpha, outx, alternative, logicOp, max_weight, max_weight_obs) {
-    .Call('_mCI_concordanceIndex_modified_helper_weighted', PACKAGE = 'mCI', x, y, deltaX, deltaY, weightingFun_pred, weightingFun_obs, alpha, outx, alternative, logicOp, max_weight, max_weight_obs)
+    .Call('_wCI_concordanceIndex_modified_helper_weighted', PACKAGE = 'wCI', x, y, deltaX, deltaY, weightingFun_pred, weightingFun_obs, alpha, outx, alternative, logicOp, max_weight, max_weight_obs)
 }
 

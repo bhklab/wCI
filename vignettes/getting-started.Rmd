@@ -1,5 +1,5 @@
 ---
-title: "Modified Concordance Index"
+title: "Weighted Concordance Index"
 author:
 - "Zhaleh Safikhani"
 - "Wail Ba-alawi"
@@ -9,7 +9,7 @@ author:
 output:
   BiocStyle::pdf_document
 vignette: >
-  %\VignetteIndexEntry{Modified Concordance Index}
+  %\VignetteIndexEntry{Weighted Concordance Index}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -23,21 +23,21 @@ require(devtools)
 The concordance index (CI) is a widely used to assess the predictive value of biomedical assays. CI has previously been used in cell line-based drug screening
 to estimate the probability that two randomly-chosen cell lines are ranke identically across biological replicates or independent studies based on their 
 drug response. However, the conventional formulation of CI does not account for 
-the high level noise in drug response measurements. Here we introduce the mCI package implementing a modification of the concordance index (CI), called the 
+the high level noise in drug response measurements. Here we introduce the wCI package implementing a modification of the concordance index (CI), called the 
 robust concordance index (rCI) to explicitly accounts for the intrinsic 
 variability of the pharmacological assays. 
 
 
 ## Installing the package
   ```{r, results='hide',warning=FALSE,error=FALSE}
-  devtools::install_github("bhklab/mCI")
+  devtools::install_github("bhklab/mCI", ref = "mCI_Chris")
   ```
 
 ## Using the package
 
 Load library
   ```{r ci1}
-  library(mCI)
+  library(wCI)
   ```
 
 
@@ -72,7 +72,7 @@ If we calculate the regular concordance index, we find that the two datasets dis
 
 
 However, if we account for the noise when replicating the experiments and use 
-mCI, we are able to capture the true similarity between the experiments in the 
+wCI, we are able to capture the true similarity between the experiments in the 
 two datasets
   ```{r ci4}
   paired.concordance.index(predictions = PLX4720_data[,"AAC_CTRPv2"], 

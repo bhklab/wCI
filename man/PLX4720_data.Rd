@@ -9,6 +9,6 @@
 PLX4720_data
 }
 \description{
-A dataset for use in mCI package examples
+A dataset for use in wCI package examples
 }
 \keyword{datasets}

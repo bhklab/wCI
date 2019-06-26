@@ -1,6 +1,6 @@
 #' PLX4720 Dataset
 #'
-#' A dataset for use in mCI package examples
+#' A dataset for use in wCI package examples
 #'
 #' @format A dataframe with 534 rows and 2 variables
 #'

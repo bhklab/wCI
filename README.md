@@ -1,4 +1,4 @@
-# mCI
+# wCI
 Modified Concordance Index for pharmacological readout
 
 How to install: At present there are 2 ways to install:

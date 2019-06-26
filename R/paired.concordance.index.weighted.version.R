@@ -45,7 +45,7 @@
 #' @param comppairs {numeric} minimum number of pairs to calculate a valid CI
 #' @importFrom stats complete.cases qnorm pnorm
 #' @import Rcpp
-#' @useDynLib mCI _mCI_concordanceIndex_modified_helper_weighted
+#' @useDynLib wCI _wCI_concordanceIndex_modified_helper_weighted
 #' @return [list] ! list of concordance index and its pvalue
 #' along with the lower and upper confidence intervals
 #' @export
