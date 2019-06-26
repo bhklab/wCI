@@ -20,53 +20,59 @@ require(devtools)
 ```
 
 ## Introduction
-The concordance index (CI) is a widely used to assess the predictive value of biomedical assays. CI has previously been used in cell line-based drug screening
-to estimate the probability that two randomly-chosen cell lines are ranke identically across biological replicates or independent studies based on their 
+The concordance index (CI) is a widely used to assess the predictive value of 
+biomedical assays. CI has previously been used in cell line-based drug screening
+to estimate the probability that two randomly-chosen cell lines are ranke 
+identically across biological replicates or independent studies based on their 
 drug response. However, the conventional formulation of CI does not account for 
-the high level noise in drug response measurements. Here we introduce the wCI package implementing a modification of the concordance index (CI), called the 
+the high level noise in drug response measurements. Here we introduce the wCI 
+package implementing a modification of the concordance index (CI), called the 
 robust concordance index (rCI) to explicitly accounts for the intrinsic 
 variability of the pharmacological assays. 
 
 
 ## Installing the package
-  ```{r, results='hide',warning=FALSE,error=FALSE}
-  devtools::install_github("bhklab/mCI", ref = "mCI_Chris")
-  ```
+```{r ci0, results="hide", warning=FALSE, error=FALSE, message=FALSE}
+devtools::install_github("bhklab/mCI", ref = "mCI_Chris")
+```
 
 ## Using the package
 
 Load library
-  ```{r ci1}
-  library(wCI)
-  ```
+```{r ci1}
+library(wCI)
+```
 
 
 Load real data example. In this example we load the responses of applying 
 PLX4720 drug in two big pharmacogenomic datasets (CTRPv2 and GDSC) on the same 
 cell lines.
-  ```{r ci2,results='hold'}
-    load("../data/PLX4720_data.rda")
-  ```
 
-Below is a plot of the Area-Above-the-dose-response-Curve of all points in the experiment mentined above.
-  ```{r, fig.show='hold'}
-  plot(PLX4720_data[,"AAC_CTRPv2"],PLX4720_data[,"AAC_GDSC"], 
-    main = "AAC drug response consistency between CTRPv2 and GDSC\nPLX4720 drug 
-    as an example", xlab = "CTRPv2[AAC]", ylab = "GDSC[AAC]", xlim = c(0,0.5),
-    ylim = c(0,0.5))
-  ```
+```{r ci2,results='hold'}
+load("../data/PLX4720_data.rda")
+```
+
+Below is a plot of the Area-Above-the-dose-response-Curve of all points in the 
+experiment mentined above.
+```{r, fig.show='hold'}
+plot(PLX4720_data[,"AAC_CTRPv2"],PLX4720_data[,"AAC_GDSC"], 
+  main = "AAC drug response consistency between CTRPv2 and GDSC\nPLX4720 drug 
+  as an example", xlab = "CTRPv2[AAC]", ylab = "GDSC[AAC]", xlim = c(0,0.5),
+  ylim = c(0,0.5))
+```
 
 
 
 
-If we calculate the regular concordance index, we find that the two datasets disagree a lot!
-  ```{r ci3}
-  paired.concordance.index(predictions = PLX4720_data[,"AAC_CTRPv2"],
-                           observations = PLX4720_data[,"AAC_GDSC"],
-                           delta.pred = 0, 
-                           delta.obs = 0,
-                           outx = TRUE)$cindex
-  ```
+If we calculate the regular concordance index, we find that the two datasets 
+disagree a lot!
+```{r ci3}
+paired.concordance.index(predictions = PLX4720_data[,"AAC_CTRPv2"],
+                         observations = PLX4720_data[,"AAC_GDSC"],
+                         delta.pred = 0, 
+                         delta.obs = 0,
+                         outx = TRUE)$cindex
+```
 
 
 
@@ -74,11 +80,11 @@ If we calculate the regular concordance index, we find that the two datasets dis
 However, if we account for the noise when replicating the experiments and use 
 wCI, we are able to capture the true similarity between the experiments in the 
 two datasets
-  ```{r ci4}
-  paired.concordance.index(predictions = PLX4720_data[,"AAC_CTRPv2"], 
-                            observations = PLX4720_data[,"AAC_GDSC"],
-                            delta.pred = 0.2, 
-                            delta.obs = 0.2,
-                            outx = TRUE)$cindex
-  ```
+```{r ci4}
+paired.concordance.index(predictions = PLX4720_data[,"AAC_CTRPv2"], 
+                          observations = PLX4720_data[,"AAC_GDSC"],
+                          delta.pred = 0.2, 
+                          delta.obs = 0.2,
+                          outx = TRUE)$cindex
+```
 
