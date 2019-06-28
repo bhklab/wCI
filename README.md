@@ -17,8 +17,3 @@ devtools::install("mCI-master")
 ```R
 devtools::install_github("bhklab/mCI")
 ```
-
-3. This is private repository, you will require a personal access token on GitHub. Go to the url https://github.com/settings/tokens and login to your account. Type a token description and click on Generate Token. Copy the token text. Now in R:
-```R
-devtools::install_github("bhklab/mCI", auth_token = "your access token")
-```
