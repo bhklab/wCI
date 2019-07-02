@@ -33,7 +33,7 @@ variability of the pharmacological assays.
 
 ## Installing the package
 ```{r ci0, results="hide", warning=FALSE, error=FALSE, message=FALSE}
-devtools::install_github("bhklab/mCI", ref = "mCI_Chris")
+devtools::install_github("bhklab/wCI")
 ```
 
 ## Using the package

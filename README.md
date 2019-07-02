@@ -8,12 +8,12 @@ install.packages("devtools")
 library(devtools) #load library
 ```
 
-1. Download zip file from mCI github page. Unzip it. and install 
+1. Download zip file from wCI github page. Unzip it and install 
 ```R
-devtools::install("mCI-master")
+devtools::install("wCI-master")
 ```
  
-2. Using install_github :  
+2. Using install_github:  
 ```R
-devtools::install_github("bhklab/mCI")
+devtools::install_github("bhklab/wCI")
 ```
