@@ -29,7 +29,7 @@ License: GPL-3
 biocViews: Software, StatisticalMethod, CellBasedAssays
 LazyData: true
 Encoding: UTF-8
-Depends: R (>= 3.6.0)
+Depends: R (>= 3.5.0)
 Imports: Rcpp (>= 0.12.12), stats
 LinkingTo: Rcpp
 SystemRequirements: C++11, Rcpp, parallel, doParallel, BiocStyle
