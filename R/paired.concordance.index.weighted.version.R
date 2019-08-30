@@ -92,10 +92,8 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
     obs_weights <- obs_weights/sum(obs_weights)
     pred_weights <- pred_weights/sum(pred_weights)
     jj <- vapply(seq_along(length(obs_weights)),
-                 function(i){max(obs_weights[i],
-                                 pred_weights[i]
-                                 )},
-                 numeric()
+                 function(i){ max(obs_weights[i], pred_weights[i]) },
+                 double(1)
                  )
     if(sum(jj)!=0){
       max_weight <- sum(jj)
