@@ -38,7 +38,6 @@
 #' @param comppairs {numeric} minimum number of pairs to calculate a valid CI
 #' @importFrom stats complete.cases qnorm pnorm
 #' @import Rcpp
-#' @import parallel
 #' @useDynLib wCI _wCI_concordanceIndex_modified_helper
 #' @return [list] ! list of concordance index and its pvalue
 #' along with the lower and upper confidence intervals
@@ -48,8 +47,7 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0,
                                      delta.obs=0, alpha = 0.05, outx=FALSE,
                                      alternative = c("two.sided", "less", "greater"),
                                      logic.operator=c("and", "or"),
-                                     CPP=TRUE, comppairs=10,
-                                     simulate.p.value = FALSE, ncores=2) {
+                                     CPP=TRUE, comppairs=10) {
   alternative <- match.arg(alternative)
   logic.operator <- match.arg(logic.operator)
   predictions[which(is.nan(predictions))] <- NA
@@ -130,66 +128,20 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0,
     c.d.seq <- values$cdseq
   }
 
-  # if (N < 3 || (C == 0 && D == 0)) {
-  #   return(list("cindex"=NA, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA,
-  #               "relevant.pairs.no"=0))
-  # }
-  # if(C!=0 & D==0){
-  #   return(list("cindex"=1, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA,
-  #               "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
-  # }
-  # if(C==0 || D==0 || C * (C - 1)==0 || D * (D - 1)==0 || C * D==0 || (C + D) <
-  #    comppairs){
-  #   return(list("cindex"=NA, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA,
-  #               "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
-  # }
-
-  cindex <- C / (C + D)
-
-  if(simulate.p.value != FALSE)
-  {
-    if(simulate.p.value <100)
-    {
-      warning("simulate.p.value to low. Setting to 100")
-      simulate.p.value = 100
-    }
-
-    #sci = unlist(lapply(1:simulate.p.value, function(x)
-    #  {
-    #  v=paired.concordance.index(sample(predictions), sample(observations),
-    #                             delta.pred, delta.obs, alpha, outx, alternative,
-    #                             logic.operator, CPP, comppairs, simulate.p.value=FALSE)
-    #  return(v$cindex)
-    #  }))
-
-    sci <- unlist(parallel::mclapply(1:simulate.p.value, function(x)
-    {
-      v=paired.concordance.index(sample(predictions), sample(observations),
-                                 delta.pred, delta.obs, alpha, outx, alternative,
-                                 logic.operator, CPP, comppairs, simulate.p.value=FALSE)
-      return(v$cindex)
-    }, mc.cores = ncores) )
-
-
-    if(cindex>0.5)
-    {
-      left.ci <- sum(sci < (1-cindex))
-      rigt.ci <- sum(sci > cindex)
-    } else {
-      left.ci <- sum(sci < cindex)
-      rigt.ci <- sum(sci > (1-cindex))
-    }
-    pl <- 2*left.ci/length(sci); pr <- 2*rigt.ci/length(sci)
-    p <- min(pl, pr)
-    if(p==0){p=1/(length(sci)+1)}
-
-    return(list("cindex"=cindex,
-                "p.value"=p,
-                "sterr"=NA, "lower"=NA, "upper"=NA,
-                "relevant.pairs.no"=(C + D) / 2,
-                "concordant.pairs"=c.d.seq #, sci=sci
-                ))
+  if (N < 3 || (C == 0 && D == 0)) {
+    return(list("cindex"=NA, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA,
+                "relevant.pairs.no"=0))
   }
+  if(C!=0 & D==0){
+    return(list("cindex"=1, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA,
+                "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
+  }
+  if(C==0 || D==0 || C * (C - 1)==0 || D * (D - 1)==0 || C * D==0 || (C + D) <
+     comppairs){
+    return(list("cindex"=NA, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA,
+                "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
+  }
+  cindex <- C / (C + D)
   varp <- 4 * ((D ^ 2 * CC - 2 * C * D * CD + C ^ 2 * DD) / (C + D) ^ 4) * N *
     (N - 1) / (N - 2)
   if (varp >= 0) {
