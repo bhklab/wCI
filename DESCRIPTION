@@ -32,7 +32,7 @@ Encoding: UTF-8
 Depends: R (>= 3.6.0)
 Imports: Rcpp (>= 0.12.12), stats
 LinkingTo: Rcpp
-SystemRequirements: C++11, Rcpp, parallel, doParallel, BiocStyle
+SystemRequirements: C++11, Rcpp, parallel, doParallel, BiocStyle, dqrng
 RoxygenNote: 6.1.1
 VignetteBuilder: knitr
 Suggests: BiocStyle, knitr, rmarkdown, devtools
