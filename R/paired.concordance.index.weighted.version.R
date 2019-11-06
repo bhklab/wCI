@@ -74,33 +74,33 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
   max_weight <- 1
 
 
-
-  if(!missing(weightingFun_obs)){
-    obs_dist <- outer(predictions, predictions, FUN="-")
-    obs_weights <- abs(log10(weightingFun_obs(obs_dist)))
-
-    w_order <- seq_along(observations)
-
-    if(sum(obs_weights)!=0){
-      max_weight <- sum(obs_weights)
-    }
-  }
-  if(!missing(weightingFun_obs) & !missing(weightingFun_pred)){
-    pred_dist <- outer(observations, observations, FUN="-")
-    pred_weights <- abs(log10(weightingFun_pred(pred_dist)))
-    #pred_weights[which(pred_weights < 0)] <- 0
-    obs_weights <- obs_weights/sum(obs_weights)
-    pred_weights <- pred_weights/sum(pred_weights)
-    jj <- vapply(seq_along(length(obs_weights)),
-                 function(i){max(obs_weights[i],
-                                 pred_weights[i]
-                                 )},
-                 numeric()
-                 )
-    if(sum(jj)!=0){
-      max_weight <- sum(jj)
-    }
-  }
+#
+#   if(!missing(weightingFun_obs)){
+#     obs_dist <- outer(predictions, predictions, FUN="-")
+#     obs_weights <- abs(log10(weightingFun_obs(obs_dist)))
+#
+#     w_order <- seq_along(observations)
+#
+#     if(sum(obs_weights)!=0){
+#       max_weight <- sum(obs_weights)
+#     }
+#   }
+#   if(!missing(weightingFun_obs) & !missing(weightingFun_pred)){
+#     pred_dist <- outer(observations, observations, FUN="-")
+#     pred_weights <- abs(log10(weightingFun_pred(pred_dist)))
+#     #pred_weights[which(pred_weights < 0)] <- 0
+#     obs_weights <- obs_weights/sum(obs_weights)
+#     pred_weights <- pred_weights/sum(pred_weights)
+#     jj <- vapply(seq_along(length(obs_weights)),
+#                  function(i){max(obs_weights[i],
+#                                  pred_weights[i]
+#                                  )},
+#                  numeric()
+#                  )
+#     if(sum(jj)!=0){
+#       max_weight <- sum(jj)
+#     }
+#   }
 
   N <- length(which(cc.ix))
 
@@ -200,8 +200,6 @@ paired.concordance.index.weighted.version <- function(predictions, observations,
     }else{
       f_pred <- find.original.name(weightingFun_pred)
     }
-
-
 
 
     values <- concordanceIndex_modified_helper_weighted(x=predictions,
