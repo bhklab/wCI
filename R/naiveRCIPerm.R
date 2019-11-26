@@ -7,12 +7,15 @@
 ### XXX: this doesn't do anything correctly right now!!
 
 
-source("adaptive_permutation.R")
-
+library(tictoc)
 
 
 computePearson <- function(mat) return(cor(mat[,1], mat[,2]))
 
+
+#' Naive RCI Permutations
+#' 
+#' @useDynLib wCI _wCI_rCIPermC
 naiveRCIPerm <- function(x, y, 
                          delta_x = 0.2, 
                          delta_y = 0.2, 
@@ -20,7 +23,8 @@ naiveRCIPerm <- function(x, y,
                          tie.method.x = c("ignore", "half"), 
                          tie.method.y = c("ignore", "half"),
                          required_alpha = 1e-6,
-                         p_confidence = 0.01){
+                         p_confidence = 0.01,
+                         C=TRUE){
   
   valid.logic <- match.arg(valid.logic)
   tie.method.x = match.arg(tie.method.x)
@@ -36,9 +40,7 @@ naiveRCIPerm <- function(x, y,
   ### Calculating Permutation stopping parameters
   
   B <- choose_b(required_alpha, p_confidence)
-  R <- choose_r(required_alpha, p_confidence)
-  
-  
+  R <- choose_r_fast(required_alpha, p_confidence)
   
   
   xmat <- matrix(rep(x, length(x)), ncol=length(x))
@@ -72,30 +74,40 @@ naiveRCIPerm <- function(x, y,
     return(t0)
   }
   
-  
   t0 <- compCI(xmat * ymat)
-  
-  t <- numeric(B)
-  
-  totalSeenLarger <- 0
-  
-  i <- 1
-  while(i <= B){
-    smpl <- sample.int(N)
-    ymat <- ymat[smpl, smpl]
-    t[i] <- compCI(xmat * ymat)
-    totalSeenLarger <- totalSeenLarger + (abs(t[i]-0.5) > abs(t0-0.5))
-    if(totalSeenLarger == R){
-      break
+  if(C){
+    if(valid.logic == "or"){
+      stop("Not Implemented Yet in C. Please use C=FALSE, but warning, very slow!")
     }
-    i = i + 1
-  }
-  browser()
-  if(any(totalSeenLarger == R)){
-    return(totalSeenLarger/i)
+    pval <- .Call("_wCI_rCIPermC", PACKAGE = "wCI",
+                  as.integer(xmat),
+                  as.integer(ymat),
+                  as.numeric(t0),
+                  as.numeric(R),
+                  as.numeric(B),
+                  as.numeric(N),
+                  as.integer(tie.method.x == "half"),
+                  as.integer(tie.method.y == "half"),
+                  as.numeric(runif(2))
+                  )
+    return(pval)
   } else {
-    return((totalSeenLarger+1)/(B + 1))
+    totalSeenLarger <- 0
+    i <- 1
+    while(i <= B){
+      smpl <- sample.int(N)
+      ymat <- ymat[smpl, smpl]
+      t <- compCI(xmat * ymat)
+      totalSeenLarger <- totalSeenLarger + (abs(t-0.5) > abs(t0-0.5))
+      if(totalSeenLarger == R){
+        break
+      }
+      i = i + 1
+    }
+    if(any(totalSeenLarger == R)){
+      return(totalSeenLarger/i)
+    } else {
+      return((totalSeenLarger+1)/(B + 1))
+    }
   }
-  
-  return(res)
 }

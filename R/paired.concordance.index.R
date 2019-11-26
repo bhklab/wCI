@@ -35,8 +35,23 @@
 #' remove noisy pairs. Must be one of "and" or "or" and defaults to "and".
 #' @param CPP {boolean} Whether to use the C version of the code for faster
 #' execution
-#' @param comppairs {numeric} minimum number of pairs to calculate a valid CI
-#' @importFrom stats complete.cases qnorm pnorm
+#' @param p_method {character} Either "Permutation", or "Asymptotic", picks a
+#' method to use for calculating p-values. If Permutation, then "alpha"/"num_hypothesis"
+#' is used to determine the effective alpha used for estimating number of required 
+#' permutations. 
+#' @param conf_int_method {character} Either "Bootstrap" or "Asymptotic", picks a method for
+#' estimating the confidence interval corresponding to 1-"alpha". 
+#' @param num_hypothesis {numeric} Total number of hypothesis being tested in analysis. Used
+#' for adjusting number of required permutations when using the permutation method of computing
+#' p values. Default 1. Ignored if using asymptotic p value.
+#' @param perm_p_confidence {numeric} Maximum permited 1 SD confidence interval of our estimated 
+#' permutation p value around the true p value, as a fraction of "alpha"/"num_hypothesis". Ignored
+#' if using asymptotic p value, no guarantee on correctness exists. 
+#' @param boot_num {numeric} number of samples to use for bootstrap. Default 5000. Ignored
+#' if using asymptotic confidence interval. 
+#' @param comppairs {numeric} minimum number of pairs to calculate a valid CI.
+#' @importFrom stats complete.cases qnorm pnorm 
+#' @importFrom boot boot.ci
 #' @import Rcpp
 #' @useDynLib wCI _wCI_concordanceIndex_modified_helper
 #' @return [list] ! list of concordance index and its pvalue
@@ -47,7 +62,13 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0,
                                      delta.obs=0, alpha = 0.05, outx=FALSE,
                                      alternative = c("two.sided", "less", "greater"),
                                      logic.operator=c("and", "or"),
-                                     CPP=TRUE, comppairs=10) {
+                                     CPP=TRUE, 
+                                     p_method = c("Permutation", "Asymptotic"),
+                                     conf_int_method = c("Bootstrap", "Asymptotic"),
+                                     num_hypothesis = 1,
+                                     perm_p_confidence = 0.2,
+                                     boot_num  = 5000,
+                                     comppairs=10) {
   alternative <- match.arg(alternative)
   logic.operator <- match.arg(logic.operator)
   predictions[which(is.nan(predictions))] <- NA
@@ -55,6 +76,11 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0,
   cc.ix <- complete.cases(predictions, observations)
   predictions <- predictions[which(cc.ix)]
   observations <- observations[which(cc.ix)]
+  
+  p_method <- match.arg(p_method)
+  conf_int_method <- match.arg(conf_int_method)
+  
+  
   if(!CPP){
     logic.operator <- ifelse(logic.operator=="or", "|", "&")
     N <- length(which(cc.ix))
@@ -127,42 +153,64 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0,
     N <- values$N
     c.d.seq <- values$cdseq
   }
-
+  
   if (N < 3 || (C == 0 && D == 0)) {
     return(list("cindex"=NA, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA,
                 "relevant.pairs.no"=0))
   }
+  
+  returnList <- list("cindex"=NA, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA,
+                     "relevant.pairs.no"= (C + D) / 2, "concordant.pairs"=c.d.seq)
   if(C!=0 & D==0){
     return(list("cindex"=1, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA,
                 "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
   }
-  if(C==0 || D==0 || C * (C - 1)==0 || D * (D - 1)==0 || C * D==0 || (C + D) <
-     comppairs){
-    return(list("cindex"=NA, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA,
+
+  if(C==0 & D!=0){
+    return(list("cindex"=0, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA,
                 "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
   }
-  cindex <- C / (C + D)
+  
+  
+  cindex <- returnList$cindex <- C / (C + D)
   varp <- 4 * ((D ^ 2 * CC - 2 * C * D * CD + C ^ 2 * DD) / (C + D) ^ 4) * N *
     (N - 1) / (N - 2)
   if (varp >= 0) {
     sterr <- sqrt(varp / N)
     ci <- qnorm(p = alpha / 2, lower.tail = FALSE) * sterr
     p <- pnorm((cindex - 0.5) / sterr)
-  } else {
-    return(list("cindex"=cindex,
-                "p.value"=1,
-                "sterr"=NA,
-                "lower"=0,
-                "upper"=0,
-                "relevant.pairs.no"=(C + D) / 2,
-                "concordant.pairs"=c.d.seq))
   }
-  return(list("cindex"=cindex,
-              "p.value"=switch(alternative, less=p, greater=1 - p, two.sided=2 *
-                                min(p, 1 - p)),
-              "sterr"=sterr,
-              "lower"=max(cindex - ci, 0),
-              "upper"=min(cindex + ci, 1),
-              "relevant.pairs.no"=(C + D) / 2,
-              "concordant.pairs"=c.d.seq))
+
+  if(p_method == "Asymptotic"){
+    if(C==0 || D==0 || C * (C - 1)==0 || D * (D - 1)==0 || C * D==0 || (C + D) <
+       comppairs){
+      return(list("cindex"=NA, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA,
+                  "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
+    }
+    returnList$p.value <- switch(alternative, less=p, greater=1 - p, two.sided=2 *
+                                   min(p, 1 - p))
+  } else if(p_method == "Permutation"){
+    if(alternative != "two.sided") {warning("Only 2 sided p value currently implemented for permutation.")}
+    returnList$p.value <- naiveRCIPerm(x = predictions, y = observations, delta_x = delta.pred, 
+                 delta_y = delta.obs, tie.method.x = ifelse(outx, "ignore", "half"), 
+                 required_alpha = alpha/num_hypothesis, p_confidence = perm_p_confidence, C=CPP)
+  }
+  
+ if(conf_int_method == "Asymptotic"){
+   sterr <- sqrt(varp / N)
+   ci <- qnorm(p = alpha / 2, lower.tail = FALSE) * sterr
+   returnList$lower <- max(cindex - ci, 0)
+   returnList$upper <- min(cindex + ci, 1)
+   returnList$sterr <- sterr
+ } else if (conf_int_method == "Bootstrap"){
+   boot.out <- naiveRCIBoot(x = predictions, y = observations, delta_x = delta.pred, 
+                            delta_y = delta.obs, tie.method.x = ifelse(outx, "ignore", "half"), R=boot_num)
+   ci.obj <- boot.ci(boot.out, type="bca")
+   returnList$lower <- max(ci.obj$bca[4], 0)
+   returnList$upper <- min(ci.obj$bca[5], 1)
+ }
+  
+
+  
+  return(returnList)
 }

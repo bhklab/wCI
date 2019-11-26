@@ -58,6 +58,24 @@ choose_r <- function(alpha, c) {
   return(R)
 }
 
+choose_r_fast <- function(alpha, c){
+  
+  error <- alpha * c
+  R <- 1
+  foundR <- FALSE
+  while(!foundR) {
+    R <- R * 2
+    brange <- qnbinom(c(0.1586553, 0.8413447), R, alpha)
+    pvalRange <- R / (R + brange)
+    diff <- max(abs(pvalRange - alpha))
+    if(diff < error) {
+      foundR <- TRUE
+    }
+  }
+  return(R)
+  
+}
+
 # For example, if the p-value threshold for significance 
 # is 5*10^(-5), and the desired precision is 0.1 (so that 
 # the standard error is 5*10^(-6), then parameters are 

@@ -5,7 +5,7 @@
 \title{Takes two numerical vectors and computes the concordance index between them
 by comparing the order of values for two pairs of data each time}
 \usage{
-fwci(x, y, dx, dy, n.simulate = 1000, mc.cores = 1)
+fwci(x, y, dx = 0, dy = 0, n.simulate = 1000, mc.cores = 1)
 }
 \arguments{
 \item{x}{a numeric vector}
@@ -18,12 +18,13 @@ the x vector to be considered as significantly}
 \item{dy}{The minimunm reliable difference between two values in
 the y vector to be considered as significantly}
 
-\item{n.simulate}{number of simulation for p value computation, default 1000}
+\item{n.simulate}{number of simulation for p value computation, default 1000.
+If set to 0 only CI will be return}
 
 \item{mc.cores}{number of cores for parallel processing, default 1}
 }
 \value{
-[list] ! list of concordance index and its pvalue
+a list of concordance index and its pvalue
 }
 \description{
 This function returns the concordance index and simulated p-value.
@@ -31,4 +32,8 @@ This function returns the concordance index and simulated p-value.
 \examples{
 data("iris")
 fwci(x=iris$Sepal.Length, y=iris$Sepal.Width, dx=0.1, dy=0.5)
+
+}
+\author{
+{ Arvind Mer }
 }
