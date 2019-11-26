@@ -193,7 +193,7 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0,
     if(alternative != "two.sided") {warning("Only 2 sided p value currently implemented for permutation.")}
     returnList$p.value <- naiveRCIPerm(x = predictions, y = observations, delta_x = delta.pred, 
                  delta_y = delta.obs, tie.method.x = ifelse(outx, "ignore", "half"), 
-                 required_alpha = alpha/num_hypothesis, p_confidence = perm_p_confidence, C=CPP)
+                 required_alpha = alpha/num_hypothesis/2, p_confidence = perm_p_confidence, C=CPP)
   }
   
  if(conf_int_method == "Asymptotic"){
@@ -208,6 +208,7 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0,
    ci.obj <- boot.ci(boot.out, type="bca")
    returnList$lower <- max(ci.obj$bca[4], 0)
    returnList$upper <- min(ci.obj$bca[5], 1)
+   returnList$sterr <- sd(boot.out$t[,1])
  }
   
 
