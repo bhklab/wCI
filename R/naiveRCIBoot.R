@@ -14,13 +14,13 @@ naiveRCIBoot <- function(x, y,
   valid.logic <- match.arg(valid.logic)
   tie.method.x = match.arg(tie.method.x)
   tie.method.y = match.arg(tie.method.y)
-  N <- length(x)
   
   seed <- .Random.seed
   
   myCompleteCases <- complete.cases(x,y)
   x <- x[myCompleteCases]
   y <- y[myCompleteCases]
+  N <- length(x)
   
   xmat <- matrix(rep(x, length(x)), ncol=length(x))
   ymat <- matrix(rep(y, length(y)), ncol=length(y))

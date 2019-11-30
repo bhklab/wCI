@@ -53,12 +53,12 @@
 #' @importFrom stats complete.cases qnorm pnorm 
 #' @importFrom boot boot.ci
 #' @import Rcpp
-#' @useDynLib wCI _wCI_concordanceIndex_modified_helper
+#' @useDynLib wCI _wCI_newPCI
 #' @return [list] ! list of concordance index and its pvalue
 #' along with the lower and upper confidence intervals
 #' @export
 #'
-paired.concordance.index <- function(predictions, observations, delta.pred=0,
+paired.concordance.index.new <- function(predictions, observations, delta.pred=0,
                                      delta.obs=0, alpha = 0.05, outx=FALSE,
                                      alternative = c("two.sided", "less", "greater"),
                                      logic.operator=c("and", "or"),
@@ -81,78 +81,17 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0,
   conf_int_method <- match.arg(conf_int_method)
   
   
-  if(!CPP){
-    logic.operator <- ifelse(logic.operator=="or", "|", "&")
-    N <- length(which(cc.ix))
-    if(length(delta.pred) == 1){
-      delta.pred <- rep(delta.pred, N)
-    }else{
-      delta.pred <- delta.pred[which(cc.ix)]
-    }
-    if(length(delta.obs) == 1){
-      delta.obs <- rep(delta.obs, N)
-    }else{
-      delta.obs <- delta.obs[which(cc.ix)]
-    }
-    c <- d <- u <- matrix(0, nrow = 1, ncol = N)
-    c.d.seq <- NULL
-    for (i in seq(from = 1, to = N - 1)) {
-      for (j in seq(from = i + 1, to = N)) {
-        pair <- c(i, j)
-        iff <- as.logical(outer(abs(predictions[i] - predictions[j]) >
-                                  max(delta.pred[i], delta.pred[j]),
-                                abs(observations[i] - observations[j]) >
-                                  max(delta.obs[i], delta.obs[j]), logic.operator))
-        if(logic.operator == "&"){
-          ife <- abs(predictions[i] - predictions[j]) == max(delta.pred[i],
-                                                             delta.pred[j])
-        }else{
-          ife <- !iff
-        }
-        if(iff){ #add flag to replace 'or' behaviour with 'xor' behaviour
-          pp <- (predictions[i] < predictions[j])
-          oo <- (observations[i] < observations[j])
-          if (pp == oo) {
-            c[pair] <- c[pair] + 1
-            c.d.seq <- c(c.d.seq, TRUE)
-            c.d.seq <- c(c.d.seq, TRUE)
-          } else {
-            d[pair] <- d[pair] + 1
-            c.d.seq <- c(c.d.seq, FALSE)
-            c.d.seq <- c(c.d.seq, FALSE)
-          }
-        }else if (ife){
-          if(outx | abs(observations[i] - observations[j]) <= max(delta.obs[i],
-                                                                  delta.obs[j])){
-            u[pair] <- u[pair] + 1
-          }else{
-            d[pair] <- d[pair] + 0.5
-            c[pair] <- c[pair] + 0.5
-            c.d.seq <- c(c.d.seq, TRUE)
-            c.d.seq <- c(c.d.seq, FALSE)
-          }
-        }
-      }
-    }
-    C <- sum(c)
-    D <- sum(d)
-    CC <- sum(c * (c - 1))
-    DD <- sum(d * (d - 1))
-    CD <- sum(c * d)
-  }else{
-    values <- concordanceIndex_modified_helper(x=predictions, y=observations,
-                                               deltaX=delta.pred, deltaY=delta.obs,
-                                               alpha=alpha, outx=outx,
-                                               alternative=alternative,
-                                               logicOp=logic.operator)
-    C <- values$C
-    D <- values$D
-    CC <- values$CC
-    DD <- values$DD
-    CD <- values$CD
-    N <- values$N
-    c.d.seq <- values$cdseq
-  }
+    values <- newPCI(pin_x=predictions, pin_y=observations, as.numeric(length(predictions)),
+                                               pdeltaX=delta.pred, pdeltaY=delta.obs,
+                                               pxties=ifelse(outx, 0L, 1L), pyties = 0L,
+                                               plogic=ifelse(logic.operator == "and", 1L, 0L))
+    C <- values[1]
+    D <- values[2]
+    CC <- values[3]
+    DD <- values[4]
+    CD <- values[5]
+    N <- values[6]
+    # c.d.seq <- values$cdseq
   
   if (N < 3 || (C == 0 && D == 0)) {
     return(list("cindex"=NA, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA,
@@ -160,15 +99,15 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0,
   }
   
   returnList <- list("cindex"=NA, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA,
-                     "relevant.pairs.no"= (C + D) / 2, "concordant.pairs"=c.d.seq)
+                     "relevant.pairs.no"= (C + D) / 2)
   if(C!=0 & D==0){
     return(list("cindex"=1, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA,
-                "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
+                "relevant.pairs.no"=(C + D) / 2))
   }
-
+  
   if(C==0 & D!=0){
     return(list("cindex"=0, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA,
-                "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
+                "relevant.pairs.no"=(C + D) / 2))
   }
   
   
@@ -180,38 +119,38 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0,
     ci <- qnorm(p = alpha / 2, lower.tail = FALSE) * sterr
     p <- pnorm((cindex - 0.5) / sterr)
   }
-
+  
   if(p_method == "Asymptotic"){
     if(C==0 || D==0 || C * (C - 1)==0 || D * (D - 1)==0 || C * D==0 || (C + D) <
        comppairs){
       return(list("cindex"=NA, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA,
-                  "relevant.pairs.no"=(C + D) / 2, "concordant.pairs"=c.d.seq))
+                  "relevant.pairs.no"=(C + D) / 2))
     }
     returnList$p.value <- switch(alternative, less=p, greater=1 - p, two.sided=2 *
                                    min(p, 1 - p))
   } else if(p_method == "Permutation"){
     if(alternative != "two.sided") {warning("Only 2 sided p value currently implemented for permutation.")}
     returnList$p.value <- naiveRCIPerm(x = predictions, y = observations, delta_x = delta.pred, 
-                 delta_y = delta.obs, tie.method.x = ifelse(outx, "ignore", "half"), 
-                 required_alpha = alpha/num_hypothesis/2, p_confidence = perm_p_confidence, C=CPP)
+                                       delta_y = delta.obs, tie.method.x = ifelse(outx, "ignore", "half"), 
+                                       required_alpha = alpha/num_hypothesis/2, p_confidence = perm_p_confidence, C=CPP)
   }
   
- if(conf_int_method == "Asymptotic"){
-   sterr <- sqrt(varp / N)
-   ci <- qnorm(p = alpha / 2, lower.tail = FALSE) * sterr
-   returnList$lower <- max(cindex - ci, 0)
-   returnList$upper <- min(cindex + ci, 1)
-   returnList$sterr <- sterr
- } else if (conf_int_method == "Bootstrap"){
-   boot.out <- naiveRCIBoot(x = predictions, y = observations, delta_x = delta.pred, 
-                            delta_y = delta.obs, tie.method.x = ifelse(outx, "ignore", "half"), R=boot_num )
-   ci.obj <- boot.ci(boot.out, type="bca")
-   returnList$lower <- max(ci.obj$bca[4], 0)
-   returnList$upper <- min(ci.obj$bca[5], 1)
-   returnList$sterr <- sd(boot.out$t[,1])
- }
+  if(conf_int_method == "Asymptotic"){
+    sterr <- sqrt(varp / N)
+    ci <- qnorm(p = alpha / 2, lower.tail = FALSE) * sterr
+    returnList$lower <- max(cindex - ci, 0)
+    returnList$upper <- min(cindex + ci, 1)
+    returnList$sterr <- sterr
+  } else if (conf_int_method == "Bootstrap"){
+    boot.out <- naiveRCIBoot(x = predictions, y = observations, delta_x = delta.pred, 
+                             delta_y = delta.obs, tie.method.x = ifelse(outx, "ignore", "half"), R=boot_num )
+    ci.obj <- boot.ci(boot.out, type="bca")
+    returnList$lower <- max(ci.obj$bca[4], 0)
+    returnList$upper <- min(ci.obj$bca[5], 1)
+    returnList$sterr <- sd(boot.out$t[,1])
+  }
   
-
+  
   
   return(returnList)
 }

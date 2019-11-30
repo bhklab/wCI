@@ -116,6 +116,24 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// newPCI
+SEXP newPCI(SEXP pin_x, SEXP pin_y, SEXP pn, SEXP pxties, SEXP pyties, SEXP pdeltaX, SEXP pdeltaY, SEXP plogic);
+RcppExport SEXP _wCI_newPCI(SEXP pin_xSEXP, SEXP pin_ySEXP, SEXP pnSEXP, SEXP pxtiesSEXP, SEXP pytiesSEXP, SEXP pdeltaXSEXP, SEXP pdeltaYSEXP, SEXP plogicSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type pin_x(pin_xSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type pin_y(pin_ySEXP);
+    Rcpp::traits::input_parameter< SEXP >::type pn(pnSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type pxties(pxtiesSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type pyties(pytiesSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type pdeltaX(pdeltaXSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type pdeltaY(pdeltaYSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type plogic(plogicSEXP);
+    rcpp_result_gen = Rcpp::wrap(newPCI(pin_x, pin_y, pn, pxties, pyties, pdeltaX, pdeltaY, plogic));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_wCI_usable", (DL_FUNC) &_wCI_usable, 3},
@@ -125,6 +143,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_wCI_kernel_laplace_C", (DL_FUNC) &_wCI_kernel_laplace_C, 3},
     {"_wCI_concordanceIndex_modified_helper_weighted", (DL_FUNC) &_wCI_concordanceIndex_modified_helper_weighted, 12},
     {"_wCI_rCIPermC", (DL_FUNC) &_wCI_rCIPermC, 9},
+    {"_wCI_newPCI", (DL_FUNC) &_wCI_newPCI, 8},
     {NULL, NULL, 0}
 };
 

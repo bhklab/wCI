@@ -2,6 +2,7 @@
 
 export(fwci)
 export(paired.concordance.index)
+export(paired.concordance.index.new)
 export(paired.concordance.index.weighted.version)
 export(paired.concordance.index.withsim)
 import(Rcpp)
@@ -13,4 +14,5 @@ importFrom(stats,pnorm)
 importFrom(stats,qnorm)
 useDynLib(wCI,"_wCI_concordanceIndex_modified_helper")
 useDynLib(wCI,"_wCI_concordanceIndex_modified_helper_weighted")
+useDynLib(wCI,"_wCI_newPCI")
 useDynLib(wCI,"_wCI_rCIPermC")

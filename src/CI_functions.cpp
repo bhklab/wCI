@@ -111,6 +111,7 @@ List concordanceIndex_modified_helper(std::vector<double> x, std::vector<double>
 
   for (int i = 0; i < N - 1; ++i) {
     for (int j = i + 1; j < N; ++j) {
+      
 
       if (logicOpF(usable(x[i],x[j], deltaX), usable(y[i],y[j], deltaY), logicOp)) {
         if(usableHard(y[i],y[j], deltaY) && logicOp.compare("and") == 0){
