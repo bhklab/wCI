@@ -136,6 +136,9 @@ double rciBoot(int *xmat, int *ymat, double obsCI, uint64_t R, uint64_t B, uint6
 
   // TODO:: Figure out how the 0 based indexing affects calculation of the pvalues
   // printf("%ld\n", totalSeenLarger);
+
+  free(permIdx);
+
   if(totalSeenLarger==R){
     return(((double)totalSeenLarger)/((double)i+1));
   }
