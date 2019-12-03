@@ -19,6 +19,14 @@ struct runningStat{
 
 typedef struct runningStat runningStat;
 
+
+struct returnRes{
+    double pval;
+    int earlyStop;
+};
+
+typedef struct returnRes returnRes;
+
 void printVec(uint64_t *list, uint64_t N){
   for(uint64_t i = 0; i < N; i ++){
     printf("%lld, ", list[i]);
@@ -58,11 +66,12 @@ runningStat returnCurrentIncrement(uint64_t xVal, uint64_t yVal, int xties, int 
 
     } else {
       if (xties == 1 & yties == 0){
-        res.numerator = (((double) xVal == yVal)*0.5 + (double) (xVal != 0) * 0.5) * (double) (yVal != 0);
+        // printf("OUTX=FALSE\n");
+        res.numerator = (((double) xVal == yVal)*0.5 + (double) ((xVal == yVal) & (xVal != 0)) * 0.5) * (double) (yVal != 0);
         res.denominator = (double) (yVal != 0);
       }
       if (xties == 0 & yties == 1){
-        res.numerator = (((double) xVal == yVal)*0.5 + (double) (yVal != 0) * 0.5) * (double) (xVal != 0);
+        res.numerator = (((double) xVal == yVal)*0.5 + (double) ((xVal == yVal) & (yVal != 0)) * 0.5) * (double) (xVal != 0);
         res.denominator = (double) (xVal != 0);
       }
     }
@@ -76,9 +85,10 @@ uint64_t returnLinearIdx(uint64_t row, uint64_t column, uint64_t N){
 
 
 
-double rciBoot(int *xmat, int *ymat, double obsCI, uint64_t R, uint64_t B, uint64_t N, int xties, int yties, uint64_t *state){
+returnRes rciBoot(int *xmat, int *ymat, double obsCI, uint64_t R, uint64_t B, uint64_t N, int xties, int yties, uint64_t *state){
 
   double currCI;
+  returnRes res;
   uint64_t totalSeenLarger = 0;
   uint64_t i = 0;
   // uint64_t j = 0;
@@ -103,11 +113,14 @@ double rciBoot(int *xmat, int *ymat, double obsCI, uint64_t R, uint64_t B, uint6
 
       for(uint64_t k = 0; k < N; k++){
 
-        xVal = xmat[returnLinearIdx(j,k,N)];
-        yVal = ymat[returnLinearIdx(permIdx[j],permIdx[k],N)];
+        xVal = xmat[returnLinearIdx(k,j,N)];
+        yVal = ymat[returnLinearIdx(permIdx[k],permIdx[j],N)];
         // printf("%ld,%ld. ", xVal, yVal);
 
         CS = returnCurrentIncrement(xVal, yVal, xties, yties);
+        // if(xVal == 0 & yVal != 0){
+        //   printf("CurNum: %f. \n CurDenom: %f.\n", CS.numerator, CS.denominator);
+        // }
         // printf("CurNum: %f. \n CurDenom: %f.\n", CS.numerator, CS.denominator);
 
         RS.numerator += CS.numerator;
@@ -140,9 +153,13 @@ double rciBoot(int *xmat, int *ymat, double obsCI, uint64_t R, uint64_t B, uint6
   free(permIdx);
 
   if(totalSeenLarger==R){
-    return(((double)totalSeenLarger)/((double)i+1));
+    res.pval = ((double)totalSeenLarger)/((double)i+1);
+    res.earlyStop = 1;
+    return(res);
   }
-  return(((double)(totalSeenLarger + 1))/((double)(B + 1)));
+  res.pval = ((double)(totalSeenLarger + 1))/((double)(B + 1));
+  res.earlyStop = 0;
+  return(res);
 
 }
 
@@ -158,6 +175,7 @@ SEXP permC(SEXP pin_x,
              SEXP pseed){
   
   double Ndouble = *REAL(pn);
+  returnRes res;
   
   // int discard_x_ties = *INTEGER(pdiscard_x_ties);
   // int discard_y_ties = *INTEGER(pdiscard_y_ties);
@@ -174,7 +192,7 @@ SEXP permC(SEXP pin_x,
   int xties = *INTEGER(pxties);
   int yties = *INTEGER(pyties);
   
-  SEXP pout = PROTECT(allocVector(REALSXP,1));
+  SEXP pout = PROTECT(allocVector(REALSXP,2));
   
   double *out = REAL(pout);
   
@@ -182,9 +200,12 @@ SEXP permC(SEXP pin_x,
   uint64_t *state = (uint64_t*) seed;
 
   
-  out[0] = rciBoot(INTEGER(pin_x), INTEGER(pin_y), obsCI, R, B, N, xties, yties, state);
+  res = rciBoot(INTEGER(pin_x), INTEGER(pin_y), obsCI, R, B, N, xties, yties, state);
   // printf("%f\n", out[0]);
   
+  out[0] = res.pval;
+  out[1] = (double)res.earlyStop;
+
   UNPROTECT(1);
   
   return pout;

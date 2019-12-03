@@ -24,7 +24,8 @@ naiveRCIPerm <- function(x, y,
                          tie.method.y = c("ignore", "half"),
                          required_alpha = 1e-6,
                          p_confidence = 0.01,
-                         C=TRUE){
+                         C=TRUE,
+                         verbose=FALSE){
   
   valid.logic <- match.arg(valid.logic)
   tie.method.x = match.arg(tie.method.x)
@@ -90,7 +91,10 @@ naiveRCIPerm <- function(x, y,
                   as.integer(tie.method.y == "half"),
                   as.numeric(runif(2))
                   )
-    return(pval)
+    if((getOption("verbose") || verbose ) & pval[2]){
+      message("Permutations reached early stopping condition")
+    }
+    return(pval[1])
   } else {
     totalSeenLarger <- 0
     i <- 1
@@ -105,6 +109,9 @@ naiveRCIPerm <- function(x, y,
       i = i + 1
     }
     if(any(totalSeenLarger == R)){
+      if((getOption("verbose") || verbose )){
+        message("Permutations reached early stopping condition")
+      }
       return(totalSeenLarger/i)
     } else {
       return((totalSeenLarger+1)/(B + 1))
