@@ -98,8 +98,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // rCIPermC
-SEXP rCIPermC(SEXP pin_x, SEXP pin_y, SEXP pobsCI, SEXP pR, SEXP pB, SEXP pn, SEXP pxties, SEXP pyties, SEXP pseed);
-RcppExport SEXP _wCI_rCIPermC(SEXP pin_xSEXP, SEXP pin_ySEXP, SEXP pobsCISEXP, SEXP pRSEXP, SEXP pBSEXP, SEXP pnSEXP, SEXP pxtiesSEXP, SEXP pytiesSEXP, SEXP pseedSEXP) {
+SEXP rCIPermC(SEXP pin_x, SEXP pin_y, SEXP pobsCI, SEXP pR, SEXP pB, SEXP pn, SEXP pxties, SEXP pyties, SEXP palternative, SEXP pseed);
+RcppExport SEXP _wCI_rCIPermC(SEXP pin_xSEXP, SEXP pin_ySEXP, SEXP pobsCISEXP, SEXP pRSEXP, SEXP pBSEXP, SEXP pnSEXP, SEXP pxtiesSEXP, SEXP pytiesSEXP, SEXP palternativeSEXP, SEXP pseedSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -111,8 +111,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SEXP >::type pn(pnSEXP);
     Rcpp::traits::input_parameter< SEXP >::type pxties(pxtiesSEXP);
     Rcpp::traits::input_parameter< SEXP >::type pyties(pytiesSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type palternative(palternativeSEXP);
     Rcpp::traits::input_parameter< SEXP >::type pseed(pseedSEXP);
-    rcpp_result_gen = Rcpp::wrap(rCIPermC(pin_x, pin_y, pobsCI, pR, pB, pn, pxties, pyties, pseed));
+    rcpp_result_gen = Rcpp::wrap(rCIPermC(pin_x, pin_y, pobsCI, pR, pB, pn, pxties, pyties, palternative, pseed));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -142,7 +143,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_wCI_kernel_gaussian_C", (DL_FUNC) &_wCI_kernel_gaussian_C, 3},
     {"_wCI_kernel_laplace_C", (DL_FUNC) &_wCI_kernel_laplace_C, 3},
     {"_wCI_concordanceIndex_modified_helper_weighted", (DL_FUNC) &_wCI_concordanceIndex_modified_helper_weighted, 12},
-    {"_wCI_rCIPermC", (DL_FUNC) &_wCI_rCIPermC, 9},
+    {"_wCI_rCIPermC", (DL_FUNC) &_wCI_rCIPermC, 10},
     {"_wCI_newPCI", (DL_FUNC) &_wCI_newPCI, 8},
     {NULL, NULL, 0}
 };

@@ -85,7 +85,7 @@ uint64_t returnLinearIdx(uint64_t row, uint64_t column, uint64_t N){
 
 
 
-returnRes rciBoot(int *xmat, int *ymat, double obsCI, uint64_t R, uint64_t B, uint64_t N, int xties, int yties, uint64_t *state){
+returnRes rciBoot(int *xmat, int *ymat, double obsCI, uint64_t R, uint64_t B, uint64_t N, int xties, int yties, uint64_t *state, int alternative){
 
   double currCI;
   returnRes res;
@@ -134,8 +134,18 @@ returnRes rciBoot(int *xmat, int *ymat, double obsCI, uint64_t R, uint64_t B, ui
     // printf("Obs Num: %f. \n Obs Denom: %f.\n", RS.numerator, RS.denominator);
 
     // printf("Obs CI: %f. \n Curr CI: %f.\n", obsCI, currCI);
-    if(fabs(currCI - 0.5) >= fabs(obsCI - 0.5)){
+    if(alternative == 0){
+      if(fabs(currCI - 0.5) >= fabs(obsCI - 0.5)){
       totalSeenLarger++;
+      }
+    } else if(alternative > 0){
+      if(currCI - 0.5 >= obsCI - 0.5){
+      totalSeenLarger++;
+      }
+    } else {
+      if( 0.5 - currCI <= 0.5 - obsCI){
+      totalSeenLarger++;
+      }
     }
 
     if(totalSeenLarger==R){
@@ -171,7 +181,8 @@ SEXP permC(SEXP pin_x,
              SEXP pB,
              SEXP pn,
              SEXP pxties,
-             SEXP pyties, 
+             SEXP pyties,
+             SEXP palternative, 
              SEXP pseed){
   
   double Ndouble = *REAL(pn);
@@ -191,6 +202,7 @@ SEXP permC(SEXP pin_x,
 
   int xties = *INTEGER(pxties);
   int yties = *INTEGER(pyties);
+  int alternative = *INTEGER(palternative);
   
   SEXP pout = PROTECT(allocVector(REALSXP,2));
   
@@ -200,7 +212,7 @@ SEXP permC(SEXP pin_x,
   uint64_t *state = (uint64_t*) seed;
 
   
-  res = rciBoot(INTEGER(pin_x), INTEGER(pin_y), obsCI, R, B, N, xties, yties, state);
+  res = rciBoot(INTEGER(pin_x), INTEGER(pin_y), obsCI, R, B, N, xties, yties, state, alternative);
   // printf("%f\n", out[0]);
   
   out[0] = res.pval;

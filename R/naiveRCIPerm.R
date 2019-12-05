@@ -22,6 +22,7 @@ naiveRCIPerm <- function(x, y,
                          valid.logic = c("and", "or"),
                          tie.method.x = c("ignore", "half"), 
                          tie.method.y = c("ignore", "half"),
+                         alternative = c("two.sided", "greater", "less"),
                          required_alpha = 1e-6,
                          p_confidence = 0.01,
                          C=TRUE,
@@ -30,13 +31,20 @@ naiveRCIPerm <- function(x, y,
   valid.logic <- match.arg(valid.logic)
   tie.method.x = match.arg(tie.method.x)
   tie.method.y = match.arg(tie.method.y)
-  N <- length(x)
+  alternative = match.arg(alternative)
+  alternative <- switch (alternative,
+    "two.sided" = 0L,
+    "greater" = 1L,
+    "less" = -1L
+  )
   
   seed <- .Random.seed
    
   myCompleteCases <- complete.cases(x,y)
   x <- x[myCompleteCases]
   y <- y[myCompleteCases]
+  
+  N <- length(x)
   
   ### Calculating Permutation stopping parameters
   
@@ -88,7 +96,8 @@ naiveRCIPerm <- function(x, y,
                   as.numeric(B),
                   as.numeric(N),
                   as.integer(tie.method.x == "half"),
-                  as.integer(tie.method.y == "half"),
+                  as.integer(tie.method.y == "half"), 
+                  as.integer(alternative),
                   as.numeric(runif(2))
                   )
     if((getOption("verbose") || verbose ) & pval[2]){

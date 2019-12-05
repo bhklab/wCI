@@ -25,8 +25,8 @@ concordanceIndex_modified_helper_weighted <- function(x, y, deltaX, deltaY, weig
     .Call('_wCI_concordanceIndex_modified_helper_weighted', PACKAGE = 'wCI', x, y, deltaX, deltaY, weightingFun_pred, weightingFun_obs, alpha, outx, alternative, logicOp, max_weight, max_weight_obs)
 }
 
-rCIPermC <- function(pin_x, pin_y, pobsCI, pR, pB, pn, pxties, pyties, pseed) {
-    .Call('_wCI_rCIPermC', PACKAGE = 'wCI', pin_x, pin_y, pobsCI, pR, pB, pn, pxties, pyties, pseed)
+rCIPermC <- function(pin_x, pin_y, pobsCI, pR, pB, pn, pxties, pyties, palternative, pseed) {
+    .Call('_wCI_rCIPermC', PACKAGE = 'wCI', pin_x, pin_y, pobsCI, pR, pB, pn, pxties, pyties, palternative, pseed)
 }
 
 newPCI <- function(pin_x, pin_y, pn, pxties, pyties, pdeltaX, pdeltaY, plogic) {

@@ -118,6 +118,8 @@ paired.concordance.index.new <- function(predictions, observations, delta.pred=0
     sterr <- sqrt(varp / N)
     ci <- qnorm(p = alpha / 2, lower.tail = FALSE) * sterr
     p <- pnorm((cindex - 0.5) / sterr)
+  } else {
+    sterr <- CI <- p <- NA_real_
   }
   
   if(p_method == "Asymptotic"){
@@ -129,10 +131,10 @@ paired.concordance.index.new <- function(predictions, observations, delta.pred=0
     returnList$p.value <- switch(alternative, less=p, greater=1 - p, two.sided=2 *
                                    min(p, 1 - p))
   } else if(p_method == "Permutation"){
-    if(alternative != "two.sided") {warning("Only 2 sided p value currently implemented for permutation.")}
+    # if(alternative != "two.sided") {warning("Only 2 sided p value currently implemented for permutation.")}
     returnList$p.value <- naiveRCIPerm(x = predictions, y = observations, delta_x = delta.pred, 
                                        delta_y = delta.obs, tie.method.x = ifelse(outx, "ignore", "half"), 
-                                       required_alpha = alpha/num_hypothesis/2, p_confidence = perm_p_confidence, C=CPP)
+                                       required_alpha = alpha/num_hypothesis/2, p_confidence = perm_p_confidence, C=CPP, alternative = alternative)
   }
   
   if(conf_int_method == "Asymptotic"){
