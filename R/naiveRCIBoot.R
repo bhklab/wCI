@@ -36,31 +36,33 @@ naiveRCIBoot <- function(x, y,
     rcimat <- sign(xdeltamat) * sign(ydeltamat) * ((abs(xdeltamat) > delta_x) | (abs(ydeltamat) > delta_y))
   }
   
-  compCI <- function(rcimat){
+  compCI <- function(rcimat, xdeltamat, ydeltamat){
     if(tie.method.x == tie.method.y & tie.method.y == "ignore"){
       t0 <- sum(rcimat>0)/sum(rcimat != 0)
     } else if (tie.method.x == tie.method.y & tie.method.y == "half"){
-      t0 <- (sum(rcimat>0) + 0.5*sum(rcimat==0)-N/2)/(choose(N,2)*2)
+      t0 <- (sum(rcimat>0) + 0.5*sum(rcimat==0) - N/2)/(choose(N,2)*2)
     } else {
       if (tie.method.x == "half" & tie.method.y == "ignore"){
-          tieNum <- sum(abs(xdeltamat) <= delta_x) - N
+          tieNum <- sum(abs(xdeltamat) <= delta_x & abs(ydeltamat) > delta_y) 
       }
       if (tie.method.x == "ignore" & tie.method.y == "half"){
-          tieNum <- sum(abs(ydeltamat) <= delta_y) - N
+          tieNum <- sum(abs(ydeltamat) <= delta_y & abs(xdeltamat) > delta_x) 
       }
       t0 <- (sum(rcimat>0) + 0.5*tieNum)/(sum(rcimat!=0) + tieNum)
     }
     return(t0)
   }
   
-  t0 <- compCI(rcimat)
+  t0 <- compCI(rcimat, xdeltamat, ydeltamat)
   
   t <- numeric(R)
   
   for(i in seq_along(t)){
     smpl <- sample.int(N,N,replace=TRUE)
     rcimatSample <- rcimat[smpl, smpl]
-    t[i] <- compCI(rcimatSample)
+    xdeltamatSample <- xdeltamat[smpl, smpl]
+    ydeltamatSample <- ydeltamat[smpl, smpl]
+    t[i] <- compCI(rcimatSample, xdeltamatSample, ydeltamatSample)
   }
   
   dim(t) <- c(R,1)

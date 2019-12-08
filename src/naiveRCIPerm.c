@@ -46,7 +46,7 @@ void sampleIdx(uint64_t N, uint64_t *permPointer, uint64_t *state){
       permPointer[j] = i;
   }
 
-};
+}
   
   
 
@@ -67,25 +67,25 @@ runningStat returnCurrentIncrement(uint64_t xVal, uint64_t yVal, int xties, int 
     } else {
       if (xties == 1 & yties == 0){
         // printf("OUTX=FALSE\n");
-        res.numerator = (((double) xVal == yVal)*0.5 + (double) ((xVal == yVal) & (xVal != 0)) * 0.5) * (double) (yVal != 0);
+        res.numerator = (((double) ((xVal == yVal) & (yVal != 0))) + (double) ((yVal != 0) & (xVal == 0)) * 0.5);
         res.denominator = (double) (yVal != 0);
       }
       if (xties == 0 & yties == 1){
-        res.numerator = (((double) xVal == yVal)*0.5 + (double) ((xVal == yVal) & (yVal != 0)) * 0.5) * (double) (xVal != 0);
+        res.numerator = (((double) ((xVal == yVal) & (yVal != 0))) + (double) ((yVal != 0) & (xVal == 0)) * 0.5);
         res.denominator = (double) (xVal != 0);
       }
     }
     return res;
-};
+}
 
 
 uint64_t returnLinearIdx(uint64_t row, uint64_t column, uint64_t N){
   return(column*N + row);
-};
+}
 
 
 
-returnRes rciBoot(int *xmat, int *ymat, double obsCI, uint64_t R, uint64_t B, uint64_t N, int xties, int yties, uint64_t *state, int alternative){
+returnRes rciPerm(int *xmat, int *ymat, double obsCI, uint64_t R, uint64_t B, uint64_t N, int xties, int yties, uint64_t *state, int alternative){
 
   double currCI;
   returnRes res;
@@ -212,7 +212,7 @@ SEXP permC(SEXP pin_x,
   uint64_t *state = (uint64_t*) seed;
 
   
-  res = rciBoot(INTEGER(pin_x), INTEGER(pin_y), obsCI, R, B, N, xties, yties, state, alternative);
+  res = rciPerm(INTEGER(pin_x), INTEGER(pin_y), obsCI, R, B, N, xties, yties, state, alternative);
   // printf("%f\n", out[0]);
   
   out[0] = res.pval;

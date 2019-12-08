@@ -66,26 +66,25 @@ naiveRCIPerm <- function(x, y,
   } else {
     stop("Not Implemented")
   }
-  compCI <- function(rcimat){
+  compCI <- function(rcimat, xdeltamat, ydeltamat){
     if(tie.method.x == tie.method.y & tie.method.y == "ignore"){
       t0 <- sum(rcimat>0)/sum(rcimat != 0)
     } else if (tie.method.x == tie.method.y & tie.method.y == "half"){
-      t0 <- (sum(rcimat>0) + 0.5*sum(rcimat==0)-N/2)/(choose(N,2)*2)
+      t0 <- (sum(rcimat>0) + 0.5*sum(rcimat==0) - N/2)/(choose(N,2)*2)
     } else {
       if (tie.method.x == "half" & tie.method.y == "ignore"){
-        tieNum <- sum(abs(xdeltamat) <= delta_x) - N
+          tieNum <- sum(abs(xdeltamat) <= delta_x & abs(ydeltamat) > delta_y) 
       }
       if (tie.method.x == "ignore" & tie.method.y == "half"){
-        tieNum <- sum(abs(ydeltamat) <= delta_y) - N
+          tieNum <- sum(abs(ydeltamat) <= delta_y & abs(xdeltamat) > delta_x) 
       }
       t0 <- (sum(rcimat>0) + 0.5*tieNum)/(sum(rcimat!=0) + tieNum)
     }
     return(t0)
   }
   
-  if(valid.logic == "and"){
-    t0 <- compCI(xmat * ymat)
-  }
+  t0 <- compCI(xmat*ymat, xdeltamat, ydeltamat)
+  
 
   if(C){
     if(valid.logic == "or"){
@@ -112,8 +111,9 @@ naiveRCIPerm <- function(x, y,
     i <- 1
     while(i <= B){
       smpl <- sample.int(N)
-      ymat <- ymat[smpl, smpl]
-      t <- compCI(xmat * ymat)
+      ymatS <- ymat[smpl, smpl]
+      ydeltamatS <- ydeltamat[smpl, smpl]
+      t <- compCI(xmat * ymatS, xdeltamat, ydeltamatS)
       totalSeenLarger <- totalSeenLarger + (abs(t-0.5) > abs(t0-0.5))
       if(totalSeenLarger == R){
         break

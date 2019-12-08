@@ -163,7 +163,7 @@ retRes modified_concordance_index(double *x, double *y, uint64_t N, double delta
   }
 
 
-  for (int i = 0; i < N - 1; ++i) {
+  for (int i = 0; i < N; ++i) {
     for (int j = i + 1; j < N; ++j) {
 
       computePair(x[i], x[j], y[i], y[j], deltaX, deltaY, xties, yties, &c[i], &c[j], &d[i], &d[j], logic);
