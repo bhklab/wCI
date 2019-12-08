@@ -19,7 +19,7 @@ computePearson <- function(mat) return(cor(mat[,1], mat[,2]))
 naiveRCIPerm <- function(x, y, 
                          delta_x = 0.2, 
                          delta_y = 0.2, 
-                         valid.logic = c("and", "or"),
+                         # valid.logic = c("and", "or"),
                          tie.method.x = c("ignore", "half"), 
                          tie.method.y = c("ignore", "half"),
                          alternative = c("two.sided", "greater", "less"),
@@ -28,7 +28,7 @@ naiveRCIPerm <- function(x, y,
                          C=TRUE,
                          verbose=FALSE){
   
-  valid.logic <- match.arg(valid.logic)
+  valid.logic <- "and"
   tie.method.x = match.arg(tie.method.x)
   tie.method.y = match.arg(tie.method.y)
   alternative = match.arg(alternative)
@@ -83,7 +83,10 @@ naiveRCIPerm <- function(x, y,
     return(t0)
   }
   
-  t0 <- compCI(xmat * ymat)
+  if(valid.logic == "and"){
+    t0 <- compCI(xmat * ymat)
+  }
+
   if(C){
     if(valid.logic == "or"){
       stop("Not Implemented Yet in C. Please use C=FALSE, but warning, very slow!")

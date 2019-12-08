@@ -6,7 +6,7 @@
 naiveRCIBoot <- function(x, y, 
                      delta_x = 0.2, 
                      delta_y = 0.2, 
-                     valid.logic = c("or", "and"),
+                     valid.logic = c("and"),
                      tie.method.x = c("ignore", "half"), 
                      tie.method.y = c("ignore", "half"),
                      R = 2000){

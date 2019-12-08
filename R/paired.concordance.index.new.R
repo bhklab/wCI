@@ -76,7 +76,13 @@ paired.concordance.index.new <- function(predictions, observations, delta.pred=0
   cc.ix <- complete.cases(predictions, observations)
   predictions <- predictions[which(cc.ix)]
   observations <- observations[which(cc.ix)]
-  
+  N <- length(predictions)
+
+  if(N < 3){
+    return(list("cindex"=NA, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA,
+                "relevant.pairs.no"=0))
+  }
+
   p_method <- match.arg(p_method)
   conf_int_method <- match.arg(conf_int_method)
   
@@ -93,7 +99,7 @@ paired.concordance.index.new <- function(predictions, observations, delta.pred=0
     N <- values[6]
     # c.d.seq <- values$cdseq
   
-  if (N < 3 || (C == 0 && D == 0)) {
+  if ((C == 0 && D == 0)) {
     return(list("cindex"=NA, "p.value"=NA, "sterr"=NA, "lower"=NA, "upper"=NA,
                 "relevant.pairs.no"=0))
   }
