@@ -67,7 +67,7 @@ runningStat returnCurrentIncrement(uint64_t xVal, uint64_t yVal, int xties, int 
     } else {
       if (xties == 1 & yties == 0){
         // printf("OUTX=FALSE\n");
-        res.numerator = (((double) ((xVal == yVal) & (yVal != 0))) + (double) ((yVal != 0) & (xVal == 0)) * 0.5);
+        res.numerator = (((double) ((xVal == yVal) & (yVal != 0))) + (double) ((yVal != 0) & (xVal == 0)) * 0.5); // Believe it or not, this is actually faster than using short circuting if statements!!
         res.denominator = (double) (yVal != 0);
       }
       if (xties == 0 & yties == 1){
