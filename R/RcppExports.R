@@ -29,6 +29,10 @@ rCIPermC <- function(pin_x, pin_y, pobsCI, pR, pB, pn, pxties, pyties, palternat
     .Call('_wCI_rCIPermC', PACKAGE = 'wCI', pin_x, pin_y, pobsCI, pR, pB, pn, pxties, pyties, palternative, pseed)
 }
 
+rCIBootC <- function(prcimat, pR, pn, pxties, pyties, pseed) {
+    .Call('_wCI_rCIBootC', PACKAGE = 'wCI', prcimat, pR, pn, pxties, pyties, pseed)
+}
+
 newPCI <- function(pin_x, pin_y, pn, pxties, pyties, pdeltaX, pdeltaY, plogic) {
     .Call('_wCI_newPCI', PACKAGE = 'wCI', pin_x, pin_y, pn, pxties, pyties, pdeltaX, pdeltaY, plogic)
 }

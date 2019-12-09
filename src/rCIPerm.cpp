@@ -8,8 +8,8 @@ extern "C" SEXP permC(SEXP pin_x,
              SEXP pn,
              SEXP pxties,
              SEXP pyties, 
-             SEXP pseed, 
-             SEXP palternative);
+             SEXP palternative, 
+             SEXP pseed);
 
 extern "C" SEXP newPairedConcIndex(SEXP pin_x,
              SEXP pin_y,
@@ -19,6 +19,16 @@ extern "C" SEXP newPairedConcIndex(SEXP pin_x,
              SEXP pdeltaX,
              SEXP pdeltaY,
              SEXP plogic);
+
+
+extern "C" SEXP bootC(SEXP prcimat,
+             SEXP pR,
+             SEXP pn,
+             SEXP pxties,
+             SEXP pyties, 
+             SEXP pseed);
+
+
 
 // [[Rcpp::export]]
 SEXP rCIPermC(SEXP pin_x, SEXP pin_y, SEXP pobsCI, SEXP pR, SEXP pB, SEXP pn, SEXP pxties, SEXP pyties, SEXP palternative,  SEXP pseed) {
@@ -31,6 +41,17 @@ SEXP rCIPermC(SEXP pin_x, SEXP pin_y, SEXP pobsCI, SEXP pR, SEXP pB, SEXP pn, SE
              pxties,
              pyties,
              palternative, 
+             pseed);
+}
+
+
+// [[Rcpp::export]]
+SEXP rCIBootC(SEXP prcimat, SEXP pR, SEXP pn, SEXP pxties, SEXP pyties, SEXP pseed) {
+    return bootC(prcimat,
+             pR,
+             pn,
+             pxties,
+             pyties,
              pseed);
 }
 

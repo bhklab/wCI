@@ -9,7 +9,7 @@ naiveRCIBoot <- function(x, y,
                      valid.logic = c("and"),
                      tie.method.x = c("ignore", "half"), 
                      tie.method.y = c("ignore", "half"),
-                     R = 2000){
+                     R = 2000, C=T){
   
   valid.logic <- match.arg(valid.logic)
   tie.method.x = match.arg(tie.method.x)
@@ -31,40 +31,54 @@ naiveRCIBoot <- function(x, y,
   
   # RCI: sign(xdeltamat) * (abs(xdeltamat) > threshold)
   if (valid.logic == "and"){
-    rcimat <- sign(xdeltamat) * sign(ydeltamat) * ((abs(xdeltamat) > delta_x) & (abs(ydeltamat) > delta_y))
-  } else {
-    rcimat <- sign(xdeltamat) * sign(ydeltamat) * ((abs(xdeltamat) > delta_x) | (abs(ydeltamat) > delta_y))
-  }
-  
-  compCI <- function(rcimat, xdeltamat, ydeltamat){
+    rcimat <- sign(xdeltamat) * sign(ydeltamat) * ((abs(xdeltamat) > delta_x) & (abs(ydeltamat) > delta_y)) 
     if(tie.method.x == tie.method.y & tie.method.y == "ignore"){
-      t0 <- sum(rcimat>0)/sum(rcimat != 0)
     } else if (tie.method.x == tie.method.y & tie.method.y == "half"){
-      t0 <- (sum(rcimat>0) + 0.5*sum(rcimat==0) - N/2)/(choose(N,2)*2)
+      rcimat <- rcimat + 0.5*rcimat==0
+      diag(rcimat) <- 0
     } else {
       if (tie.method.x == "half" & tie.method.y == "ignore"){
-          tieNum <- sum(abs(xdeltamat) <= delta_x & abs(ydeltamat) > delta_y) 
+          rcimat <- rcimat + (abs(xdeltamat) <= delta_x & abs(ydeltamat) > delta_y) * 0.5
       }
       if (tie.method.x == "ignore" & tie.method.y == "half"){
-          tieNum <- sum(abs(ydeltamat) <= delta_y & abs(xdeltamat) > delta_x) 
+          rcimat <- rcimat + (abs(ydeltamat) <= delta_y & abs(xdeltamat) > delta_x) * 0.5
       }
-      t0 <- (sum(rcimat>0) + 0.5*tieNum)/(sum(rcimat!=0) + tieNum)
     }
+  } else {
+    stop("Valid logic or not supported anymore. ")
+  }
+  
+  compCI <- function(rcimat){
+    t0 <- sum(rcimat[rcimat > 0])/(sum(rcimat != 0))
     return(t0)
   }
   
-  t0 <- compCI(rcimat, xdeltamat, ydeltamat)
+  t0 <- compCI(rcimat)
   
-  t <- numeric(R)
+  if(!C){
+    t <- numeric(R)
   
-  for(i in seq_along(t)){
-    smpl <- sample.int(N,N,replace=TRUE)
-    rcimatSample <- rcimat[smpl, smpl]
-    xdeltamatSample <- xdeltamat[smpl, smpl]
-    ydeltamatSample <- ydeltamat[smpl, smpl]
-    t[i] <- compCI(rcimatSample, xdeltamatSample, ydeltamatSample)
+    for(i in seq_along(t)){
+      smpl <- sample.int(N,N,replace=TRUE)
+      rcimatSample <- rcimat[smpl, smpl]
+      t[i] <- compCI(rcimatSample)
+    }
+  } else {
+
+    t <- .Call("_wCI_rCIBootC", PACKAGE = "wCI",
+                  as.numeric(rcimat),
+                  as.numeric(R),
+                  as.numeric(N),
+                  as.integer(tie.method.x == "half"),
+                  as.integer(tie.method.y == "half"), 
+                  as.numeric(runif(2))
+                  )
+
   }
   
+  
+
+
   dim(t) <- c(R,1)
   res <- list(
     t0 = t0,

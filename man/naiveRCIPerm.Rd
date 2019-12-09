@@ -5,9 +5,10 @@
 \title{Naive RCI Permutations}
 \usage{
 naiveRCIPerm(x, y, delta_x = 0.2, delta_y = 0.2,
-  valid.logic = c("and", "or"), tie.method.x = c("ignore", "half"),
-  tie.method.y = c("ignore", "half"), required_alpha = 1e-06,
-  p_confidence = 0.01, C = TRUE)
+  tie.method.x = c("ignore", "half"), tie.method.y = c("ignore",
+  "half"), alternative = c("two.sided", "greater", "less"),
+  required_alpha = 1e-06, p_confidence = 0.01, C = TRUE,
+  verbose = FALSE)
 }
 \description{
 Naive RCI Permutations
