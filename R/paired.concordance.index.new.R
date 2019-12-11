@@ -52,6 +52,7 @@
 #' @param comppairs {numeric} minimum number of pairs to calculate a valid CI.
 #' @importFrom stats complete.cases qnorm pnorm 
 #' @importFrom boot boot.ci
+#' @importFrom sn selm coef.selm psn
 #' @import Rcpp
 #' @useDynLib wCI _wCI_newPCI
 #' @return [list] ! list of concordance index and its pvalue
@@ -127,6 +128,22 @@ paired.concordance.index.new <- function(predictions, observations, delta.pred=0
   } else {
     sterr <- CI <- p <- NA_real_
   }
+  if(conf_int_method == "Asymptotic"){
+    sterr <- sqrt(varp / N)
+    ci <- qnorm(p = alpha / 2, lower.tail = FALSE) * sterr
+    returnList$lower <- max(cindex - ci, 0)
+    returnList$upper <- min(cindex + ci, 1)
+    returnList$sterr <- sterr
+  } else if (conf_int_method == "Bootstrap"){
+    boot.out <- naiveRCIBoot(x = predictions, y = observations, delta_x = delta.pred, 
+                             delta_y = delta.obs, tie.method.x = ifelse(outx, "ignore", "half"), R=boot_num )
+    ci.obj <- boot.ci(boot.out, type="bca")
+    returnList$lower <- max(ci.obj$bca[4], 0)
+    returnList$upper <- min(ci.obj$bca[5], 1)
+    returnList$sterr <- sd(boot.out$t[,1])
+    returnList$boot.out <- boot.out
+  }
+  
   
   if(p_method == "Asymptotic"){
     if(C==0 || D==0 || C * (C - 1)==0 || D * (D - 1)==0 || C * D==0 || (C + D) <
@@ -141,21 +158,22 @@ paired.concordance.index.new <- function(predictions, observations, delta.pred=0
     returnList$p.value <- naiveRCIPerm(x = predictions, y = observations, delta_x = delta.pred, 
                                        delta_y = delta.obs, tie.method.x = ifelse(outx, "ignore", "half"), 
                                        required_alpha = alpha/num_hypothesis/2, p_confidence = perm_p_confidence, C=CPP, alternative = alternative)
-  }
-  
-  if(conf_int_method == "Asymptotic"){
-    sterr <- sqrt(varp / N)
-    ci <- qnorm(p = alpha / 2, lower.tail = FALSE) * sterr
-    returnList$lower <- max(cindex - ci, 0)
-    returnList$upper <- min(cindex + ci, 1)
-    returnList$sterr <- sterr
-  } else if (conf_int_method == "Bootstrap"){
-    boot.out <- naiveRCIBoot(x = predictions, y = observations, delta_x = delta.pred, 
+  } else if(p_method == "SkewNormal"){
+    if(boot_num < 10000){
+      warning("At least 10,000 bootstrap samples are recommended to ensure good estimation of sample distribution Skew")
+    }
+    stop("Not yet implemented")
+    if(!conf_int_method == "Bootstrap") {# check if bootstrap already exists
+      boot.out <- naiveRCIBoot(x = predictions, y = observations, delta_x = delta.pred, 
                              delta_y = delta.obs, tie.method.x = ifelse(outx, "ignore", "half"), R=boot_num )
-    ci.obj <- boot.ci(boot.out, type="bca")
-    returnList$lower <- max(ci.obj$bca[4], 0)
-    returnList$upper <- min(ci.obj$bca[5], 1)
-    returnList$sterr <- sd(boot.out$t[,1])
+      returnList$boot.out <- boot.out
+    }
+    colnames(boot.out$t) <- "obs"
+    sn.fit <- selm(obs~1, data=as.data.frame(boot.out$t))
+    p <- psn(0.5, dp=coef(sn.fit, "dp"))
+    returnList$p.value <- switch(alternative, less=p, greater=1 - p, two.sided=2 *
+                                 min(p, 1 - p))
+
   }
   
   
