@@ -31,17 +31,17 @@ naiveRCIBoot <- function(x, y,
   
   # RCI: sign(xdeltamat) * (abs(xdeltamat) > threshold)
   if (valid.logic == "and"){
-    rcimat <- sign(xdeltamat) * sign(ydeltamat) * ((abs(xdeltamat) > delta_x) & (abs(ydeltamat) > delta_y)) 
+    rcimat <- sign(xdeltamat) * sign(ydeltamat) * ((abs(xdeltamat) > delta_x) & (abs(ydeltamat) > delta_y)) * 2
     if(tie.method.x == tie.method.y & tie.method.y == "ignore"){
     } else if (tie.method.x == tie.method.y & tie.method.y == "half"){
-      rcimat <- rcimat + 0.5*rcimat==0
+      rcimat <- rcimat + rcimat==0
       diag(rcimat) <- 0
     } else {
       if (tie.method.x == "half" & tie.method.y == "ignore"){
-          rcimat <- rcimat + (abs(xdeltamat) <= delta_x & abs(ydeltamat) > delta_y) * 0.5
+          rcimat <- rcimat + (abs(xdeltamat) <= delta_x & abs(ydeltamat) > delta_y) 
       }
       if (tie.method.x == "ignore" & tie.method.y == "half"){
-          rcimat <- rcimat + (abs(ydeltamat) <= delta_y & abs(xdeltamat) > delta_x) * 0.5
+          rcimat <- rcimat + (abs(ydeltamat) <= delta_y & abs(xdeltamat) > delta_x) 
       }
     }
   } else {
@@ -49,7 +49,7 @@ naiveRCIBoot <- function(x, y,
   }
   
   compCI <- function(rcimat){
-    t0 <- sum(rcimat[rcimat > 0])/(sum(rcimat != 0))
+    t0 <- sum(rcimat[rcimat > 0])/(sum(abs(rcimat[rcimat != 0])))
     return(t0)
   }
   

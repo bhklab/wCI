@@ -79,6 +79,39 @@ runningStat returnCurrentIncrement(uint64_t xVal, uint64_t yVal, int xties, int 
 }
 
 
+// reducing the need for an if statement in the middle of each loop! Turns out this actually makes things slower!!
+runningStat returnCurrentIncrement_xi_yi(uint64_t xVal, uint64_t yVal){
+  runningStat res;
+  res.numerator = (double) ((xVal == yVal) & (xVal != 0) & (yVal != 0)); // Datasets agree and are non-zero
+  res.denominator = (double) ((xVal != 0) & (yVal != 0)); // Both are non-zero
+  return(res);
+}
+
+runningStat returnCurrentIncrement_xh_yi(uint64_t xVal, uint64_t yVal){
+  runningStat res;
+  res.numerator = (((double) ((xVal == yVal) & (yVal != 0))) + (double) ((yVal != 0) & (xVal == 0)) * 0.5); // Believe it or not, this is actually faster than using short circuting if statements!!
+  res.denominator = (double) (yVal != 0);
+  return(res);
+
+}
+
+runningStat returnCurrentIncrement_xi_yh(uint64_t xVal, uint64_t yVal){
+    runningStat res;
+    res.numerator = (((double) ((xVal == yVal) & (yVal != 0))) + (double) ((yVal != 0) & (xVal == 0)) * 0.5);
+    res.denominator = (double) (xVal != 0);  
+    return(res);
+
+}
+
+runningStat returnCurrentIncrement_xh_yh(uint64_t xVal, uint64_t yVal){
+    runningStat res;
+    res.numerator = ((double) xVal == yVal)*0.5 + (double) ((xVal != 0) & (yVal != 0)) * 0.5 ; // Datasets agree (0.5) non zero (0.5)
+    res.denominator = 1; // All pairs are counted. 
+    return(res);
+
+}
+
+
 uint64_t returnLinearIdx(uint64_t row, uint64_t column, uint64_t N){
   return(column*N + row);
 }
@@ -93,6 +126,21 @@ returnRes rciPerm(int *xmat, int *ymat, double obsCI, uint64_t R, uint64_t B, ui
   uint64_t i = 0;
   // uint64_t j = 0;
   uint64_t *permIdx = malloc(N * sizeof(uint64_t));
+
+  // runningStat (*retCI)(uint64_t, uint64_t);
+
+  // if(xties == yties & yties == 0){
+  //   retCI = &returnCurrentIncrement_xi_yi;
+  //   } else if (xties == yties & yties == 1){
+  //     retCI = &returnCurrentIncrement_xh_yh;
+  //   } else {
+  //     if (xties == 1 & yties == 0){
+  //       retCI = &returnCurrentIncrement_xh_yi;
+  //     }
+  //     if (xties == 0 & yties == 1){
+  //       retCI = &returnCurrentIncrement_xi_yh;
+  //     }
+  //   }
 
 
   uint64_t xVal;
@@ -117,6 +165,7 @@ returnRes rciPerm(int *xmat, int *ymat, double obsCI, uint64_t R, uint64_t B, ui
         yVal = ymat[returnLinearIdx(permIdx[k],permIdx[j],N)];
         // printf("%ld,%ld. ", xVal, yVal);
 
+        // CS = retCI(xVal, yVal);
         CS = returnCurrentIncrement(xVal, yVal, xties, yties);
         // if(xVal == 0 & yVal != 0){
         //   printf("CurNum: %f. \n CurDenom: %f.\n", CS.numerator, CS.denominator);

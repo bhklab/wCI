@@ -64,7 +64,7 @@ paired.concordance.index.new <- function(predictions, observations, delta.pred=0
                                      alternative = c("two.sided", "less", "greater"),
                                      logic.operator=c("and", "or"),
                                      CPP=TRUE, 
-                                     p_method = c("Permutation", "Asymptotic"),
+                                     p_method = c("Permutation", "Asymptotic", "SkewNormal"),
                                      conf_int_method = c("Bootstrap", "Asymptotic"),
                                      num_hypothesis = 1,
                                      perm_p_confidence = 0.2,
@@ -162,7 +162,6 @@ paired.concordance.index.new <- function(predictions, observations, delta.pred=0
     if(boot_num < 10000){
       warning("At least 10,000 bootstrap samples are recommended to ensure good estimation of sample distribution Skew")
     }
-    stop("Not yet implemented")
     if(!conf_int_method == "Bootstrap") {# check if bootstrap already exists
       boot.out <- naiveRCIBoot(x = predictions, y = observations, delta_x = delta.pred, 
                              delta_y = delta.obs, tie.method.x = ifelse(outx, "ignore", "half"), R=boot_num )

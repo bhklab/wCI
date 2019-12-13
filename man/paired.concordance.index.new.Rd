@@ -9,7 +9,7 @@ paired.concordance.index.new(predictions, observations, delta.pred = 0,
   delta.obs = 0, alpha = 0.05, outx = FALSE,
   alternative = c("two.sided", "less", "greater"),
   logic.operator = c("and", "or"), CPP = TRUE,
-  p_method = c("Permutation", "Asymptotic"),
+  p_method = c("Permutation", "Asymptotic", "SkewNormal"),
   conf_int_method = c("Bootstrap", "Asymptotic"), num_hypothesis = 1,
   perm_p_confidence = 0.2, boot_num = 5000, comppairs = 10)
 }
