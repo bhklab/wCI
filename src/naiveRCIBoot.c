@@ -122,7 +122,7 @@ void rciBoot(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xties, 
 
         RS.numerator += (curVal * (double)(curVal > 0));
         // RS.denominator += (double)(curVal != 0);
-        RS.denominator += fabs(curVal);
+        RS.denominator += (double)(curVal != 0) * 2;
         // if(curVal == 0){
         //   printf("We have a 0");
         // }

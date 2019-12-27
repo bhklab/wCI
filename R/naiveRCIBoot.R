@@ -45,11 +45,11 @@ naiveRCIBoot <- function(x, y,
       }
     }
   } else {
-    stop("Valid logic or not supported anymore. ")
+    stop("Valid logic OR not supported anymore. ")
   }
   
   compCI <- function(rcimat){
-    t0 <- sum(rcimat[rcimat > 0])/(sum(abs(rcimat[rcimat != 0])))
+    t0 <- sum(rcimat[rcimat > 0])/(sum((rcimat != 0)*2))
     return(t0)
   }
   

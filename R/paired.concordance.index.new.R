@@ -136,7 +136,7 @@ paired.concordance.index.new <- function(predictions, observations, delta.pred=0
     returnList$sterr <- sterr
   } else if (conf_int_method == "Bootstrap"){
     boot.out <- naiveRCIBoot(x = predictions, y = observations, delta_x = delta.pred, 
-                             delta_y = delta.obs, tie.method.x = ifelse(outx, "ignore", "half"), R=boot_num )
+                             delta_y = delta.obs, tie.method.x = ifelse(outx, "ignore", "half"), R=boot_num, C=CPP )
     ci.obj <- boot.ci(boot.out, type="bca")
     returnList$lower <- max(ci.obj$bca[4], 0)
     returnList$upper <- min(ci.obj$bca[5], 1)
