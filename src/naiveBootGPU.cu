@@ -113,6 +113,7 @@ void bootOnCuda(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xtie
 
   // Freeing Memory
   cudaFree(permVector);
+  curandDestroyGenerator(gen);
   cudaFree(devRandomNumbers);
   cudaFree(devOutVec);
   cudaFree(devrcimat);
