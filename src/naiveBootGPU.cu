@@ -109,7 +109,7 @@ void bootOnCuda(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xtie
 
 
   //Copying back results
-  cudaMemcpy(outVec, devOutVec, R*sizeof(double), cudaMemcpyDeviceToHost));
+  cudaMemcpy(outVec, devOutVec, R*sizeof(double), cudaMemcpyDeviceToHost);
 
   // Freeing Memory
   cudaFree(permVector);
