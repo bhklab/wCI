@@ -103,7 +103,7 @@ void bootOnCuda(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xtie
 
   // Creating permutation indicies from uniform doubles
   truncate_to_index<<<(R*N+(numThreads-1))/numThreads, numThreads>>>(devRandomNumbers, permVector, N, R*N);
-
+  cudaDeviceSynchronize();
   // Running one bootstrap instance per thread.  
   runBootOnDevice<<<(R+(numThreads-1))/numThreads, numThreads>>>(devrcimat, devOutVec, permVector, N, R);
 
