@@ -123,7 +123,10 @@ void runBootOnDevice(double *rcimat, double *outVec, uint64_t *permVector, uint6
   for(uint64_t j = 0; j < N; j++){
 
       for(uint64_t k = 0; k < N; k++){
-
+        if(permIdx[k] >= N){
+          printf("Out of bounds permutations");
+          exit(-5);
+        }
         curVal = rcimat[permIdx[j]*N + permIdx[k]];
 
         RS_numerator += (curVal * (double)(curVal > 0));
