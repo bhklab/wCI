@@ -14,12 +14,12 @@
 // #include "xoroshiro128+.h"
 
 
-#define CUDA_CALL(x) do { if((x)!=cudaSuccess) { \
-    printf("Error at %s:%d\n",__FILE__,__LINE__);\
-    return EXIT_FAILURE;}} while(0)
-#define CURAND_CALL(x) do { if((x)!=CURAND_STATUS_SUCCESS) { \
-    printf("Error at %s:%d\n",__FILE__,__LINE__);\
-    return EXIT_FAILURE;}} while(0)
+// #define x) do { if((x)!=cudaSuccess) { \
+//     printf("Error at %s:%d\n",__FILE__,__LINE__);\
+//     return EXIT_FAILURE;}} while(0)
+// #define CURAND_CALL(x) do { if((x)!=CURAND_STATUS_SUCCESS) { \
+//     printf("Error at %s:%d\n",__FILE__,__LINE__);\
+//     return EXIT_FAILURE;}} while(0)
 
 
 const int numThreads = 256;
@@ -52,7 +52,7 @@ void runBootOnDevice(double *rcimat, double *outVec, uint64_t *permVector, uint6
 
   double currCI;
   double curVal;
-
+  double RS_numerator, RS_denominator;
 
   permIdx = permVector + i*N;
 
@@ -87,19 +87,19 @@ void bootOnCuda(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xtie
   uint64_t *permVector;
 
 
-  CUDA_CALL(cudaMalloc(&devrcimat, N*N*sizeof(double))); 
-  CUDA_CALL(cudaMalloc(&devOutVec, R*sizeof(double)));
+  cudaMalloc(&devrcimat, N*N*sizeof(double)); 
+  cudaMalloc(&devOutVec, R*sizeof(double));
 
-  CUDA_CALL(cudaMalloc(&devRandomNumbers, R*N*sizeof(double)));
-  CUDA_CALL(cudaMalloc(&permVector, R*N*sizeof(uint64_t)));
+  cudaMalloc(&devRandomNumbers, R*N*sizeof(double));
+  cudaMalloc(&permVector, R*N*sizeof(uint64_t));
 
 
-  CUDA_CALL(cudaMemcpy(devrcimat, rcimat, N*N*sizeof(double), cudaMemcpyHostToDevice));
+  cudaMemcpy(devrcimat, rcimat, N*N*sizeof(double), cudaMemcpyHostToDevice);
 
-  CURAND_CALL(curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT));
-  CURAND_CALL(curandSetPseudoRandomGeneratorSeed(gen, *state));
+  curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
+  curandSetPseudoRandomGeneratorSeed(gen, *state);
 
-  CURAND_CALL(curandGenerateUniformDouble(gen, devRandomNumbers, R*N));
+  curandGenerateUniformDouble(gen, devRandomNumbers, R*N);
 
   // Creating permutation indicies from uniform doubles
   truncate_to_index<<<(R*N+(numThreads-1))/numThreads, numThreads>>>(devRandomNumbers, permVector, N, R*N);
@@ -109,13 +109,13 @@ void bootOnCuda(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xtie
 
 
   //Copying back results
-  CUDA_CALL(cudaMemcpy(outVec, devOutVec, R*sizeof(double), cudaMemcpyDeviceToHost));
+  cudaMemcpy(outVec, devOutVec, R*sizeof(double), cudaMemcpyDeviceToHost));
 
   // Freeing Memory
-  CUDA_CALL(cudaFree(permVector));
-  CUDA_CALL(cudaFree(devRandomNumbers));
-  CUDA_CALL(cudaFree(devOutVec));
-  CUDA_CALL(cudaFree(devrcimat));
+  cudaFree(permVector);
+  cudaFree(devRandomNumbers);
+  cudaFree(devOutVec);
+  cudaFree(devrcimat);
 
 }
 
