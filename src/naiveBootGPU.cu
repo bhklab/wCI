@@ -10,13 +10,76 @@
 #include <curand.h>
 #include <R.h>
 #include <Rinternals.h>
-
 // #include "xoroshiro128+.h"
 
+static const char *curandGetErrorString(curandStatus_t error)
+{
+	switch (error)
+	{
+		case CURAND_STATUS_SUCCESS:
+			return "CURAND_STATUS_SUCCESS";
 
-// #define x) do { if((x)!=cudaSuccess) { \
-//     printf("Error at %s:%d\n",__FILE__,__LINE__);\
-//     return EXIT_FAILURE;}} while(0)
+		case CURAND_STATUS_VERSION_MISMATCH:
+			return "CURAND_STATUS_VERSION_MISMATCH";
+
+		case CURAND_STATUS_NOT_INITIALIZED:
+			return "CURAND_STATUS_NOT_INITIALIZED";
+
+		case CURAND_STATUS_ALLOCATION_FAILED:
+			return "CURAND_STATUS_ALLOCATION_FAILED";
+
+		case CURAND_STATUS_TYPE_ERROR:
+			return "CURAND_STATUS_TYPE_ERROR";
+
+		case CURAND_STATUS_OUT_OF_RANGE:
+			return "CURAND_STATUS_OUT_OF_RANGE";
+
+		case CURAND_STATUS_LENGTH_NOT_MULTIPLE:
+			return "CURAND_STATUS_LENGTH_NOT_MULTIPLE";
+
+		case CURAND_STATUS_DOUBLE_PRECISION_REQUIRED:
+			return "CURAND_STATUS_DOUBLE_PRECISION_REQUIRED";
+
+		case CURAND_STATUS_LAUNCH_FAILURE:
+			return "CURAND_STATUS_LAUNCH_FAILURE";
+
+		case CURAND_STATUS_PREEXISTING_FAILURE:
+			return "CURAND_STATUS_PREEXISTING_FAILURE";
+
+		case CURAND_STATUS_INITIALIZATION_FAILED:
+			return "CURAND_STATUS_INITIALIZATION_FAILED";
+
+		case CURAND_STATUS_ARCH_MISMATCH:
+			return "CURAND_STATUS_ARCH_MISMATCH";
+
+		case CURAND_STATUS_INTERNAL_ERROR:
+			return "CURAND_STATUS_INTERNAL_ERROR";
+	}
+
+	return "<unknown>";
+}
+
+
+#define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
+inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
+{
+	   if (code != cudaSuccess) 
+		      {
+			            fprintf(stderr,"GPUassert: %s %s %d\n", cudaGetErrorString(code), file, line);
+				          if (abort) exit(code);
+					     }
+}
+
+#define gpuErrchkRand(ans) { gpuAssertRand((ans), __FILE__, __LINE__); }
+inline void gpuAssertRand(curandStatus_t code, const char *file, int line, bool abort=true)
+{
+	if (code != CURAND_STATUS_SUCCESS)
+		{
+		        fprintf(stderr,"GPUassert: %s %s %d\n", curandGetErrorString(code), file, line);
+			if (abort) exit(code);
+	       	}
+}
+
 // #define CURAND_CALL(x) do { if((x)!=CURAND_STATUS_SUCCESS) { \
 //     printf("Error at %s:%d\n",__FILE__,__LINE__);\
 //     return EXIT_FAILURE;}} while(0)
@@ -87,36 +150,50 @@ void bootOnCuda(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xtie
   uint64_t *permVector;
 
 
-  cudaMalloc(&devrcimat, N*N*sizeof(double)); 
-  cudaMalloc(&devOutVec, R*sizeof(double));
+  gpuErrchk(cudaMalloc(&devrcimat, N*N*sizeof(double))); 
+  gpuErrchk(cudaMalloc(&devOutVec, R*sizeof(double)));
 
-  cudaMalloc(&devRandomNumbers, R*N*sizeof(double));
-  cudaMalloc(&permVector, R*N*sizeof(uint64_t));
+  gpuErrchk(cudaMalloc(&devRandomNumbers, R*N*sizeof(double)));
+  gpuErrchk(cudaMalloc(&permVector, R*N*sizeof(uint64_t)));
 
 
-  cudaMemcpy(devrcimat, rcimat, N*N*sizeof(double), cudaMemcpyHostToDevice);
+  gpuErrchk(cudaMemcpy(devrcimat, rcimat, N*N*sizeof(double), cudaMemcpyHostToDevice));
 
-  curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
-  curandSetPseudoRandomGeneratorSeed(gen, *state);
+  gpuErrchkRand(curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT));
+  gpuErrchkRand(curandSetPseudoRandomGeneratorSeed(gen, *state));
 
-  curandGenerateUniformDouble(gen, devRandomNumbers, R*N);
-
+  gpuErrchkRand(curandGenerateUniformDouble(gen, devRandomNumbers, R*N));
+  cudaDeviceSynchronize();
   // Creating permutation indicies from uniform doubles
   truncate_to_index<<<(R*N+(numThreads-1))/numThreads, numThreads>>>(devRandomNumbers, permVector, N, R*N);
   cudaDeviceSynchronize();
+
+  cudaError_t error = cudaGetLastError();
+  if(error != cudaSuccess) {
+		        // print the CUDA error message and exit
+	printf("CUDA error: %s\n", cudaGetErrorString(error));
+	 exit(-1);
+  }
+
   // Running one bootstrap instance per thread.  
   runBootOnDevice<<<(R+(numThreads-1))/numThreads, numThreads>>>(devrcimat, devOutVec, permVector, N, R);
+  cudaDeviceSynchronize();
 
-
+  error = cudaGetLastError();
+  if(error != cudaSuccess) {
+		        // print the CUDA error message and exit
+	printf("CUDA error: %s\n", cudaGetErrorString(error));
+	 exit(-1);
+  }
   //Copying back results
-  cudaMemcpy(outVec, devOutVec, R*sizeof(double), cudaMemcpyDeviceToHost);
+  gpuErrchk(cudaMemcpy(outVec, devOutVec, R*sizeof(double), cudaMemcpyDeviceToHost));
 
   // Freeing Memory
-  cudaFree(permVector);
+  gpuErrchk(cudaFree(permVector));
   curandDestroyGenerator(gen);
-  cudaFree(devRandomNumbers);
-  cudaFree(devOutVec);
-  cudaFree(devrcimat);
+  gpuErrchk(cudaFree(devRandomNumbers));
+  gpuErrchk(cudaFree(devOutVec));
+  gpuErrchk(cudaFree(devrcimat));
 
 }
 
