@@ -156,7 +156,7 @@ void bootOnCuda(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xtie
   gpuErrchk(cudaMalloc(&devRandomNumbers, R*N*sizeof(double)));
   gpuErrchk(cudaMalloc(&permVector, R*N*sizeof(uint64_t)));
 
-
+  printf("%lld", R*N);
   gpuErrchk(cudaMemcpy(devrcimat, rcimat, N*N*sizeof(double), cudaMemcpyHostToDevice));
 
   gpuErrchkRand(curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT));
@@ -175,7 +175,7 @@ void bootOnCuda(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xtie
   if(error != cudaSuccess) {
 		        // print the CUDA error message and exit
 	printf("CUDA error: %s\n", cudaGetErrorString(error));
-	 exit(-1);
+        exit(-1);
   }
 
   // Running one bootstrap instance per thread.  
@@ -186,7 +186,7 @@ void bootOnCuda(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xtie
   if(error != cudaSuccess) {
 		        // print the CUDA error message and exit
 	printf("CUDA error: %s\n", cudaGetErrorString(error));
-	 exit(-1);
+	exit(-1);
   }
   //Copying back results
   gpuErrchk(cudaMemcpy(outVec, devOutVec, R*sizeof(double), cudaMemcpyDeviceToHost));
