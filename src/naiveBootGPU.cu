@@ -160,7 +160,10 @@ void bootOnCuda(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xtie
   gpuErrchk(cudaMemcpy(devrcimat, rcimat, N*N*sizeof(double), cudaMemcpyHostToDevice));
 
   gpuErrchkRand(curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT));
+
+  cudaDeviceSynchronize();
   gpuErrchkRand(curandSetPseudoRandomGeneratorSeed(gen, *state));
+  cudaDeviceSynchronize();
 
   gpuErrchkRand(curandGenerateUniformDouble(gen, devRandomNumbers, R*N));
   cudaDeviceSynchronize();
@@ -187,6 +190,7 @@ void bootOnCuda(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xtie
   }
   //Copying back results
   gpuErrchk(cudaMemcpy(outVec, devOutVec, R*sizeof(double), cudaMemcpyDeviceToHost));
+  cudaDeviceSynchronize();
 
   // Freeing Memory
   gpuErrchk(cudaFree(permVector));
