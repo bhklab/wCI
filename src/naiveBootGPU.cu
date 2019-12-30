@@ -119,6 +119,7 @@ void bootOnCuda(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xtie
 
 }
 
+extern "C"
 SEXP bootCUDA(SEXP prcimat,
              // SEXP pobsCI,
              SEXP pR,
