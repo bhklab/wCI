@@ -33,17 +33,11 @@ typedef struct runningStat2 runningStat2;
 //   }
 // }
 
-// Using "inside out" Fisher Yates https://en.wikipedia.org/wiki/Fisher–Yates_shuffle
-void sampleIdxBoot(uint64_t N, uint64_t *permPointer, uint64_t *state){
-  // uint64_t j;
-  // permPointer[0] = 0;
+void sampleIdxBoot(uint64_t N, uint64_t *bootPointer, uint64_t *state){
+
 
   for(uint64_t i = 0; i < N; i++){
-      // j = generate_random_index(state, i);
-      // if(j != i){
-      //   permPointer[i] = permPointer[j];
-      // }
-      permPointer[i] = generate_random_index(state, N - 1);
+      bootPointer[i] = generate_random_index(state, N - 1);
   }
 
 }

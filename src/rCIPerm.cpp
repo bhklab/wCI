@@ -29,6 +29,12 @@ extern "C" SEXP bootC(SEXP prcimat,
              SEXP pseed);
 
 
+extern "C" SEXP bootCUDA(SEXP prcimat,
+             SEXP pR,
+             SEXP pn,
+             SEXP pxties,
+             SEXP pyties, 
+             SEXP pseed);
 
 // [[Rcpp::export]]
 SEXP rCIPermC(SEXP pin_x, SEXP pin_y, SEXP pobsCI, SEXP pR, SEXP pB, SEXP pn, SEXP pxties, SEXP pyties, SEXP palternative,  SEXP pseed) {
@@ -48,6 +54,17 @@ SEXP rCIPermC(SEXP pin_x, SEXP pin_y, SEXP pobsCI, SEXP pR, SEXP pB, SEXP pn, SE
 // [[Rcpp::export]]
 SEXP rCIBootC(SEXP prcimat, SEXP pR, SEXP pn, SEXP pxties, SEXP pyties, SEXP pseed) {
     return bootC(prcimat,
+             pR,
+             pn,
+             pxties,
+             pyties,
+             pseed);
+}
+
+
+// [[Rcpp::export]]
+SEXP rCIBootCUDA(SEXP prcimat, SEXP pR, SEXP pn, SEXP pxties, SEXP pyties, SEXP pseed) {
+    return bootCUDA(prcimat,
              pR,
              pn,
              pxties,
