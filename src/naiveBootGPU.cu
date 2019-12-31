@@ -12,6 +12,11 @@
 #include <Rinternals.h>
 // #include "xoroshiro128+.h"
 
+ #define min(a,b) \
+   ({ __typeof__ (a) _a = (a); \
+       __typeof__ (b) _b = (b); \
+     _a < _b ? _a : _b; })
+
 static const char *curandGetErrorString(curandStatus_t error)
 {
 	switch (error)
@@ -144,10 +149,32 @@ void bootOnCuda(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xtie
   double *devrcimat, *devOutVec, *devRandomNumbers;
 
   curandGenerator_t gen;
-
+  size_t free_mem, total_mem;
+  size_t mem_needed_per_R;
 
   uint64_t *permVector;
 
+  uint64_t RperLoop, Roffset, loopI;
+
+
+
+  // Need to calculate here to make sure we don't run out of memory while using the GPU. 
+  // Will do the computation in batches over R. 
+
+  gpuErrchk(cudaMemGetInfo(&free_mem, &total_mem));
+
+  mem_needed_per_R = (2*(N)+1)*sizeof(double);
+
+  total_mem = total_mem - (N*N + 10)*sizeof(double) - sizeof(gen); // keeping some extra buffer space of 10 doubles
+
+  RperLoop = min(total_mem / mem_needed_per_R, R);
+
+  printr("R per loop: %lld, " RperLoop);
+
+  for(loopI = 0; loopI < (R/RperLoop)+1; loopI++){
+    Roffset = loopI * RperLoop;
+
+  }
 
   gpuErrchk(cudaMalloc(&devrcimat, N*N*sizeof(double))); 
   gpuErrchk(cudaMalloc(&devOutVec, R*sizeof(double)));
@@ -162,6 +189,8 @@ void bootOnCuda(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xtie
   cudaDeviceSynchronize();
   gpuErrchkRand(curandSetPseudoRandomGeneratorSeed(gen, *state));
   cudaDeviceSynchronize();
+
+
 
   gpuErrchkRand(curandGenerateUniformDouble(gen, devRandomNumbers, R*N));
   cudaDeviceSynchronize();
