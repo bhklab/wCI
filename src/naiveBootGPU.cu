@@ -185,6 +185,14 @@ void bootOnCuda(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xtie
 
     Roffset = loopI * RperLoop;
     printf(" R offset: %lld \n", Roffset);
+
+    if((RperLoop + Roffset) > R){
+      RperLoop = R - Roffset;
+    }
+    if(RperLoop == 0){
+      break
+    }
+
     gpuErrchk(cudaMalloc(&devOutVec, RperLoop*sizeof(double)));
 
     gpuErrchk(cudaMalloc(&devRandomNumbers, RperLoop*N*sizeof(double)));
@@ -229,10 +237,10 @@ void bootOnCuda(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xtie
 
   // Freeing Memory
   gpuErrchk(cudaFree(permVector));
-  curandDestroyGenerator(gen);
   gpuErrchk(cudaFree(devRandomNumbers));
   gpuErrchk(cudaFree(devOutVec));
   gpuErrchk(cudaFree(devrcimat));
+  curandDestroyGenerator(gen);
 
 }
 
