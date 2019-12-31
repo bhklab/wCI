@@ -175,7 +175,7 @@ void bootOnCuda(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xtie
 
   mem_needed_per_R = (2*(N)+1)*sizeof(double);
 
-  free_mem = free_mem - 10*sizeof(double); // keeping some extra buffer space of 10 doubles for variables allocated in kernels
+  free_mem = free_mem - 50*sizeof(double); // keeping some extra buffer space of 50 doubles for variables allocated in kernels
 
   RperLoop = min(free_mem / mem_needed_per_R, R);
 
@@ -216,7 +216,7 @@ void bootOnCuda(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xtie
     }
 
     // Running one bootstrap instance per thread.  
-    runBootOnDevice<<<(R+(numThreads-1))/numThreads, numThreads>>>(devrcimat, devOutVec, permVector, N, RperLoop);
+    runBootOnDevice<<<(RperLoop+(numThreads-1))/numThreads, numThreads>>>(devrcimat, devOutVec, permVector, N, RperLoop);
     cudaDeviceSynchronize();
 
     error = cudaGetLastError();
