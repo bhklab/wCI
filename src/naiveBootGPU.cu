@@ -156,68 +156,76 @@ void bootOnCuda(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xtie
 
   uint64_t RperLoop, Roffset, loopI;
 
-
-
-  // Need to calculate here to make sure we don't run out of memory while using the GPU. 
-  // Will do the computation in batches over R. 
-
-  gpuErrchk(cudaMemGetInfo(&free_mem, &total_mem));
-
-  mem_needed_per_R = (2*(N)+1)*sizeof(double);
-
-  total_mem = total_mem - (N*N + 10)*sizeof(double) - sizeof(gen); // keeping some extra buffer space of 10 doubles
-
-  RperLoop = min(total_mem / mem_needed_per_R, R);
-
-  printf("R per loop: %lld", RperLoop);
-
-  for(loopI = 0; loopI < (R/RperLoop)+1; loopI++){
-    Roffset = loopI * RperLoop;
-
-  }
-
-  gpuErrchk(cudaMalloc(&devrcimat, N*N*sizeof(double))); 
-  gpuErrchk(cudaMalloc(&devOutVec, R*sizeof(double)));
-
-  gpuErrchk(cudaMalloc(&devRandomNumbers, R*N*sizeof(double)));
-  gpuErrchk(cudaMalloc(&permVector, R*N*sizeof(uint64_t)));
-
-  gpuErrchk(cudaMemcpy(devrcimat, rcimat, N*N*sizeof(double), cudaMemcpyHostToDevice));
-
   gpuErrchkRand(curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT));
 
   cudaDeviceSynchronize();
   gpuErrchkRand(curandSetPseudoRandomGeneratorSeed(gen, *state));
   cudaDeviceSynchronize();
 
+  // Need to calculate here to make sure we don't run out of memory while using the GPU. 
+  // Will do the computation in batches over R. 
+
+  gpuErrchk(cudaMalloc(&devrcimat, N*N*sizeof(double))); 
+  gpuErrchk(cudaMemcpy(devrcimat, rcimat, N*N*sizeof(double), cudaMemcpyHostToDevice));
 
 
-  gpuErrchkRand(curandGenerateUniformDouble(gen, devRandomNumbers, R*N));
-  cudaDeviceSynchronize();
+  gpuErrchk(cudaMemGetInfo(&free_mem, &total_mem));
+
+
+
+  mem_needed_per_R = (2*(N)+1)*sizeof(double);
+
+  free_mem = free_mem - 10*sizeof(double); // keeping some extra buffer space of 10 doubles for variables allocated in kernels
+
+  RperLoop = min(free_mem / mem_needed_per_R, R);
+
+  printf("R per loop: %lld", RperLoop);
+
+  for(loopI = 0; loopI < (R/RperLoop)+1; loopI++){
+
+    Roffset = loopI * RperLoop;
+
+    gpuErrchk(cudaMalloc(&devOutVec, RperLoop*sizeof(double)));
+
+    gpuErrchk(cudaMalloc(&devRandomNumbers, RperLoop*N*sizeof(double)));
+    gpuErrchk(cudaMalloc(&permVector, RperLoop*N*sizeof(uint64_t)));
+
+
+
+
+
+
+    gpuErrchkRand(curandGenerateUniformDouble(gen, devRandomNumbers, RperLoop*N));
+    cudaDeviceSynchronize();
   // Creating permutation indicies from uniform doubles
-  truncate_to_index<<<(R*N+(numThreads-1))/numThreads, numThreads>>>(devRandomNumbers, permVector, N, R*N);
-  cudaDeviceSynchronize();
+    truncate_to_index<<<(RperLoop*N+(numThreads-1))/numThreads, numThreads>>>(devRandomNumbers, permVector, N, RperLoop*N);
+    cudaDeviceSynchronize();
 
-  cudaError_t error = cudaGetLastError();
-  if(error != cudaSuccess) {
-		        // print the CUDA error message and exit
-	printf("CUDA error: %s\n", cudaGetErrorString(error));
-        exit(-1);
+    cudaError_t error = cudaGetLastError();
+    if(error != cudaSuccess) {
+            // print the CUDA error message and exit
+      printf("CUDA error: %s\n", cudaGetErrorString(error));
+      exit(-1);
+    }
+
+    // Running one bootstrap instance per thread.  
+    runBootOnDevice<<<(R+(numThreads-1))/numThreads, numThreads>>>(devrcimat, devOutVec, permVector, N, RperLoop);
+    cudaDeviceSynchronize();
+
+    error = cudaGetLastError();
+    if(error != cudaSuccess) {
+            // print the CUDA error message and exit
+      printf("CUDA error: %s\n", cudaGetErrorString(error));
+      exit(-1);
+    }
+    //Copying back results
+    gpuErrchk(cudaMemcpy(outVec+Roffset, devOutVec, RperLoop*sizeof(double), cudaMemcpyDeviceToHost));
+    cudaDeviceSynchronize();
+
+
   }
 
-  // Running one bootstrap instance per thread.  
-  runBootOnDevice<<<(R+(numThreads-1))/numThreads, numThreads>>>(devrcimat, devOutVec, permVector, N, R);
-  cudaDeviceSynchronize();
-
-  error = cudaGetLastError();
-  if(error != cudaSuccess) {
-		        // print the CUDA error message and exit
-	printf("CUDA error: %s\n", cudaGetErrorString(error));
-	exit(-1);
-  }
-  //Copying back results
-  gpuErrchk(cudaMemcpy(outVec, devOutVec, R*sizeof(double), cudaMemcpyDeviceToHost));
-  cudaDeviceSynchronize();
+  
 
   // Freeing Memory
   gpuErrchk(cudaFree(permVector));
