@@ -228,16 +228,16 @@ void bootOnCuda(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xtie
     //Copying back results
     gpuErrchk(cudaMemcpy(outVec+Roffset, devOutVec, RperLoop*sizeof(double), cudaMemcpyDeviceToHost));
     cudaDeviceSynchronize();
-
-
+    
+    gpuErrchk(cudaFree(permVector));
+    gpuErrchk(cudaFree(devRandomNumbers));
+    gpuErrchk(cudaFree(devOutVec));
   }
 
   
 
   // Freeing Memory
-  gpuErrchk(cudaFree(permVector));
-  gpuErrchk(cudaFree(devRandomNumbers));
-  gpuErrchk(cudaFree(devOutVec));
+  
   gpuErrchk(cudaFree(devrcimat));
   curandDestroyGenerator(gen);
 
