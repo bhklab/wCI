@@ -169,7 +169,7 @@ void bootOnCuda(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xtie
 
   RperLoop = min(total_mem / mem_needed_per_R, R);
 
-  printr("R per loop: %lld, " RperLoop);
+  printf("R per loop: %lld", RperLoop);
 
   for(loopI = 0; loopI < (R/RperLoop)+1; loopI++){
     Roffset = loopI * RperLoop;
