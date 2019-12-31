@@ -96,7 +96,7 @@ void truncate_to_index(double *randomDoubles, uint64_t *randomInt, uint64_t N, u
   if(i >= maxI){
    return;
   }
-  randomInt[i] = (uint64_t)ceil(randomDoubles[i] * N);
+  randomInt[i] = (uint64_t)ceil(randomDoubles[i] * N) - 1;
 
 }
 
@@ -125,7 +125,6 @@ void runBootOnDevice(double *rcimat, double *outVec, uint64_t *permVector, uint6
       for(uint64_t k = 0; k < N; k++){
         if(permIdx[k] >= N){
           printf("Out of bounds permutations");
-          exit(-5);
         }
         curVal = rcimat[permIdx[j]*N + permIdx[k]];
 
@@ -136,7 +135,7 @@ void runBootOnDevice(double *rcimat, double *outVec, uint64_t *permVector, uint6
     }
 
     currCI = (RS_numerator)/(RS_denominator);
-
+    
     outVec[i] = currCI;
 
 }
