@@ -179,12 +179,12 @@ void bootOnCuda(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xtie
 
   RperLoop = min(free_mem / mem_needed_per_R, R);
 
-  printf("R per loop: %lld", RperLoop);
+  printf("R per loop: %lld\n", RperLoop);
 
   for(loopI = 0; loopI < (R/RperLoop)+1; loopI++){
 
     Roffset = loopI * RperLoop;
-
+    printf(" R offset: %lld \n", Roffset);
     gpuErrchk(cudaMalloc(&devOutVec, RperLoop*sizeof(double)));
 
     gpuErrchk(cudaMalloc(&devRandomNumbers, RperLoop*N*sizeof(double)));
