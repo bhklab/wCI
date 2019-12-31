@@ -85,7 +85,7 @@ inline void gpuAssertRand(curandStatus_t code, const char *file, int line, bool 
 //     return EXIT_FAILURE;}} while(0)
 
 
-const int numThreads = 256;
+const int numThreads = 64;
 
 
 // Code to create indicies properly from the uniform random numbers. 
@@ -96,7 +96,7 @@ void truncate_to_index(double *randomDoubles, uint64_t *randomInt, uint64_t N, u
   if(i >= maxI){
    return;
   }
-  randomInt[i] = (uint64_t)ceil(randomDoubles[i] * N);
+  randomInt[i] = (uint64_t)ceil(randomDoubles[i] * N) - 1;
 
 }
 
@@ -116,18 +116,15 @@ void runBootOnDevice(double *rcimat, double *outVec, uint64_t *permVector, uint6
   double currCI;
   double curVal;
   double RS_numerator, RS_denominator;
-
+  RS_numerator = 0;
+  RS_denominator = 0;
   permIdx = permVector + i*N;
-
-
+  
   for(uint64_t j = 0; j < N; j++){
 
       for(uint64_t k = 0; k < N; k++){
-        if(permIdx[k] >= N){
-          printf("Out of bounds permutations");
-          exit(-5);
-        }
         curVal = rcimat[permIdx[j]*N + permIdx[k]];
+	//if(curVal != 0 & curVal != 1 & curVal != 2 & curVal != -2) {printf("Curval = %f, permIdxj = %lld, permIdxk = %lld \n", curVal, permIdx[j], permIdx[k]);};
 
         RS_numerator += (curVal * (double)(curVal > 0));
         RS_denominator += (double)(curVal != 0) * 2;
@@ -136,7 +133,6 @@ void runBootOnDevice(double *rcimat, double *outVec, uint64_t *permVector, uint6
     }
 
     currCI = (RS_numerator)/(RS_denominator);
-
     outVec[i] = currCI;
 
 }
@@ -159,7 +155,6 @@ void bootOnCuda(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xtie
   gpuErrchk(cudaMalloc(&devRandomNumbers, R*N*sizeof(double)));
   gpuErrchk(cudaMalloc(&permVector, R*N*sizeof(uint64_t)));
 
-  printf("%lld", R*N);
   gpuErrchk(cudaMemcpy(devrcimat, rcimat, N*N*sizeof(double), cudaMemcpyHostToDevice));
 
   gpuErrchkRand(curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT));
