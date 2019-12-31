@@ -85,7 +85,7 @@ inline void gpuAssertRand(curandStatus_t code, const char *file, int line, bool 
 //     return EXIT_FAILURE;}} while(0)
 
 
-const int numThreads = 256;
+const int numThreads = 64;
 
 
 // Code to create indicies properly from the uniform random numbers. 
@@ -116,16 +116,13 @@ void runBootOnDevice(double *rcimat, double *outVec, uint64_t *permVector, uint6
   double currCI;
   double curVal;
   double RS_numerator, RS_denominator;
-
+  RS_numerator = 0;
+  RS_denominator = 0;
   permIdx = permVector + i*N;
-
-
+  
   for(uint64_t j = 0; j < N; j++){
 
       for(uint64_t k = 0; k < N; k++){
-        if(permIdx[k] >= N){
-          printf("Out of bounds permutations");
-        }
         curVal = rcimat[permIdx[j]*N + permIdx[k]];
 
         RS_numerator += (curVal * (double)(curVal > 0));
@@ -158,7 +155,6 @@ void bootOnCuda(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xtie
   gpuErrchk(cudaMalloc(&devRandomNumbers, R*N*sizeof(double)));
   gpuErrchk(cudaMalloc(&permVector, R*N*sizeof(uint64_t)));
 
-
   gpuErrchk(cudaMemcpy(devrcimat, rcimat, N*N*sizeof(double), cudaMemcpyHostToDevice));
 
   gpuErrchkRand(curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT));
@@ -177,7 +173,7 @@ void bootOnCuda(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xtie
   if(error != cudaSuccess) {
 		        // print the CUDA error message and exit
 	printf("CUDA error: %s\n", cudaGetErrorString(error));
-	 exit(-1);
+        exit(-1);
   }
 
   // Running one bootstrap instance per thread.  
@@ -188,7 +184,7 @@ void bootOnCuda(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xtie
   if(error != cudaSuccess) {
 		        // print the CUDA error message and exit
 	printf("CUDA error: %s\n", cudaGetErrorString(error));
-	 exit(-1);
+	exit(-1);
   }
   //Copying back results
   gpuErrchk(cudaMemcpy(outVec, devOutVec, R*sizeof(double), cudaMemcpyDeviceToHost));
