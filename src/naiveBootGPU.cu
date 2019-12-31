@@ -190,7 +190,7 @@ void bootOnCuda(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xtie
       RperLoop = R - Roffset;
     }
     if(RperLoop == 0){
-      break
+      break;
     }
 
     gpuErrchk(cudaMalloc(&devOutVec, RperLoop*sizeof(double)));
