@@ -96,23 +96,25 @@ void bootOnCuda(double *rcimat, double *outVec, uint64_t R, uint64_t N, int xtie
 
 
 
-  mem_needed_per_R = (2*(N)+1)*sizeof(double);
+  mem_needed_per_R = (2*(N+1))*sizeof(double);
 
   free_mem = free_mem - 50*sizeof(double); // keeping some extra buffer space of 50 doubles for variables allocated in kernels
 
   RperLoop = min(free_mem / mem_needed_per_R, R);
 
-  printf("R per loop: %lld", RperLoop);
+  //printf("R per loop: %lld\n", RperLoop);
 
   for(loopI = 0; loopI < (R/RperLoop)+1; loopI++){
-
+    //printf(" loopI: %lld", loopI);
+    //printf(" R/RperLoop + 1: %lld", (R/RperLoop)+1);
     Roffset = loopI * RperLoop;
+    //printf(" R offset: %lld \n", Roffset);
 
     if((RperLoop + Roffset) > R){
-      RperLoop = R - Roffset;
+      RperLoop = min(R - Roffset, 0);
     }
     if(RperLoop == 0){
-      break
+      break;
     }
 
     gpuErrchk(cudaMalloc(&devOutVec, RperLoop*sizeof(double)));
