@@ -29,6 +29,9 @@
 #' @param outx {boolean} set to TRUE to not count pairs of predictions that are
 #' tied as a relevant pair. This results in a Goodman-Kruskal gamma type rank
 #' correlation.
+#' @param outy {boolean} set to TRUE to not count pairs of predictions that are
+#' tied as a relevant pair. This results in a Goodman-Kruskal gamma type rank
+#' correlation.
 #' @param alternative {character} What is the alternative hypothesis? Must be
 #' one of "two.sides", "less", and "greater" and defaults to two.sides".
 #' @param logic.operator {character} determines how strict should the test be to
@@ -60,7 +63,7 @@
 #' @export
 #'
 paired.concordance.index.new <- function(predictions, observations, delta.pred=0,
-                                     delta.obs=0, alpha = 0.05, outx=FALSE,
+                                     delta.obs=0, alpha = 0.05, outx=FALSE, outy=FALSE,
                                      alternative = c("two.sided", "less", "greater"),
                                      logic.operator=c("and", "or"),
                                      CPP=TRUE, 
@@ -90,7 +93,7 @@ paired.concordance.index.new <- function(predictions, observations, delta.pred=0
   
     values <- newPCI(pin_x=predictions, pin_y=observations, as.numeric(length(predictions)),
                                                pdeltaX=delta.pred, pdeltaY=delta.obs,
-                                               pxties=ifelse(outx, 0L, 1L), pyties = 0L,
+                                               pxties=ifelse(outx, 0L, 1L), pyties = ifelse(outx, 0L, 1L),
                                                plogic=ifelse(logic.operator == "and", 1L, 0L))
     C <- values[1]
     D <- values[2]
