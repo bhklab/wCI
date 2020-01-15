@@ -33,6 +33,10 @@ rCIBootC <- function(prcimat, pR, pn, pxties, pyties, pseed) {
     .Call('_wCI_rCIBootC', PACKAGE = 'wCI', prcimat, pR, pn, pxties, pyties, pseed)
 }
 
+rCIBootCUDA <- function(prcimat, pR, pn, pxties, pyties, pseed) {
+    .Call('_wCI_rCIBootCUDA', PACKAGE = 'wCI', prcimat, pR, pn, pxties, pyties, pseed)
+}
+
 newPCI <- function(pin_x, pin_y, pn, pxties, pyties, pdeltaX, pdeltaY, plogic) {
     .Call('_wCI_newPCI', PACKAGE = 'wCI', pin_x, pin_y, pn, pxties, pyties, pdeltaX, pdeltaY, plogic)
 }
