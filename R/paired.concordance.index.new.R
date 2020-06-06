@@ -142,7 +142,7 @@ paired.concordance.index.new <- function(predictions, observations, delta.pred=0
                              delta_y = delta.obs, tie.method.x = ifelse(outx, "ignore", "half"), R=boot_num, C=CPP )
     ci.obj <- tryCatch(boot.ci(boot.out, type="bca"),
           error = function(e) {
-            if(e$message == "estimated adjustment 'w' is infinite" || e$message == "Error in if (const(t, min(1e-08, mean(t, na.rm = TRUE)/1e+06))) { : \n  missing value where TRUE/FALSE needed\n"){
+            if(e$message == "estimated adjustment 'w' is infinite" || e$message == "missing value where TRUE/FALSE needed"){
               warning("estimated adjustment 'w' is infinite for some features")
               return(list("t" = NA, bca = rep(NA_real, 5)))
             } else {
