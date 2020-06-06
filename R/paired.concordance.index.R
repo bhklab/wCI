@@ -205,7 +205,15 @@ paired.concordance.index <- function(predictions, observations, delta.pred=0,
  } else if (conf_int_method == "Bootstrap"){
    boot.out <- naiveRCIBoot(x = predictions, y = observations, delta_x = delta.pred, 
                             delta_y = delta.obs, tie.method.x = ifelse(outx, "ignore", "half"), R=boot_num )
-   ci.obj <- boot.ci(boot.out, type="bca")
+   ci.obj <- tryCatch(boot.ci(boot.out, type="bca"),
+          error = function(e) {
+            if(e$message == "estimated adjustment 'w' is infinite" || e$message == "Error in if (const(t, min(1e-08, mean(t, na.rm = TRUE)/1e+06))) { : \n  missing value where TRUE/FALSE needed\n"){
+              warning("estimated adjustment 'w' is infinite for some features")
+              return(list("t" = NA, bca = rep(NA_real, 5)))
+            } else {
+              stop(e)
+            }
+          })
    returnList$lower <- max(ci.obj$bca[4], 0)
    returnList$upper <- min(ci.obj$bca[5], 1)
    returnList$sterr <- sd(boot.out$t[,1])
