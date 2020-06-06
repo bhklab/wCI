@@ -144,7 +144,7 @@ paired.concordance.index.new <- function(predictions, observations, delta.pred=0
           error = function(e) {
             if(e$message == "estimated adjustment 'w' is infinite" || e$message == "missing value where TRUE/FALSE needed"){
               warning("estimated adjustment 'w' is infinite for some features")
-              return(list("t" = NA, bca = rep(NA_real, 5)))
+              return(list("t" = NA, bca = rep(NA_real_, 5)))
             } else {
               stop(e)
             }
