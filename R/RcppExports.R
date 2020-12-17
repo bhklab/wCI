@@ -37,6 +37,10 @@ newPCI <- function(pin_x, pin_y, pn, pxties, pyties, pdeltaX, pdeltaY, plogic) {
     .Call('_wCI_newPCI', PACKAGE = 'wCI', pin_x, pin_y, pn, pxties, pyties, pdeltaX, pdeltaY, plogic)
 }
 
+frCI <- function(pin_x, pin_y, pdelta_x, pdelta_y, pn, pdiscard_x_ties, pdiscard_y_ties) {
+    .Call('_wCI_frCI', PACKAGE = 'wCI', pin_x, pin_y, pdelta_x, pdelta_y, pn, pdiscard_x_ties, pdiscard_y_ties)
+}
+
 KCI <- function(pin_x, pin_y, pn, psymmetric, pkern1, pkern2) {
     .Call('_wCI_KCI', PACKAGE = 'wCI', pin_x, pin_y, pn, psymmetric, pkern1, pkern2)
 }
