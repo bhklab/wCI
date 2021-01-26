@@ -1,7 +1,7 @@
 
 // Fast permutations for rCI using a naive matrix based approach.
 
-
+//TODO: If I decide to finish this file, the vision is to have a deltaX and deltaY value passed in for each permutation
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -149,7 +149,6 @@ void createValidVecDev(float *ValueVec, unsigned int *validVec, float Delta, uin
   }
 }
 
-//TODO: get this to copy memory into shared memory and work together to compute the Yinv and Yvalid vectors
 __global__
 void createYinvKernel(float *devYPerms, unsigned int *devYinvVec, unsigned int *devYvalidVec, 
                       float DeltaY, uint32_t N, uint64_t R, uint32_t *iVec, uint32_t *jVec){
@@ -313,8 +312,8 @@ t <- .Call("permCUDA", as.numeric(1:100), runif(100), 1, 100, 0, 0, runif(1));
 */
 
 
-void permOnCuda(unsigned int *XinvVec, unsigned int *XvalidVec, float *yvec, 
-                float *outVec, uint64_t R, uint32_t N, float DeltaY, uint64_t *state){
+void permOnCuda(float *xvec, float *yvec, float *outVec, uint64_t R, uint32_t N, 
+                float *DeltaX, float *DeltaY, uint64_t *state){
 
 
   float *devYvec, *devOutVec, *devRandomNumbers; 
@@ -470,6 +469,8 @@ void permOnCuda(unsigned int *XinvVec, unsigned int *XvalidVec, float *yvec,
     // gpuErrchk(cudaFree(devYPerms));
     gpuErrchk(cudaFree(devYinvVec));
     gpuErrchk(cudaFree(devYvalidVec));
+    gpuErrchk(cudaFree(devXinvVec));
+    gpuErrchk(cudaFree(devXvalidVec));
 
   }
 
@@ -478,63 +479,14 @@ void permOnCuda(unsigned int *XinvVec, unsigned int *XvalidVec, float *yvec,
   // Freeing Memory
   
   gpuErrchk(cudaFree(devYvec));
-  gpuErrchk(cudaFree(devXinvVec));
-  gpuErrchk(cudaFree(devXvalidVec));
+  gpuErrchk(cudaFree(devXvec));
   gpuErrchk(cudaFree(iVec));
   gpuErrchk(cudaFree(jVec));
 
   curandDestroyGenerator(gen);
 
 }
-__host__
-void createInvVec(double *ValueVec, unsigned int *invVec, uint32_t N){
 
-  uint32_t i = 0;
-  uint32_t j = 0;
-  uint32_t totIndex = 0;
-  uint32_t curInt = 0;
-
-  uint32_t curBit = 0;
-
-  for(i = 0; i < N; i++){
-
-    for(j = 0; j < i; j++){
-
-      curInt = totIndex/(sizeof(unsigned int) * CHAR_BIT);
-      curBit = totIndex%(sizeof(unsigned int) * CHAR_BIT);
-
-      if(ValueVec[j] > ValueVec[i]){
-        invVec[curInt] |= (1 << (((sizeof(unsigned int) * CHAR_BIT) - 1 ) - curBit)); // Sending 1 to appropriate place to signify inverted
-      }
-      totIndex += 1;
-    }
-  }
-}
-
-__host__
-void createValidVec(double *ValueVec, unsigned int *validVec, double Delta, uint32_t N){
-
-  uint32_t i = 0;
-  uint32_t j = 0;
-  uint32_t totIndex = 0;
-  uint32_t curInt = 0;
-
-  uint32_t curBit = 0;
-
-  for(i = 0; i < N; i++){
-
-    for(j = 0; j < i; j++){
-
-      curInt = totIndex/(sizeof(unsigned int) * CHAR_BIT);
-      curBit = totIndex%(sizeof(unsigned int) * CHAR_BIT);
-
-      if(fabsf(ValueVec[j] - ValueVec[i]) >= Delta){
-        validVec[curInt] |= (1 << (((sizeof(unsigned int) * CHAR_BIT) - 1 ) - curBit)); // Sending 1 to appropriate place to signify inverted
-      }
-      totIndex += 1;
-    }
-  }
-}
 
 //https://stackoverflow.com/questions/111928/is-there-a-printf-converter-to-print-in-binary-format
 #define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
@@ -579,8 +531,6 @@ SEXP permCUDA(SEXP pxvec,
   // double obsCI = *REAL(pobsCI);
   double Rdouble = *REAL(pR);  
 
-  double DeltaX = *REAL(pDeltaX);
-  float DeltaY = (float) (*REAL(pDeltaY));
 
   if(Ndouble > (double)pow(2,16)){
     printf("Maximum size of vector exceeded for gpu code");
@@ -598,47 +548,40 @@ SEXP permCUDA(SEXP pxvec,
   uint32_t numIntsNeededX = ((N * N - N)/(2*sizeof(unsigned int)*CHAR_BIT) + 1);
   // I am allocating 2 arrays with 1 bit for each pair in X. One array to hold whether a pair is valid, and one to hold if its inverted. 
   //consider aligning this to 32 bytes for the GPU to be happy? Alhough googling suggests this is not necessary 
-  unsigned int *XinvVec = (unsigned int *)malloc(numIntsNeededX * sizeof(unsigned int)); //Sometimes allocating an extra int, but 32 bits shouldn't 
-  memset(XinvVec, 0, numIntsNeededX * sizeof(unsigned int));
  
-  unsigned int *XvalidVec = (unsigned int *)malloc(numIntsNeededX * sizeof(unsigned int)); //Sometimes allocating an extra int, but 32 bits shouldn't 
-  memset(XvalidVec, 0, numIntsNeededX * sizeof(unsigned int));
-  
 
   SEXP pout = PROTECT(allocVector(REALSXP,R));
   
 
   float *singleY = (float *)malloc(N *sizeof(float));
+  float *singleX = (float *)malloc(N *sizeof(float));
+
   float *singleOut = (float *)malloc(R * sizeof(float));
+  float *sDeltaY = (float *)malloc(R * sizeof(float));
+  float *sDeltaX = (float *)malloc(R * sizeof(float));
 
   convDoubleToSingle(REAL(pyvec), singleY, N);
+  convDoubleToSingle(REAL(pxvec), singleX, N);
+
+  convDoubleToSingle(REAL(pDeltaY), sDeltaY, R);
+  convDoubleToSingle(REAL(pDeltaX), sDeltaX, R);
 
 
   // double *out = REAL(pout);
   
 
-
-  createInvVec(REAL(pxvec), XinvVec,  N);
-  // printf("\nFirst Int of Inversion Vec: "BYTE_TO_BINARY_PATTERN" "BYTE_TO_BINARY_PATTERN" "BYTE_TO_BINARY_PATTERN" "BYTE_TO_BINARY_PATTERN"\n", 
-  //       BYTE_TO_BINARY(XinvVec[0]>>24), BYTE_TO_BINARY(XinvVec[0]>>16), BYTE_TO_BINARY(XinvVec[0]>>8), BYTE_TO_BINARY(XinvVec[0]>>0));
-
-
-  createValidVec(REAL(pxvec), XvalidVec, DeltaX, N);
-  // printf("\nFirst Int of Valid Vec: "BYTE_TO_BINARY_PATTERN" "BYTE_TO_BINARY_PATTERN" "BYTE_TO_BINARY_PATTERN" "BYTE_TO_BINARY_PATTERN"\n", 
-  //       BYTE_TO_BINARY(XvalidVec[0]>>24), BYTE_TO_BINARY(XvalidVec[0]>>16), BYTE_TO_BINARY(XvalidVec[0]>>8), BYTE_TO_BINARY(XvalidVec[0]>>0));
-
-
   // double *rcimat2 = malloc(N * N * sizeof(double));
-  permOnCuda(XinvVec, XvalidVec, singleY, singleOut, R, N, DeltaY, state);
+  permOnCuda(singleX, singleY, singleOut, R, N, sDeltaX, sDeltaY, state);
   // printf("%f\n", out[0]);
   // rciBootWithCopy(REAL(prcimat), rcimat2, REAL(pout), R, N, xties, yties, state);
   convSingleToDouble(singleOut, REAL(pout), R);
 
   // free(rcimat2);
-  free(XinvVec);
-  free(XvalidVec);
+  free(sDeltaY);
+  free(sDeltaX);
 
   free(singleY);
+  free(singleX);
   free(singleOut);
 
   UNPROTECT(1);
