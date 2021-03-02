@@ -5,11 +5,20 @@
 \title{Takes two numerical vectors and computes the concordance index between them
 by comparing the order of values for two pairs of data each time}
 \usage{
-paired.concordance.index.withsim(predictions, observations,
-  delta.pred = 0, delta.obs = 0, alpha = 0.05, outx = FALSE,
+paired.concordance.index.withsim(
+  predictions,
+  observations,
+  delta.pred = 0,
+  delta.obs = 0,
+  alpha = 0.05,
+  outx = FALSE,
   alternative = c("two.sided", "less", "greater"),
-  logic.operator = c("and", "or"), CPP = TRUE, comppairs = 10,
-  simulate.p.value = FALSE, ncores = 2)
+  logic.operator = c("and", "or"),
+  CPP = TRUE,
+  comppairs = 10,
+  simulate.p.value = FALSE,
+  ncores = 2
+)
 }
 \arguments{
 \item{predictions}{{numeric} A vector of predicted drug responces which could

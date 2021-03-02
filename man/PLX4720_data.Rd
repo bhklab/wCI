@@ -4,7 +4,9 @@
 \name{PLX4720_data}
 \alias{PLX4720_data}
 \title{PLX4720 Dataset}
-\format{A dataframe with 534 rows and 2 variables}
+\format{
+A dataframe with 534 rows and 2 variables
+}
 \usage{
 PLX4720_data
 }

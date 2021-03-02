@@ -25,6 +25,14 @@ concordanceIndex_modified_helper_weighted <- function(x, y, deltaX, deltaY, weig
     .Call('_wCI_concordanceIndex_modified_helper_weighted', PACKAGE = 'wCI', x, y, deltaX, deltaY, weightingFun_pred, weightingFun_obs, alpha, outx, alternative, logicOp, max_weight, max_weight_obs)
 }
 
+do_swaps_c <- function(pvector, pvlen, pnswap, pseed) {
+    .Call('_wCI_do_swaps_c', PACKAGE = 'wCI', pvector, pvlen, pnswap, pseed)
+}
+
+do_random_swaps_c <- function(pvector, pvlen, pnswap, pseed) {
+    .Call('_wCI_do_random_swaps_c', PACKAGE = 'wCI', pvector, pvlen, pnswap, pseed)
+}
+
 rCIPermC <- function(pin_x, pin_y, pobsCI, pR, pB, pn, pxties, pyties, palternative, pseed) {
     .Call('_wCI_rCIPermC', PACKAGE = 'wCI', pin_x, pin_y, pobsCI, pR, pB, pn, pxties, pyties, palternative, pseed)
 }

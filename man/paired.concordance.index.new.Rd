@@ -5,13 +5,24 @@
 \title{Takes two numerical vectors and computes the concordance index between them
 by comparing the order of values for two pairs of data each time}
 \usage{
-paired.concordance.index.new(predictions, observations, delta.pred = 0,
-  delta.obs = 0, alpha = 0.05, outx = FALSE,
+paired.concordance.index.new(
+  predictions,
+  observations,
+  delta.pred = 0,
+  delta.obs = 0,
+  alpha = 0.05,
+  outx = FALSE,
+  outy = FALSE,
   alternative = c("two.sided", "less", "greater"),
-  logic.operator = c("and", "or"), CPP = TRUE,
+  logic.operator = c("and", "or"),
+  CPP = TRUE,
   p_method = c("Permutation", "Asymptotic", "SkewNormal"),
-  conf_int_method = c("Bootstrap", "Asymptotic"), num_hypothesis = 1,
-  perm_p_confidence = 0.2, boot_num = 5000, comppairs = 10)
+  conf_int_method = c("Bootstrap", "Asymptotic"),
+  num_hypothesis = 1,
+  perm_p_confidence = 0.2,
+  boot_num = 5000,
+  comppairs = 10
+)
 }
 \arguments{
 \item{predictions}{{numeric} A vector of predicted drug responces which could
@@ -34,6 +45,10 @@ GRAY (85 drugs over ~10-50 cells)}
 \item{alpha}{{numeric} alpha level to compute confidence interval}
 
 \item{outx}{{boolean} set to TRUE to not count pairs of predictions that are
+tied as a relevant pair. This results in a Goodman-Kruskal gamma type rank
+correlation.}
+
+\item{outy}{{boolean} set to TRUE to not count pairs of predictions that are
 tied as a relevant pair. This results in a Goodman-Kruskal gamma type rank
 correlation.}
 

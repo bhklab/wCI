@@ -33,6 +33,6 @@ Depends: R (>= 3.6.0)
 Imports: Rcpp (>= 0.12.12), stats, boot
 LinkingTo: Rcpp
 SystemRequirements: C++11, Rcpp, parallel, doParallel, BiocStyle, dqrng
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1
 VignetteBuilder: knitr
 Suggests: BiocStyle, knitr, rmarkdown, devtools
