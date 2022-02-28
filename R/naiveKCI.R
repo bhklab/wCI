@@ -16,7 +16,8 @@ naiveKCI <- function(x, y,
                       p.method=c(),
                       alpha=0.05, 
                       interval=c("confidence", "prediction"), 
-                      returnAll=c(FALSE, TRUE)){  
+                      returnAll=c(FALSE, TRUE), 
+                      altkmat=FALSE){  
 
   myCompleteCases <- complete.cases(x,y)
   x <- x[myCompleteCases]
