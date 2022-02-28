@@ -2,6 +2,7 @@
 
 export(fwci)
 export(getCIPvals)
+export(naiveKCI)
 export(nullCIDist)
 export(paired.concordance.index)
 export(paired.concordance.index.new)
