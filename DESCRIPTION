@@ -3,11 +3,11 @@ Type: Package
 Title: Modified Concordance Index
 Version: 0.1.0
 Authors@R: c(
-  person("Zhaleh","Safikhani", email = "zhaleh.safikhani@utoronto.ca", 
+  person("Ian","Smith", email = "ianc.smith@mail.utoronto.ca", 
+    role = c("aut")),
+person("Zhaleh","Safikhani", email = "zhaleh.safikhani@utoronto.ca", 
     role = c("aut")),
   person("Wail","Ba-alawi", email = "Wail.ba-alawi@uhnresearch.ca", 
-    role = c("aut")),
-  person("Ian","Smith", email = "ianc.smith@mail.utoronto.ca", 
     role = c("aut")),
   person("Petr","Smirnov", email = "petr.smirnov@uhnresearch.ca", 
     role = c("aut")),
